@@ -22,9 +22,9 @@ client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Models (Dec 2025)
-MODEL_STRATEGY = "claude-3-opus-20240229" 
-MODEL_CODER = "claude-3-5-sonnet-20241022" 
-MODEL_COPY = "gpt-4-turbo"
+MODEL_STRATEGY = "claude-sonnet-4-5-20250929"
+MODEL_CODER = "claude-sonnet-4-5-20250929"
+MODEL_COPY = "gpt-4o"
 
 # Config
 WATCH_DIR = "./clients"

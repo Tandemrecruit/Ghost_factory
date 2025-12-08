@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { Menu, X } from 'lucide-react'
+import { Icon } from '@/lib/icons'
 
 export interface NavLink {
   label: string
@@ -77,9 +77,9 @@ export function NavSimple({
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
+              <Icon name="x" className="h-6 w-6" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Icon name="menu" className="h-6 w-6" />
             )}
           </button>
         </div>
