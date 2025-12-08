@@ -23,8 +23,8 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Models (Dec 2025)
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Opus for strategic briefs (best reasoning)
-MODEL_CODER = "claude-sonnet-4-5-20250929"     # Sonnet for code generation
-MODEL_COPY = "gpt-5.1"
+MODEL_CODER = "claude-sonnet-4-5-20250929"     # Sonnet for code generation (SWE-bench leader)
+MODEL_COPY = "claude-sonnet-4-5-20250929"      # Sonnet for copy (best tone control, no AI clichés)
 
 # Config
 WATCH_DIR = "./clients"
@@ -107,16 +107,16 @@ def run_architect(client_path):
 def run_copywriter(client_path):
     logging.info(f"✍️  Copywriter writing for {os.path.basename(client_path)}...")
     with open(f"{client_path}/brief.md", "r") as f: brief = f.read()
-    
+
     prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
-    
-    res = client_openai.chat.completions.create(
-        model=MODEL_COPY,
-        messages=[{"role": "system", "content": prompt}, {"role": "user", "content": brief}]
+
+    msg = client_anthropic.messages.create(
+        model=MODEL_COPY, max_tokens=4000, system=prompt,
+        messages=[{"role": "user", "content": brief}]
     )
-    
-    with open(f"{client_path}/content.md", "w") as f: f.write(res.choices[0].message.content)
-    
+
+    with open(f"{client_path}/content.md", "w") as f: f.write(msg.content[0].text)
+
     run_builder(client_path)
 
 def run_builder(client_path):
