@@ -40,7 +40,7 @@ def git_pull():
     try:
         # Run git pull and capture output
         result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-        
+
         if "Already up to date" not in result.stdout:
             logging.info("📦 New data downloaded from GitHub.")
             return True
@@ -50,6 +50,29 @@ def git_pull():
     except Exception as e:
         logging.error(f"Git Pull Failed: {e}")
         return False
+
+def run_intake_sanitizer():
+    """Converts any raw intakes (intake-raw.md) to structured intakes (intake.md)."""
+    if not os.path.exists(WATCH_DIR):
+        return
+
+    for client_id in os.listdir(WATCH_DIR):
+        client_path = os.path.join(WATCH_DIR, client_id)
+        raw_intake_path = os.path.join(client_path, "intake-raw.md")
+
+        if os.path.isdir(client_path) and os.path.exists(raw_intake_path):
+            logging.info(f"📝 Sanitizing raw intake for {client_id}...")
+            try:
+                result = subprocess.run(
+                    ["python", "automation/intake_sanitizer.py", raw_intake_path],
+                    capture_output=True, text=True
+                )
+                if result.returncode == 0:
+                    logging.info(f"✅ Sanitized intake for {client_id}")
+                else:
+                    logging.error(f"❌ Sanitizer failed for {client_id}: {result.stderr}")
+            except Exception as e:
+                logging.error(f"❌ Sanitizer error for {client_id}: {e}")
 
 def check_server_status():
     """Verifies that the Next.js dev server is running before QA."""
@@ -215,8 +238,11 @@ if __name__ == "__main__":
     while True:
         # 1. Pull latest data
         has_new_data = git_pull()
-        
-        # 2. Process ALL pending intakes
+
+        # 2. Sanitize any raw intakes (intake-raw.md -> intake.md)
+        run_intake_sanitizer()
+
+        # 3. Process ALL pending intakes
         # (We check regardless of git pull result, just in case manual files were added)
         if os.path.exists(WATCH_DIR):
             for client_id in os.listdir(WATCH_DIR):
