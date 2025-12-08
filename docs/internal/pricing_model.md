@@ -376,3 +376,44 @@ Internal rules:
   - LP-Base minimum, or
   - My minimum viable project fee, just because “the system is fast.”
 - Timeline promises (3–5 business days, 2-day rush) stay stable even if the system gets faster; improvements increase margin, not decrease price.
+
+---
+
+## 11. Launch Configuration: Single Live Offer (Internal Only)
+
+At launch, I will only have ONE public-facing landing page offer.
+
+- Public live offer: LP-Standard
+- Internal-only variants:
+  - LP-Base = quiet “simple discount / stripped scope” tier
+  - LP-Plus = quiet “complex scope / premium” tier
+
+External positioning at launch:
+
+- I sell a single, flat-fee “Done-for-you landing page” offer.
+- Scope (mapped to LP-Standard):
+  - 1 conversion-focused landing page
+  - ~6 sections (Hero, Problem/Solution, Benefits, Social Proof, FAQ/Process, Final CTA)
+  - One primary and one secondary CTA
+  - 1 revision round
+  - Draft delivery in 3–5 business days after intake form submission
+
+Internal rules:
+
+- All early clients go through the LP-Standard offer by default.
+- LP-Base is used quietly when:
+  - Scope is truly simple, or
+  - I want to offer a strategic/pilot discount without collapsing margins.
+- LP-Plus is used quietly when:
+  - The project is clearly more complex (multiple segments, heavier copy, advanced structure),
+  - And I need more budget to keep my hourly sane.
+
+Branding starter packs:
+
+- Branding work is NOT a live public offer at launch.
+- I only consider branding as:
+  - A future Product #2, after landing pages run smoothly,
+  - Or a one-off custom quote for perfect-fit clients.
+
+---
+
