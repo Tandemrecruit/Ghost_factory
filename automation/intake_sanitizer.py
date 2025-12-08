@@ -1,19 +1,24 @@
 import os
 import sys
+import re
+import time
+import logging
 from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load .env so OPENAI_API_KEY is available
+# 1. SETUP
 load_dotenv()
 
-# Use existing OpenAI key
+# Configure logging
+logging.getLogger("SANITIZER").setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - [SANITIZER] - %(message)s')
+
 client = OpenAI()
 
-# Allow override via env, but give a sensible default
-MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano")  # Nano is ideal for simple restructuring
-
+# UPDATED: Using current generation model for Dec 2025
+MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano")
 
 SYSTEM_PROMPT = """
 You are an Intake Sanitizer for a landing-page studio.
@@ -71,84 +76,50 @@ structured Markdown file that follows this exact outline:
 - Special instructions:
 - Anything unclear / missing:
 
-MAPPING RULES (from raw form answers to this schema):
-
-- Use the business name, location, website URL, and “what does your business do?” answers
-  to fill Business Name, Location, Industry, Primary Offer, and a simple Tagline.
-
-- Use the “ONE thing you want visitors to do on this page” to fill:
-  - Main Goal of This Page
-  - Primary CTA (text + behavior)
-
-- Use the CTA details (what the button should do and where it should point) to fill:
-  - Primary CTA Target (phone / URL / email)
-
-- Use the “dream client” description for Ideal Customer.
-
-- Use the “brand as a person” options to fill Brand Voice (3–5 words).
-
-- Use “Why should customers choose YOU?” to fill:
-  - Core Promise (1–2 sentences)
-  - Top 3 Benefits (bullet-ish blurbs)
-
-- Use “Why might a customer hesitate?” to extract Key Objections.
-  For each objection, write a short, SAFE reassurance. Do NOT promise outcomes
-  you are not explicitly given (avoid ROI guarantees, medical claims, etc.).
-
-- Use testimonials / reviews for Social Proof / Testimonials.
-
-- Use logo / colors answers and “websites you love” for:
-  - Logo / Brand Assets
-  - Existing Brand Colors
-  - Competitors / Inspiration URLs
-  - Visual hints (if mentioned) can be folded into Assets & Constraints or Notes.
-
-- Use “red flags / things to avoid” and any legal/disclaimer answers for:
-  - Must-Avoid Topics / Phrases
-  - Legal / Compliance Notes
-
-- Use service area / locations answers for Service Area / Locations.
-
-- Use pricing questions (“show starting price vs range vs contact us”) for Pricing Strategy.
-  If they provide numbers, mention them briefly; if not, keep it general.
-
-- Use timeline / urgency answers for:
-  - Urgency / Time Sensitivity
-  - Project Urgency / Timeline
-
-- Anything else they type in “anything else” or similar open fields goes under:
-  - Notes from Client
-  - Notes about scheduling, hours, availability (if timing-related)
-
 RULES:
-
 - Do NOT invent details. If something is missing, write "Not provided" or "TBD".
 - Be concise. Prefer short sentences and bullet-style lines.
 - Do NOT output any extra explanation, comments, or code fences. Only the final Markdown.
-- Keep the structure and headings exactly as shown above.
 """
-
 
 def sanitize_raw_intake(raw_text: str) -> str:
     """Send raw form answers to the model and return a structured intake.md string."""
-    response = client.chat.completions.create(
-        model=MODEL_SANITIZER,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": (
-                    "Here are the raw answers from a client form. "
-                    "Normalize them into the structured Markdown described above:\n\n"
-                    + raw_text
-                ),
-            },
-        ],
-    )
+    max_retries = 3
+    
+    for attempt in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model=MODEL_SANITIZER,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": (
+                            "Here are the raw answers from a client form. "
+                            "Normalize them into the structured Markdown described above:\n\n"
+                            + raw_text
+                        ),
+                    },
+                ],
+            )
 
-    content = response.choices[0].message.content
-    return content.strip()
+            content = response.choices[0].message.content or ""
+            
+            # Robust Extraction: Remove markdown code fences if present
+            # Matches ```markdown ... ``` or just ``` ... ```
+            match = re.search(r'```(?:markdown)?(.*?)```', content, re.DOTALL)
+            if match:
+                return match.group(1).strip()
+            
+            return content.strip()
 
+        except Exception as e:
+            logging.warning(f"Attempt {attempt + 1}/{max_retries} failed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # Wait 2 seconds before retrying
+            else:
+                logging.error("❌ Max retries reached. API call failed.")
+                raise e
 
 def main():
     if len(sys.argv) != 2:
@@ -157,28 +128,38 @@ def main():
 
     raw_path = Path(sys.argv[1]).resolve()
     if not raw_path.exists():
-        print(f"ERROR: {raw_path} does not exist.")
+        logging.error(f"ERROR: {raw_path} does not exist.")
         sys.exit(1)
 
     client_dir = raw_path.parent
     intake_md_path = client_dir / "intake.md"
     archive_path = client_dir / "intake-source.md"
 
+    # Silent failure check
     with raw_path.open("r", encoding="utf-8") as f:
         raw_text = f.read()
+    
+    if not raw_text.strip():
+        logging.error(f"❌ Input file {raw_path.name} is empty. Skipping.")
+        sys.exit(1)
 
-    print(f"Sanitizing raw intake for client folder: {client_dir.name}...")
-    structured = sanitize_raw_intake(raw_text)
+    logging.info(f"Sanitizing raw intake for client folder: {client_dir.name}...")
+    
+    try:
+        structured = sanitize_raw_intake(raw_text)
 
-    # Write normalized intake.md
-    with intake_md_path.open("w", encoding="utf-8") as f:
-        f.write(structured + "\n")
+        # Write normalized intake.md
+        with intake_md_path.open("w", encoding="utf-8") as f:
+            f.write(structured + "\n")
 
-    # Archive original raw file
-    raw_path.rename(archive_path)
+        # Atomic move for Windows compatibility
+        os.replace(raw_path, archive_path)
 
-    print(f"✅ Wrote {intake_md_path.name} and archived original as {archive_path.name}")
+        logging.info(f"✅ Wrote {intake_md_path.name} and archived original as {archive_path.name}")
 
+    except Exception as e:
+        logging.error(f"❌ Critical failure: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
