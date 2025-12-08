@@ -16,3 +16,12 @@ export { CtaBanner, type CtaBannerProps } from './CtaBanner'
 export { TrustBadges, type TrustBadgesProps, type TrustBadge } from './TrustBadges'
 export { StatsHighlight, type StatsHighlightProps, type Stat } from './StatsHighlight'
 export { GuaranteeBlock, type GuaranteeBlockProps } from './GuaranteeBlock'
+
+// New components
+export { LogoCloud, type LogoCloudProps, type Logo } from './LogoCloud'
+export { PricingTiers, type PricingTiersProps, type PricingTier } from './PricingTiers'
+export { TeamGrid, type TeamGridProps, type TeamMember } from './TeamGrid'
+export { VideoEmbed, type VideoEmbedProps } from './VideoEmbed'
+export { ComparisonTable, type ComparisonTableProps, type ComparisonFeature } from './ComparisonTable'
+export { NewsletterSignup, type NewsletterSignupProps } from './NewsletterSignup'
+export { BentoGrid, type BentoGridProps, type BentoItem } from './BentoGrid'
