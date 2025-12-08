@@ -1,0 +1,18 @@
+// Component exports for easy importing
+// Usage: import { HeroSimple, FeatureGrid } from '@/components'
+
+export { HeroSimple, type HeroSimpleProps } from './HeroSimple'
+export { HeroSplit, type HeroSplitProps } from './HeroSplit'
+export { FeatureGrid, type FeatureGridProps, type FeatureGridItem } from './FeatureGrid'
+export { FeatureSteps, type FeatureStepsProps, type FeatureStep } from './FeatureSteps'
+export { TestimonialCards, type TestimonialCardsProps, type Testimonial } from './TestimonialCards'
+export { FaqAccordion, type FaqAccordionProps, type FaqItem } from './FaqAccordion'
+export { PricingSimple, type PricingSimpleProps } from './PricingSimple'
+export { ContactForm, type ContactFormProps, type FormField } from './ContactForm'
+export { NavSimple, type NavSimpleProps, type NavLink } from './NavSimple'
+export { FooterSimple, type FooterSimpleProps, type FooterLink, type SocialLink } from './FooterSimple'
+export { SectionWrapper, type SectionWrapperProps } from './SectionWrapper'
+export { CtaBanner, type CtaBannerProps } from './CtaBanner'
+export { TrustBadges, type TrustBadgesProps, type TrustBadge } from './TrustBadges'
+export { StatsHighlight, type StatsHighlightProps, type Stat } from './StatsHighlight'
+export { GuaranteeBlock, type GuaranteeBlockProps } from './GuaranteeBlock'
