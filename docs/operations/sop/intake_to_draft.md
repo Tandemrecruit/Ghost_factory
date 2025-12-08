@@ -130,7 +130,7 @@ Expected results after it runs:
 
 When you're at your machine, the command will look like:
 
-    python scripts/intake_sanitizer.py clients/<client_id>/intake-raw.md
+    python automation/intake_sanitizer.py clients/<client_id>/intake-raw.md
 
 After this completes in practice:
 

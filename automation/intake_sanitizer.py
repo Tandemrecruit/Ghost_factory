@@ -12,7 +12,7 @@ load_dotenv()
 client = OpenAI()
 
 # Allow override via env, but give a sensible default
-MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-4.1-mini")
+MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano")  # Nano is ideal for simple restructuring
 
 
 SYSTEM_PROMPT = """
@@ -152,7 +152,7 @@ def sanitize_raw_intake(raw_text: str) -> str:
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python scripts/intake_sanitizer.py path/to/clients/<id>/intake-raw.md")
+        print("Usage: python automation/intake_sanitizer.py path/to/clients/<id>/intake-raw.md")
         sys.exit(1)
 
     raw_path = Path(sys.argv[1]).resolve()

@@ -133,7 +133,7 @@ Some fields can be updated automatically based on files in ./clients.
 
 When you run:
 
-    python scripts\project_tracker_autoupdate.py
+    python automation/project_tracker_autoupdate.py
 
 the script will:
 
