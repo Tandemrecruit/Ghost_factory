@@ -25,6 +25,7 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Opus for strategic briefs (best reasoning)
 MODEL_CODER = "claude-sonnet-4-5-20250929"     # Sonnet for code generation (SWE-bench leader)
 MODEL_COPY = "claude-sonnet-4-5-20250929"      # Sonnet for copy (best tone control, no AI clichés)
+MODEL_QA = "claude-haiku-4-5-20251015"         # Haiku for visual QA (3x cheaper, supports vision)
 
 # Config
 WATCH_DIR = "./clients"
@@ -191,9 +192,9 @@ def run_qa(client_path):
         img_b64 = base64.b64encode(f.read()).decode("utf-8")
         
     msg = client_anthropic.messages.create(
-        model=MODEL_CODER, max_tokens=1000,
+        model=MODEL_QA, max_tokens=1000,
         messages=[{
-            "role": "user", 
+            "role": "user",
             "content": [
                 {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
                 {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
