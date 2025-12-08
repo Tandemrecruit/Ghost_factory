@@ -28,7 +28,7 @@ You are a Senior Design Engineer & Brand Strategist.
 - **Images:** `next/image` is mandatory.
 
 # 4. CODING PROTOCOL ("The Lego Method")
-- **Manifest Adherence:** You MUST check `library/manifest.md` before building pages.
+- **Manifest Adherence:** You MUST check `design-system/manifest.md` before building pages.
 - **Component Selection:** Do not invent new UI patterns if a component exists in the manifest.
 - **Token Usage:** NEVER hardcode hex codes. Use Tailwind variables from the Client Brief (e.g., `bg-primary`, `text-accent`).
 
