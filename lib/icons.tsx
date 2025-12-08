@@ -25,6 +25,16 @@ import {
   Linkedin,
   Instagram,
   Youtube,
+  Building,
+  Globe,
+  TrendingUp,
+  Briefcase,
+  Calendar,
+  Crown,
+  Gift,
+  Sparkles,
+  Quote,
+  Minus,
   type LucideProps,
 } from 'lucide-react'
 
@@ -55,6 +65,16 @@ export type IconName =
   | 'linkedin'
   | 'instagram'
   | 'youtube'
+  | 'building'
+  | 'globe'
+  | 'trending-up'
+  | 'briefcase'
+  | 'calendar'
+  | 'crown'
+  | 'gift'
+  | 'sparkles'
+  | 'quote'
+  | 'minus'
 
 const iconMap: Record<IconName, React.ComponentType<LucideProps>> = {
   zap: Zap,
@@ -83,6 +103,16 @@ const iconMap: Record<IconName, React.ComponentType<LucideProps>> = {
   linkedin: Linkedin,
   instagram: Instagram,
   youtube: Youtube,
+  building: Building,
+  globe: Globe,
+  'trending-up': TrendingUp,
+  briefcase: Briefcase,
+  calendar: Calendar,
+  crown: Crown,
+  gift: Gift,
+  sparkles: Sparkles,
+  quote: Quote,
+  minus: Minus,
 }
 
 interface IconProps extends LucideProps {
