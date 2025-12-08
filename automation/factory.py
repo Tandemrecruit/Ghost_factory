@@ -157,40 +157,67 @@ def ensure_server_running():
         return False
 
 def send_discord_alert(client_name, status, report=None):
-    if not webhook_url: return
+    """Send Discord notification for build status. Fails silently to keep pipeline resilient."""
+    if not webhook_url:
+        logging.warning("⚠️ DISCORD_WEBHOOK_URL not set. Skipping Discord notification.")
+        return
     
-    # Color codes: Green (Success), Red (Failure), Orange (Warning)
-    if status == "SUCCESS":
-        color = 5763719 
-        title = f"🚀 Build Ready: {client_name}"
-        desc = "Build complete. Ready for final approval."
-    elif status == "QA_FAILED":
-        color = 15548997 
-        title = f"⚠️ QA Failed: {client_name}"
-        desc = "Issues found during visual inspection."
-    else: # WARNING
-        color = 16776960
-        title = f"⚠️ Build Warning: {client_name}"
-        desc = "Build finished but QA could not be run."
-    
-    embed = {
-        "title": title,
-        "description": desc,
-        "color": color,
-        "fields": [
-            {"name": "Location", "value": f"`clients/{client_name}/`", "inline": False}
-        ]
-    }
-    
-    if report:
-        # Truncate report for Discord embed limit
-        embed["fields"].append({"name": "Report Details", "value": report[:900] + "..."})
+    try:
+        # Color codes: Green (Success), Red (Failure), Orange (Warning)
+        if status == "SUCCESS":
+            color = 5763719 
+            title = f"🚀 Build Ready: {client_name}"
+            desc = "Build complete. Ready for final approval."
+        elif status == "QA_FAILED":
+            color = 15548997 
+            title = f"⚠️ QA Failed: {client_name}"
+            desc = "Issues found during visual inspection."
+        else: # WARNING
+            color = 16776960
+            title = f"⚠️ Build Warning: {client_name}"
+            desc = "Build finished but QA could not be run."
+        
+        embed = {
+            "title": title,
+            "description": desc,
+            "color": color,
+            "fields": [
+                {"name": "Location", "value": f"`clients/{client_name}/`", "inline": False}
+            ],
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime())
+        }
+        
+        if report:
+            # Truncate report for Discord embed limit (Discord field value limit is 1024 chars)
+            report_text = report[:900] + "..." if len(report) > 900 else report
+            embed["fields"].append({"name": "Report Details", "value": report_text, "inline": False})
 
-    requests.post(webhook_url, json={
-        "username": "Factory Manager", 
-        "content": f"Update for: {client_name}", 
-        "embeds": [embed]
-    })
+        response = requests.post(
+            webhook_url, 
+            json={
+                "username": "Factory Manager", 
+                "content": f"Update for: {client_name}", 
+                "embeds": [embed]
+            },
+            timeout=10
+        )
+        
+        # Check if request was successful
+        if response.status_code == 204:
+            logging.info(f"✅ Discord notification sent for {client_name}")
+        elif response.status_code == 404:
+            logging.error(f"❌ Discord webhook not found (404). Check webhook URL.")
+        elif response.status_code == 401:
+            logging.error(f"❌ Discord webhook unauthorized (401). Check webhook URL.")
+        else:
+            logging.warning(f"⚠️ Discord webhook returned status {response.status_code}: {response.text}")
+            
+    except requests.exceptions.Timeout:
+        logging.warning(f"⚠️ Discord webhook request timed out for {client_name}")
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"⚠️ Discord notification failed for {client_name}: {e}")
+    except Exception as e:
+        logging.warning(f"⚠️ Unexpected error sending Discord notification: {e}")
 
 # 3. WORKER AGENTS
 

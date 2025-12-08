@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Bar,
   BarChart,
+  Cell,
   Line,
   LineChart,
   Pie,
