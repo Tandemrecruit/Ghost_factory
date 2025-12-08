@@ -124,3 +124,23 @@ Let the internal pipeline do its own thing behind the scenes.
 If you want to mirror this in Google Sheets or Excel, use this as the header row:
 
 client_id,business_name,contact_name,contact_email,status,package,hosting,deposit_date,form_sent_date,form_received_date,draft_ready_date,sent_to_client_date,revision_request_date,revision_complete_date,final_payment_date,final_delivery_date,notes
+
+---
+
+## Auto-updated fields (by script)
+
+Some fields can be updated automatically based on files in ./clients.
+
+When you run:
+
+    python scripts\project_tracker_autoupdate.py
+
+the script will:
+
+- Set form_received_date and change status from INTAKE_PENDING to PIPELINE_RUNNING
+  when a raw intake file exists for that client (intake-raw.md or intake-source.md).
+- Set draft_ready_date and change status to DRAFT_REVIEW
+  when intake.md, brief.md, content.md, and qa_report.(md|txt) exist.
+
+All other status changes (SENT_TO_CLIENT, REVISION_IN_PROGRESS, AWAITING_FINAL_PAYMENT, COMPLETE,
+ON_HOLD, CANCELLED) are manual and should only be updated by me.
