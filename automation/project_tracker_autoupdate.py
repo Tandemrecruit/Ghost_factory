@@ -31,6 +31,8 @@ from datetime import date
 from pathlib import Path
 from typing import List, Dict, Tuple
 
+import revenue_tracker
+
 
 def find_table_bounds(lines: List[str]) -> Tuple[int, int] | Tuple[None, None]:
     """
@@ -238,6 +240,14 @@ def main() -> None:
     new_lines = write_table(lines, start, end, header_line, separator_line, rows)
     tracker_path.write_text("".join(new_lines), encoding="utf-8")
     print("[INFO] Updated project_tracker.md with inferred status/date changes.")
+
+    # Generate revenue entries for current month after tracker sync
+    month_str = date.today().strftime("%Y-%m")
+    try:
+        revenue_tracker.generate_revenue_for_month(month_str)
+        print(f"[INFO] Synced revenue entries for {month_str}")
+    except Exception as exc:
+        print(f"[WARN] Revenue sync failed: {exc}")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
 from playwright.sync_api import sync_playwright
+from automation import time_tracker, cost_tracker
 
 # 1. SETUP
 load_dotenv()
@@ -32,6 +33,32 @@ MODEL_QA = "claude-haiku-4-5-20251015"
 WATCH_DIR = "./clients"
 LIBRARY_PATH = "./design-system/manifest.md"
 BATCH_INTERVAL = 3600  # Check every 1 hour
+
+def _extract_usage_tokens(response):
+    """Best-effort extraction of token usage from API responses."""
+    usage = getattr(response, "usage", None)
+    if usage:
+        input_tokens = getattr(usage, "input_tokens", None) or usage.get("input_tokens") if isinstance(usage, dict) else None
+        output_tokens = getattr(usage, "output_tokens", None) or usage.get("output_tokens") if isinstance(usage, dict) else None
+        return input_tokens, output_tokens
+    return None, None
+
+
+def _record_model_cost(provider, model, activity, client_id, response, metadata=None):
+    """Send usage data to cost tracker; ignore errors to keep pipeline resilient."""
+    try:
+        in_tokens, out_tokens = _extract_usage_tokens(response)
+        cost_tracker.record_api_cost(
+            provider=provider,
+            model=model,
+            client_id=client_id,
+            activity=activity,
+            input_tokens=in_tokens,
+            output_tokens=out_tokens,
+            metadata=metadata or {},
+        )
+    except Exception as e:
+        logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
 
 # 2. HELPER FUNCTIONS
 
@@ -168,83 +195,99 @@ def send_discord_alert(client_name, status, report=None):
 # 3. WORKER AGENTS
 
 def run_architect(client_path):
-    logging.info(f"🏗️  Architect analyzing {os.path.basename(client_path)}...")
-    with open(f"{client_path}/intake.md", "r") as f: intake = f.read()
-    
-    prompt = "You are a Senior Strategist. Create a Project Brief from these notes. Sections: Overview, Brand Colors, Sitemap, Layout Strategy."
-    
-    msg = client_anthropic.messages.create(
-        model=MODEL_STRATEGY, max_tokens=2000, system=prompt,
-        messages=[{"role": "user", "content": intake}]
-    )
-    
-    with open(f"{client_path}/brief.md", "w") as f: f.write(msg.content[0].text)
+    client_id = os.path.basename(client_path)
+    logging.info(f"🏗️  Architect analyzing {client_id}...")
+    with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
+        with open(f"{client_path}/intake.md", "r") as f:
+            intake = f.read()
+        
+        prompt = "You are a Senior Strategist. Create a Project Brief from these notes. Sections: Overview, Brand Colors, Sitemap, Layout Strategy."
+        
+        msg = client_anthropic.messages.create(
+            model=MODEL_STRATEGY, max_tokens=2000, system=prompt,
+            messages=[{"role": "user", "content": intake}]
+        )
+        _record_model_cost("anthropic", MODEL_STRATEGY, "pipeline_architect", client_id, msg)
+        
+        with open(f"{client_path}/brief.md", "w") as f:
+            f.write(msg.content[0].text)
     
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
     # This prevents the "Limbo" state if the script crashes later.
-    
     run_copywriter(client_path)
 
 def run_copywriter(client_path):
-    logging.info(f"✍️  Copywriter writing for {os.path.basename(client_path)}...")
-    with open(f"{client_path}/brief.md", "r") as f: brief = f.read()
+    client_id = os.path.basename(client_path)
+    logging.info(f"✍️  Copywriter writing for {client_id}...")
+    with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
+        with open(f"{client_path}/brief.md", "r") as f:
+            brief = f.read()
 
-    prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
+        prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
 
-    msg = client_anthropic.messages.create(
-        model=MODEL_COPY, max_tokens=4000, system=prompt,
-        messages=[{"role": "user", "content": brief}]
-    )
+        msg = client_anthropic.messages.create(
+            model=MODEL_COPY, max_tokens=4000, system=prompt,
+            messages=[{"role": "user", "content": brief}]
+        )
+        _record_model_cost("anthropic", MODEL_COPY, "pipeline_copywriter", client_id, msg)
 
-    with open(f"{client_path}/content.md", "w") as f: f.write(msg.content[0].text)
+        with open(f"{client_path}/content.md", "w") as f:
+            f.write(msg.content[0].text)
 
     run_builder(client_path)
 
 def run_builder(client_path):
-    logging.info(f"🧱 Builder assembling {os.path.basename(client_path)}...")
+    client_id = os.path.basename(client_path)
+    logging.info(f"🧱 Builder assembling {client_id}...")
     
-    with open(f"{client_path}/brief.md", "r") as f: brief = f.read()
-    with open(f"{client_path}/content.md", "r") as f: content = f.read()
-    
-    manifest = ""
-    if os.path.exists(LIBRARY_PATH):
-        with open(LIBRARY_PATH, "r") as f: manifest = f.read()
-    else:
-        logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
-    
-    prompt = f"""
-    You are a React Engineer. 
-    Your goal: Create the `page.tsx` file for a Next.js landing page.
-    
-    1. Read the Content and Brief.
-    2. Select components ONLY from the Library Manifest below.
-    3. Map the content into the component props.
-    4. Output ONLY the code for `page.tsx` inside a code block.
-    
-    MANIFEST:
-    {manifest}
-    """
-    
-    msg = client_anthropic.messages.create(
-        model=MODEL_CODER, max_tokens=4000, system=prompt,
-        messages=[{"role": "user", "content": f"Brief: {brief}\n\nContent: {content}"}]
-    )
-    
-    raw_response = msg.content[0].text
-    
-    # Robust Code Extraction (Fix #2)
-    # Looks for ```tsx or ```typescript or just ``` and captures content inside
-    match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
-    if match:
-        code = match.group(1).strip()
-    else:
-        logging.warning("⚠️ No code blocks found in Builder response. Using raw output (might fail).")
-        code = raw_response
-    
-    target_file = f"./app/clients/{os.path.basename(client_path)}/page.tsx"
-    os.makedirs(os.path.dirname(target_file), exist_ok=True)
-    
-    with open(target_file, "w") as f: f.write(code)
+    with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
+        with open(f"{client_path}/brief.md", "r") as f:
+            brief = f.read()
+        with open(f"{client_path}/content.md", "r") as f:
+            content = f.read()
+        
+        manifest = ""
+        if os.path.exists(LIBRARY_PATH):
+            with open(LIBRARY_PATH, "r") as f:
+                manifest = f.read()
+        else:
+            logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
+        
+        prompt = f"""
+        You are a React Engineer. 
+        Your goal: Create the `page.tsx` file for a Next.js landing page.
+        
+        1. Read the Content and Brief.
+        2. Select components ONLY from the Library Manifest below.
+        3. Map the content into the component props.
+        4. Output ONLY the code for `page.tsx` inside a code block.
+        
+        MANIFEST:
+        {manifest}
+        """
+        
+        msg = client_anthropic.messages.create(
+            model=MODEL_CODER, max_tokens=4000, system=prompt,
+            messages=[{"role": "user", "content": f"Brief: {brief}\n\nContent: {content}"}]
+        )
+        _record_model_cost("anthropic", MODEL_CODER, "pipeline_builder", client_id, msg)
+        
+        raw_response = msg.content[0].text
+        
+        # Robust Code Extraction (Fix #2)
+        # Looks for ```tsx or ```typescript or just ``` and captures content inside
+        match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
+        if match:
+            code = match.group(1).strip()
+        else:
+            logging.warning("⚠️ No code blocks found in Builder response. Using raw output (might fail).")
+            code = raw_response
+        
+        target_file = f"./app/clients/{client_id}/page.tsx"
+        os.makedirs(os.path.dirname(target_file), exist_ok=True)
+        
+        with open(target_file, "w") as f:
+            f.write(code)
     
     logging.info("✅ Build Complete.")
     run_qa(client_path)
@@ -260,43 +303,45 @@ def run_qa(client_path):
         send_discord_alert(client_id, "WARNING", "QA Skipped - Server Down")
         # We proceed to commit anyway so the code is saved, but we warn the user
     else:
-        logging.info("🕵️‍♂️ QA Inspector starting...")
-        url = f"http://localhost:3000/clients/{client_id}"
-        screenshot_path = f"{client_path}/qa_mobile.jpg"
-        
-        try:
-            with sync_playwright() as p:
-                browser = p.chromium.launch()
-                page = browser.new_page(viewport={"width": 390, "height": 844})
-                page.goto(url)
-                page.wait_for_timeout(3000) # Wait for hydration
-                page.screenshot(path=screenshot_path, full_page=True)
-                browser.close()
+        with time_tracker.track_span("pipeline_qa", client_id, {"stage": "qa"}):
+            logging.info("🕵️‍♂️ QA Inspector starting...")
+            url = f"http://localhost:3000/clients/{client_id}"
+            screenshot_path = f"{client_path}/qa_mobile.jpg"
+            
+            try:
+                with sync_playwright() as p:
+                    browser = p.chromium.launch()
+                    page = browser.new_page(viewport={"width": 390, "height": 844})
+                    page.goto(url)
+                    page.wait_for_timeout(3000) # Wait for hydration
+                    page.screenshot(path=screenshot_path, full_page=True)
+                    browser.close()
 
-            # Analyze with Vision Model
-            with open(screenshot_path, "rb") as f:
-                img_b64 = base64.b64encode(f.read()).decode("utf-8")
+                # Analyze with Vision Model
+                with open(screenshot_path, "rb") as f:
+                    img_b64 = base64.b64encode(f.read()).decode("utf-8")
+                    
+                msg = client_anthropic.messages.create(
+                    model=MODEL_QA, max_tokens=1000,
+                    messages=[{
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                            {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
+                        ]
+                    }]
+                )
+                _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
                 
-            msg = client_anthropic.messages.create(
-                model=MODEL_QA, max_tokens=1000,
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
-                        {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
-                    ]
-                }]
-            )
-            
-            report = msg.content[0].text
-            with open(f"{client_path}/qa_report.md", "w") as f: f.write(report)
-            
-            status = "SUCCESS" if "PASS" in report else "QA_FAILED"
-            send_discord_alert(client_id, status, report)
+                report = msg.content[0].text
+                with open(f"{client_path}/qa_report.md", "w") as f: f.write(report)
+                
+                status = "SUCCESS" if "PASS" in report else "QA_FAILED"
+                send_discord_alert(client_id, status, report)
 
-        except Exception as e:
-            logging.error(f"❌ Visual QA Error: {e}")
-            send_discord_alert(client_id, "WARNING", f"QA Crashed: {str(e)}")
+            except Exception as e:
+                logging.error(f"❌ Visual QA Error: {e}")
+                send_discord_alert(client_id, "WARNING", f"QA Crashed: {str(e)}")
 
     # Finalization Steps (Fix #1 & #3)
     # 1. Commit and Push everything to Git

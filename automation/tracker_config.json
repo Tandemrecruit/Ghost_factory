@@ -1,0 +1,54 @@
+{
+  "baseline_minutes": {
+    "pipeline_architect": 120,
+    "pipeline_copywriter": 180,
+    "pipeline_builder": 240,
+    "pipeline_qa": 60
+  },
+  "api_pricing": {
+    "anthropic/claude-opus-4-5-20251101": {
+      "input_per_million": 15.0,
+      "output_per_million": 75.0
+    },
+    "anthropic/claude-sonnet-4-5-20250929": {
+      "input_per_million": 3.0,
+      "output_per_million": 15.0
+    },
+    "anthropic/claude-haiku-4-5-20251015": {
+      "input_per_million": 0.25,
+      "output_per_million": 1.25
+    },
+    "openai/gpt-4": {
+      "input_per_million": 10.0,
+      "output_per_million": 30.0
+    }
+  },
+  "token_estimates": {
+    "pipeline_architect": {
+      "input": 4000,
+      "output": 1200
+    },
+    "pipeline_copywriter": {
+      "input": 5000,
+      "output": 3200
+    },
+    "pipeline_builder": {
+      "input": 6000,
+      "output": 4000
+    },
+    "pipeline_qa": {
+      "input": 2000,
+      "output": 400
+    }
+  },
+  "hosting": {
+    "cost_per_managed_client": 5.0,
+    "fee_per_managed_client": 25.0
+  },
+  "payment_processing_rate": 0.03,
+  "activity_tracking": {
+    "inactivity_seconds": 300,
+    "minimum_session_seconds": 60
+  }
+}
+
