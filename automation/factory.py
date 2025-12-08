@@ -4,6 +4,7 @@ import logging
 import requests
 import subprocess
 import base64
+import re
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
@@ -22,10 +23,10 @@ client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Models (Dec 2025)
-MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Opus for strategic briefs (best reasoning)
-MODEL_CODER = "claude-sonnet-4-5-20250929"     # Sonnet for code generation (SWE-bench leader)
-MODEL_COPY = "claude-sonnet-4-5-20250929"      # Sonnet for copy (best tone control, no AI clichés)
-MODEL_QA = "claude-haiku-4-5-20251015"         # Haiku for visual QA (3x cheaper, supports vision)
+MODEL_STRATEGY = "claude-opus-4-5-20251101"    
+MODEL_CODER = "claude-sonnet-4-5-20250929"     
+MODEL_COPY = "claude-sonnet-4-5-20250929"      
+MODEL_QA = "claude-haiku-4-5-20251015"         
 
 # Config
 WATCH_DIR = "./clients"
@@ -38,9 +39,7 @@ def git_pull():
     """Checks for new intake forms from GitHub."""
     logging.info("⬇️  Checking GitHub for new intakes...")
     try:
-        # Run git pull and capture output
         result = subprocess.run(["git", "pull"], capture_output=True, text=True)
-
         if "Already up to date" not in result.stdout:
             logging.info("📦 New data downloaded from GitHub.")
             return True
@@ -50,6 +49,25 @@ def git_pull():
     except Exception as e:
         logging.error(f"Git Pull Failed: {e}")
         return False
+
+def git_commit_and_push(client_id):
+    """Commits and pushes generated code to the repository."""
+    logging.info(f"💾 Committing changes for {client_id}...")
+    try:
+        # Stage all changes (new pages, tracking files, processed intakes)
+        subprocess.run(["git", "add", "."], check=True, capture_output=True)
+        
+        # Commit
+        commit_msg = f"feat: Auto-generated landing page for {client_id}"
+        subprocess.run(["git", "commit", "-m", commit_msg], check=True, capture_output=True)
+        
+        # Push
+        subprocess.run(["git", "push"], check=True, capture_output=True)
+        logging.info("✅ Git push successful.")
+    except subprocess.CalledProcessError as e:
+        # Don't crash the loop if git fails, just log it
+        error_msg = e.stderr.decode() if e.stderr else str(e)
+        logging.error(f"❌ Git commit/push failed: {error_msg}")
 
 def run_intake_sanitizer():
     """Converts any raw intakes (intake-raw.md) to structured intakes (intake.md)."""
@@ -75,22 +93,62 @@ def run_intake_sanitizer():
                 logging.error(f"❌ Sanitizer error for {client_id}: {e}")
 
 def check_server_status():
-    """Verifies that the Next.js dev server is running before QA."""
+    """Simple check if localhost:3000 is reachable."""
     try:
-        requests.get("http://localhost:3000")
+        requests.get("http://localhost:3000", timeout=2)
         return True
-    except requests.exceptions.ConnectionError:
+    except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+        return False
+
+def ensure_server_running():
+    """Ensures dev server is up. Attempts to start it if down."""
+    if check_server_status():
+        return True
+        
+    logging.warning("⚠️ localhost:3000 is down. Attempting to start dev server...")
+    try:
+        # Start npm run dev in the background
+        # Note: This process will die if the script exits, which is usually fine for a worker
+        subprocess.Popen(
+            ["npm", "run", "dev"], 
+            stdout=subprocess.DEVNULL, 
+            stderr=subprocess.DEVNULL,
+            shell=True if os.name == 'nt' else False
+        )
+        
+        # Wait up to 15 seconds for it to boot
+        for _ in range(15):
+            time.sleep(1)
+            if check_server_status():
+                logging.info("✅ Server started successfully.")
+                return True
+                
+        logging.error("❌ Failed to start server within timeout.")
+        return False
+    except Exception as e:
+        logging.error(f"❌ Error starting server: {e}")
         return False
 
 def send_discord_alert(client_name, status, report=None):
     if not webhook_url: return
     
-    color = 5763719 if status == "SUCCESS" else 15548997 # Green or Red
-    description = "Build complete. Ready for final approval." if status == "SUCCESS" else "Issues found during QA."
+    # Color codes: Green (Success), Red (Failure), Orange (Warning)
+    if status == "SUCCESS":
+        color = 5763719 
+        title = f"🚀 Build Ready: {client_name}"
+        desc = "Build complete. Ready for final approval."
+    elif status == "QA_FAILED":
+        color = 15548997 
+        title = f"⚠️ QA Failed: {client_name}"
+        desc = "Issues found during visual inspection."
+    else: # WARNING
+        color = 16776960
+        title = f"⚠️ Build Warning: {client_name}"
+        desc = "Build finished but QA could not be run."
     
     embed = {
-        "title": f"🚀 Build Ready: {client_name}" if status == "SUCCESS" else f"⚠️ QA Failed: {client_name}",
-        "description": description,
+        "title": title,
+        "description": desc,
         "color": color,
         "fields": [
             {"name": "Location", "value": f"`clients/{client_name}/`", "inline": False}
@@ -99,12 +157,11 @@ def send_discord_alert(client_name, status, report=None):
     
     if report:
         # Truncate report for Discord embed limit
-        embed["fields"].append({"name": "QA Report", "value": report[:900] + "..."})
+        embed["fields"].append({"name": "Report Details", "value": report[:900] + "..."})
 
-    # 'content' ensures it shows up on Lock Screen
     requests.post(webhook_url, json={
         "username": "Factory Manager", 
-        "content": f"🚀 Ready for Build: {client_name}", 
+        "content": f"Update for: {client_name}", 
         "embeds": [embed]
     })
 
@@ -123,8 +180,8 @@ def run_architect(client_path):
     
     with open(f"{client_path}/brief.md", "w") as f: f.write(msg.content[0].text)
     
-    # Mark intake as processed so we don't loop it again
-    os.rename(f"{client_path}/intake.md", f"{client_path}/intake-processed.md")
+    # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
+    # This prevents the "Limbo" state if the script crashes later.
     
     run_copywriter(client_path)
 
@@ -149,7 +206,6 @@ def run_builder(client_path):
     with open(f"{client_path}/brief.md", "r") as f: brief = f.read()
     with open(f"{client_path}/content.md", "r") as f: content = f.read()
     
-    # Check if Library Manifest exists, otherwise warn
     manifest = ""
     if os.path.exists(LIBRARY_PATH):
         with open(LIBRARY_PATH, "r") as f: manifest = f.read()
@@ -163,7 +219,7 @@ def run_builder(client_path):
     1. Read the Content and Brief.
     2. Select components ONLY from the Library Manifest below.
     3. Map the content into the component props.
-    4. Output ONLY the code for `page.tsx`.
+    4. Output ONLY the code for `page.tsx` inside a code block.
     
     MANIFEST:
     {manifest}
@@ -174,12 +230,17 @@ def run_builder(client_path):
         messages=[{"role": "user", "content": f"Brief: {brief}\n\nContent: {content}"}]
     )
     
-    code = msg.content[0].text
+    raw_response = msg.content[0].text
     
-    # Simple cleaner for markdown code blocks
-    code = code.replace("```tsx", "").replace("```typescript", "").replace("```", "")
+    # Robust Code Extraction (Fix #2)
+    # Looks for ```tsx or ```typescript or just ``` and captures content inside
+    match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
+    if match:
+        code = match.group(1).strip()
+    else:
+        logging.warning("⚠️ No code blocks found in Builder response. Using raw output (might fail).")
+        code = raw_response
     
-    # Output file location
     target_file = f"./app/clients/{os.path.basename(client_path)}/page.tsx"
     os.makedirs(os.path.dirname(target_file), exist_ok=True)
     
@@ -191,66 +252,91 @@ def run_builder(client_path):
 def run_qa(client_path):
     client_id = os.path.basename(client_path)
     
-    # Safety Check: Is Server Running?
-    if not check_server_status():
-        logging.warning("⚠️  localhost:3000 is down. Skipping Visual QA.")
-        send_discord_alert(client_id, "SUCCESS", "QA Skipped (Server Down). Code is ready for review.")
-        return
-
-    logging.info("🕵️‍♂️ QA Inspector starting...")
-    url = f"http://localhost:3000/clients/{client_id}"
-    screenshot_path = f"{client_path}/qa_mobile.jpg"
+    # Server Check with Auto-Start (Fix #4)
+    server_ready = ensure_server_running()
     
-    # 1. Capture
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": 390, "height": 844})
-        page.goto(url)
-        page.wait_for_timeout(2000) # Wait for hydration
-        page.screenshot(path=screenshot_path, full_page=True)
-        browser.close()
-
-    # 2. Analyze
-    with open(screenshot_path, "rb") as f:
-        img_b64 = base64.b64encode(f.read()).decode("utf-8")
+    if not server_ready:
+        logging.error("❌ Server unavailable. QA Failed.")
+        send_discord_alert(client_id, "WARNING", "QA Skipped - Server Down")
+        # We proceed to commit anyway so the code is saved, but we warn the user
+    else:
+        logging.info("🕵️‍♂️ QA Inspector starting...")
+        url = f"http://localhost:3000/clients/{client_id}"
+        screenshot_path = f"{client_path}/qa_mobile.jpg"
         
-    msg = client_anthropic.messages.create(
-        model=MODEL_QA, max_tokens=1000,
-        messages=[{
-            "role": "user",
-            "content": [
-                {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
-                {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
-            ]
-        }]
-    )
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch()
+                page = browser.new_page(viewport={"width": 390, "height": 844})
+                page.goto(url)
+                page.wait_for_timeout(3000) # Wait for hydration
+                page.screenshot(path=screenshot_path, full_page=True)
+                browser.close()
+
+            # Analyze with Vision Model
+            with open(screenshot_path, "rb") as f:
+                img_b64 = base64.b64encode(f.read()).decode("utf-8")
+                
+            msg = client_anthropic.messages.create(
+                model=MODEL_QA, max_tokens=1000,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                        {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
+                    ]
+                }]
+            )
+            
+            report = msg.content[0].text
+            with open(f"{client_path}/qa_report.md", "w") as f: f.write(report)
+            
+            status = "SUCCESS" if "PASS" in report else "QA_FAILED"
+            send_discord_alert(client_id, status, report)
+
+        except Exception as e:
+            logging.error(f"❌ Visual QA Error: {e}")
+            send_discord_alert(client_id, "WARNING", f"QA Crashed: {str(e)}")
+
+    # Finalization Steps (Fix #1 & #3)
+    # 1. Commit and Push everything to Git
+    git_commit_and_push(client_id)
     
-    report = msg.content[0].text
-    with open(f"{client_path}/qa_report.md", "w") as f: f.write(report)
-    
-    status = "SUCCESS" if "PASS" in report else "REVIEW"
-    send_discord_alert(client_id, status, report)
+    # 2. Mark as processed ONLY after everything is done/saved
+    logging.info(f"🏁 Finalizing job for {client_id}...")
+    try:
+        os.rename(f"{client_path}/intake.md", f"{client_path}/intake-processed.md")
+    except OSError as e:
+        logging.error(f"⚠️ Failed to rename intake.md: {e}")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
-    print("\n🏭  FACTORY V2 ONLINE: Batch Mode (1 Hour Interval)  🏭")
+    print("\n🏭  FACTORY V2.1 ONLINE: Robust Mode  🏭")
     
-    while True:
-        # 1. Pull latest data
-        has_new_data = git_pull()
+    # Ensure environment is ready (Fix #5)
+    logging.info("🎭 Checking Playwright browsers...")
+    try:
+        subprocess.run(["playwright", "install", "chromium"], check=True, capture_output=True)
+        logging.info("✅ Browsers ready.")
+    except Exception as e:
+        logging.error(f"❌ Playwright install failed: {e}")
+        logging.warning("Visual QA may fail.")
 
-        # 2. Sanitize any raw intakes (intake-raw.md -> intake.md)
+    while True:
+        has_new_data = git_pull()
         run_intake_sanitizer()
 
-        # 3. Process ALL pending intakes
-        # (We check regardless of git pull result, just in case manual files were added)
         if os.path.exists(WATCH_DIR):
             for client_id in os.listdir(WATCH_DIR):
                 path = os.path.join(WATCH_DIR, client_id)
                 # Look for unprocessed intake files
                 if os.path.isdir(path) and os.path.exists(f"{path}/intake.md"):
                     logging.info(f"🚀 Found pending job: {client_id}")
-                    run_architect(path)
+                    try:
+                        run_architect(path)
+                    except Exception as e:
+                        logging.error(f"❌ Pipeline crashed for {client_id}: {e}")
+                        # Since we didn't rename intake.md, it will be retried next loop
 
         logging.info(f"💤 Batch complete. Sleeping for {BATCH_INTERVAL/60} minutes...")
         time.sleep(BATCH_INTERVAL)
