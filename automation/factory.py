@@ -22,8 +22,8 @@ client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Models (Dec 2025)
-MODEL_STRATEGY = "claude-sonnet-4-5-20250929"
-MODEL_CODER = "claude-sonnet-4-5-20250929"
+MODEL_STRATEGY = "claude-haiku-4-5-20251001"  # Haiku for briefs (cost-effective)
+MODEL_CODER = "claude-sonnet-4-5-20250929"    # Sonnet for code generation
 MODEL_COPY = "gpt-5.1"
 
 # Config
