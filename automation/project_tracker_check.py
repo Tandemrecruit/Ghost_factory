@@ -5,7 +5,7 @@ Helper script to keep your project tracker in sync with the actual clients on di
 
 What it does:
 - Scans the ./clients/ directory for client folders
-- Parses docs/project_tracker.md for client_ids in the table
+- Parses docs/operations/project_tracker.md for client_ids in the table
 - Warns if:
   - There are client folders with no matching tracker row
   - There are tracker rows with no matching client folder
@@ -13,9 +13,9 @@ What it does:
   - Has intake.md?
   - Has qa_report.md?
 
-Usage (from repo root, PowerShell on Windows):
+Usage (from repo root):
 
-    python scripts\project_tracker_check.py
+    python automation/project_tracker_check.py
 """
 
 import sys
@@ -82,7 +82,7 @@ def inspect_client_folder(client_dir: Path) -> dict:
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
-    tracker_path = repo_root / "docs" / "project_tracker.md"
+    tracker_path = repo_root / "docs" / "operations" / "project_tracker.md"
     clients_dir = repo_root / "clients"
 
     print(f"[INFO] Repo root: {repo_root}")
@@ -115,7 +115,7 @@ def main() -> None:
         print("[WARN] Client folders with NO matching tracker row:")
         for cid in sorted(missing_in_tracker):
             print(f"  - {cid}")
-        print("      → Add these client_ids to docs/project_tracker.md\n")
+        print("      → Add these client_ids to docs/operations/project_tracker.md\n")
 
     if missing_on_disk:
         print("[WARN] Tracker rows with NO matching client folder on disk:")

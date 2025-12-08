@@ -17,10 +17,10 @@ Rules:
 
 Usage (from repo root):
 
-    python scripts/project_tracker_autoupdate.py
+    python automation/project_tracker_autoupdate.py
 
 Note:
-- This script REWRITES docs/project_tracker.md.
+- This script REWRITES docs/operations/project_tracker.md.
 - Commit your changes before running if you want easy rollback.
 """
 
@@ -200,7 +200,7 @@ def auto_update_row(row: Dict[str, str], clients_dir: Path, today_str: str) -> b
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
-    tracker_path = repo_root / "docs" / "project_tracker.md"
+    tracker_path = repo_root / "docs" / "operations" / "project_tracker.md"
     clients_dir = repo_root / "clients"
 
     print(f"[INFO] Repo root: {repo_root}")

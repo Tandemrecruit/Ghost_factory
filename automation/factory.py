@@ -28,7 +28,7 @@ MODEL_COPY = "gpt-4-turbo"
 
 # Config
 WATCH_DIR = "./clients"
-LIBRARY_PATH = "./library/manifest.md"
+LIBRARY_PATH = "./design-system/manifest.md"
 BATCH_INTERVAL = 3600  # Check every 1 hour
 
 # 2. HELPER FUNCTIONS
