@@ -225,7 +225,7 @@ def run_architect(client_path):
     client_id = os.path.basename(client_path)
     logging.info(f"🏗️  Architect analyzing {client_id}...")
     with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
-        with open(f"{client_path}/intake.md", "r") as f:
+        with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
             intake = f.read()
         
         prompt = "You are a Senior Strategist. Create a Project Brief from these notes. Sections: Overview, Brand Colors, Sitemap, Layout Strategy."
@@ -236,7 +236,7 @@ def run_architect(client_path):
         )
         _record_model_cost("anthropic", MODEL_STRATEGY, "pipeline_architect", client_id, msg)
         
-        with open(f"{client_path}/brief.md", "w") as f:
+        with open(f"{client_path}/brief.md", "w", encoding="utf-8") as f:
             f.write(msg.content[0].text)
     
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
@@ -247,7 +247,7 @@ def run_copywriter(client_path):
     client_id = os.path.basename(client_path)
     logging.info(f"✍️  Copywriter writing for {client_id}...")
     with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
-        with open(f"{client_path}/brief.md", "r") as f:
+        with open(f"{client_path}/brief.md", "r", encoding="utf-8") as f:
             brief = f.read()
 
         prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
@@ -258,7 +258,7 @@ def run_copywriter(client_path):
         )
         _record_model_cost("anthropic", MODEL_COPY, "pipeline_copywriter", client_id, msg)
 
-        with open(f"{client_path}/content.md", "w") as f:
+        with open(f"{client_path}/content.md", "w", encoding="utf-8") as f:
             f.write(msg.content[0].text)
 
     run_builder(client_path)
@@ -268,14 +268,14 @@ def run_builder(client_path):
     logging.info(f"🧱 Builder assembling {client_id}...")
     
     with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
-        with open(f"{client_path}/brief.md", "r") as f:
+        with open(f"{client_path}/brief.md", "r", encoding="utf-8") as f:
             brief = f.read()
-        with open(f"{client_path}/content.md", "r") as f:
+        with open(f"{client_path}/content.md", "r", encoding="utf-8") as f:
             content = f.read()
         
         manifest = ""
         if os.path.exists(LIBRARY_PATH):
-            with open(LIBRARY_PATH, "r") as f:
+            with open(LIBRARY_PATH, "r", encoding="utf-8") as f:
                 manifest = f.read()
         else:
             logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
@@ -313,7 +313,7 @@ def run_builder(client_path):
         target_file = f"./app/clients/{client_id}/page.tsx"
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
         
-        with open(target_file, "w") as f:
+        with open(target_file, "w", encoding="utf-8") as f:
             f.write(code)
     
     logging.info("✅ Build Complete.")
@@ -361,7 +361,7 @@ def run_qa(client_path):
                 _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
                 
                 report = msg.content[0].text
-                with open(f"{client_path}/qa_report.md", "w") as f: f.write(report)
+                with open(f"{client_path}/qa_report.md", "w", encoding="utf-8") as f: f.write(report)
                 
                 status = "SUCCESS" if "PASS" in report else "QA_FAILED"
                 send_discord_alert(client_id, status, report)

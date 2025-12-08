@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2025-12-08T22:23:24.822348",
+    "activity": "pipeline_architect",
+    "client_id": "ember-roasters",
+    "duration_seconds": 0.01,
+    "time_saved_seconds": 7199.99,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-08T22:24:51.394817",
+    "activity": "pipeline_architect",
+    "client_id": "ember-roasters",
+    "duration_seconds": 28.15,
+    "time_saved_seconds": 7171.85,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-08T22:26:05.094298",
+    "activity": "pipeline_copywriter",
+    "client_id": "ember-roasters",
+    "duration_seconds": 73.7,
+    "time_saved_seconds": 10726.3,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-08T22:27:00.588506",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "duration_seconds": 55.48,
+    "time_saved_seconds": 14344.52,
+    "metadata": {
+      "stage": "builder"
+    }
+  },
+  {
+    "timestamp": "2025-12-08T22:27:12.793244",
+    "activity": "pipeline_qa",
+    "client_id": "ember-roasters",
+    "duration_seconds": 9.12,
+    "time_saved_seconds": 3590.88,
+    "metadata": {
+      "stage": "qa"
+    }
+  }
+]
