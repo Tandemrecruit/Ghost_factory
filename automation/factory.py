@@ -24,7 +24,7 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 # Models (Dec 2025)
 MODEL_STRATEGY = "claude-sonnet-4-5-20250929"
 MODEL_CODER = "claude-sonnet-4-5-20250929"
-MODEL_COPY = "gpt-4o"
+MODEL_COPY = "gpt-5.1"
 
 # Config
 WATCH_DIR = "./clients"

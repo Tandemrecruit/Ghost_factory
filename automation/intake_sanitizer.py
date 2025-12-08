@@ -12,7 +12,7 @@ load_dotenv()
 client = OpenAI()
 
 # Allow override via env, but give a sensible default
-MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-4o-mini")
+MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-mini")
 
 
 SYSTEM_PROMPT = """
