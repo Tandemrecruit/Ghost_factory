@@ -88,7 +88,7 @@ Public pricing (to decide later):
 - Likely a single clear number (or “starting at” number), e.g. something like:
   - 4xx–5xx USD for the full landing page.
 - Exact numbers and copy will be set when I write the sales page,
-  using this file and pricing_model_internal.md as the source of truth.
+  using this file and docs/internal/pricing_model.md as the source of truth.
 
 ---
 
@@ -131,7 +131,7 @@ At launch:
 Details and exact numbers are controlled by:
 
 - docs/hosting_policy.md
-- docs/pricing_model_internal.md
+- docs/internal/pricing_model.md
 
 ---
 

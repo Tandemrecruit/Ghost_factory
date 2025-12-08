@@ -15,9 +15,9 @@ Rules:
    - If intake.md, brief.md, content.md, and qa_report.(md|txt) all exist
    => Set draft_ready_date = today (if empty), status = DRAFT_REVIEW
 
-Usage (from repo root, PowerShell on Windows):
+Usage (from repo root):
 
-    python scripts\project_tracker_autoupdate.py
+    python scripts/project_tracker_autoupdate.py
 
 Note:
 - This script REWRITES docs/project_tracker.md.

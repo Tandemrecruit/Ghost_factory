@@ -128,9 +128,9 @@ Expected results after it runs:
 - intake-source.md exists (archived original).
 - intake.md exists (clean structured intake used by Ghost_factory).
 
-When you’re at your machine, the command will look like:
+When you're at your machine, the command will look like:
 
-    python scripts\intake_sanitizer.py clients\<client_id>\intake-raw.md
+    python scripts/intake_sanitizer.py clients/<client_id>/intake-raw.md
 
 After this completes in practice:
 
