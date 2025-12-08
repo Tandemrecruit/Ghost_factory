@@ -13,7 +13,7 @@ Use these high-level statuses:
 
 - `LEAD` – Interested but not booked (no payment)
 - `INTAKE_PENDING` – Deposit paid, form link sent, waiting on client to submit the form
-- `PIPELINE_RUNNING` – Form submitted and accepted; automation is doing its work (intake → brief → copy → build → QA)
+- `PIPELINE_RUNNING` – Form submitted and accepted; automation is doing its work (intake → sanitize → architect → copy → build → QA)
 - `DRAFT_REVIEW` – Automation is done; draft is ready for **your** review before the client sees it
 - `SENT_TO_CLIENT` – Draft link sent to client, waiting on feedback
 - `REVISION_IN_PROGRESS` – You’re implementing the included revision round
@@ -123,5 +123,4 @@ Let the internal pipeline do its own thing behind the scenes.
 
 If you want to mirror this in Google Sheets or Excel, use this as the header row:
 
-```text
 client_id,business_name,contact_name,contact_email,status,package,hosting,deposit_date,form_sent_date,form_received_date,draft_ready_date,sent_to_client_date,revision_request_date,revision_complete_date,final_payment_date,final_delivery_date,notes
