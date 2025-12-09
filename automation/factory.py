@@ -6,12 +6,15 @@ import subprocess
 import base64
 import re
 import json
+import tempfile
+from typing import Tuple, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
 from playwright.sync_api import sync_playwright
 from automation import time_tracker, cost_tracker
+from automation import memory
 
 # 1. SETUP
 load_dotenv()
@@ -107,8 +110,14 @@ REQUIRED_PROMPTS = [
     "strategy/webinar.md",
     "critique/strategy_critic.md",
     "critique/copy_critic.md",
+    "critique/a11y_critic.md",
     "design/palette_generator.md",
 ]
+
+# Max retries for self-correcting loops
+MAX_SYNTAX_RETRIES = 3
+MAX_VISUAL_REPAIR_RETRIES = 3
+MAX_A11Y_RETRIES = 3
 
 
 def validate_prompt_library():
@@ -348,15 +357,106 @@ def send_discord_alert(client_name, status, report=None):
     except Exception as e:
         logging.warning(f"⚠️ Unexpected error sending Discord notification: {e}")
 
+
+def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, str]:
+    """
+    Validate TypeScript/TSX code syntax by running the TypeScript compiler.
+
+    Saves the code to a temporary file and runs `npx tsc --noEmit --skipLibCheck --jsx preserve`.
+    This catches syntax errors, type errors, and import issues before the code is saved.
+
+    Parameters:
+        code_string: The TypeScript/TSX code to validate
+        client_id: Client identifier for logging purposes
+
+    Returns:
+        Tuple[bool, str]: (success, error_log)
+        - success: True if code compiles without errors
+        - error_log: Empty string on success, or the compiler error output on failure
+    """
+    if not code_string or not code_string.strip():
+        return (False, "Empty code string provided")
+
+    temp_file = None
+    try:
+        # Create a temporary .tsx file
+        with tempfile.NamedTemporaryFile(
+            mode='w',
+            suffix='.tsx',
+            delete=False,
+            encoding='utf-8'
+        ) as temp_file:
+            temp_file.write(code_string)
+            temp_path = temp_file.name
+
+        # Run TypeScript compiler in check-only mode
+        result = subprocess.run(
+            [
+                "npx", "tsc",
+                "--noEmit",           # Don't emit output files
+                "--skipLibCheck",     # Skip type checking of declaration files
+                "--jsx", "preserve",  # Preserve JSX for Next.js
+                "--esModuleInterop",  # Enable ES module interop
+                "--moduleResolution", "node",
+                "--target", "ES2020",
+                "--module", "ESNext",
+                temp_path
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=os.getcwd()
+        )
+
+        if result.returncode == 0:
+            logging.info(f"✅ Syntax check passed for {client_id}")
+            return (True, "")
+        else:
+            # Combine stdout and stderr for full error output
+            error_output = result.stderr or result.stdout or "Unknown compilation error"
+            # Clean up the temp file path from error messages for cleaner logs
+            error_output = error_output.replace(temp_path, "page.tsx")
+            logging.warning(f"⚠️ Syntax check failed for {client_id}: {error_output[:200]}...")
+            return (False, error_output)
+
+    except subprocess.TimeoutExpired:
+        error_msg = "TypeScript compilation timed out (30s limit)"
+        logging.error(f"❌ {error_msg} for {client_id}")
+        return (False, error_msg)
+
+    except FileNotFoundError:
+        error_msg = "npx/tsc not found. Ensure Node.js and TypeScript are installed."
+        logging.error(f"❌ {error_msg}")
+        return (False, error_msg)
+
+    except Exception as e:
+        error_msg = f"Syntax check error: {str(e)}"
+        logging.error(f"❌ {error_msg} for {client_id}")
+        return (False, error_msg)
+
+    finally:
+        # Clean up temp file
+        if temp_file and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception:
+                pass
+
+
 # 3. WORKER AGENTS
 
 def run_visual_designer(client_path):
     """
-    Generate a theme JSON file for a client from their intake content and save it as theme.json in the client's directory.
-    
+    Generate a theme JSON file for a client with accessibility (a11y) critique loop.
+
+    This function now implements a self-correcting loop:
+    1. Generate initial theme from intake
+    2. Run a11y critic to check color contrast
+    3. If a11y fails, feed feedback back to designer and retry (up to MAX_A11Y_RETRIES)
+
     Parameters:
         client_path (str): Filesystem path of the client directory; must contain an intake.md file.
-    
+
     Returns:
         dict: Theme data written to theme.json (colors, fonts, and styling values) if generation or fallback succeeded.
         None: If intake.md is missing or the designer failed to produce usable output.
@@ -374,37 +474,10 @@ def run_visual_designer(client_path):
         with open(intake_path, "r", encoding="utf-8") as f:
             intake = f.read()
 
-        # Load the palette generator prompt
+        # Load prompts
         designer_prompt = _load_prompt("design/palette_generator.md")
+        a11y_critic_prompt = _load_prompt("critique/a11y_critic.md")
 
-        # Generate theme
-        msg = client_anthropic.messages.create(
-            model=MODEL_COPY,  # Use Sonnet for design decisions
-            max_tokens=500,
-            system=designer_prompt,
-            messages=[{"role": "user", "content": intake}]
-        )
-        _record_model_cost("anthropic", MODEL_COPY, "pipeline_visual_designer", client_id, msg)
-
-        theme_content = _extract_response_text(msg)
-        if not theme_content:
-            logging.error(f"❌ Visual Designer returned empty response for {client_id}")
-            return None
-
-        # Extract JSON from response (may be wrapped in markdown code block)
-        # Use specific json language tag to avoid matching other code blocks
-        json_match = re.search(r'```json\s*([\s\S]*?)\s*```', theme_content)
-        if json_match:
-            theme_json_str = json_match.group(1).strip()
-        else:
-            # Fallback: try generic code block or raw response
-            generic_match = re.search(r'```\s*([\s\S]*?)\s*```', theme_content)
-            if generic_match:
-                theme_json_str = generic_match.group(1).strip()
-            else:
-                theme_json_str = theme_content.strip()
-
-        # Validate JSON and ensure it's a dict (model could return list or scalar)
         default_theme = {
             "primary": "#3B82F6",
             "secondary": "#1E40AF",
@@ -415,15 +488,121 @@ def run_visual_designer(client_path):
             "border_radius": "0.5rem",
             "source": "generated"
         }
-        try:
-            theme_data = json.loads(theme_json_str)
-            if not isinstance(theme_data, dict):
-                logging.warning("⚠️ Visual Designer returned non-dict JSON (%s), using default", type(theme_data).__name__)
-                theme_data = default_theme
-        except json.JSONDecodeError:
-            logging.exception("❌ Visual Designer returned invalid JSON")
+
+        # A11y Critique Loop
+        theme_data = None
+        previous_feedback = None
+        attempt = 0
+
+        while attempt < MAX_A11Y_RETRIES:
+            attempt += 1
+            logging.info(f"🎨 Visual Designer attempt {attempt}/{MAX_A11Y_RETRIES}...")
+
+            # Build user content with feedback if available
+            if previous_feedback:
+                user_content = f"""## Original Client Intake
+{intake}
+
+## Previous Theme Feedback (Accessibility Issues)
+The previous theme was rejected by our accessibility checker. Please address these issues:
+{previous_feedback}
+
+Generate an improved theme.json with better color contrast."""
+            else:
+                user_content = intake
+
+            # Generate theme
+            msg = client_anthropic.messages.create(
+                model=MODEL_COPY,
+                max_tokens=500,
+                system=designer_prompt,
+                messages=[{"role": "user", "content": user_content}]
+            )
+            _record_model_cost("anthropic", MODEL_COPY, "pipeline_visual_designer", client_id, msg, {"attempt": attempt})
+
+            theme_content = _extract_response_text(msg)
+            if not theme_content:
+                logging.error(f"❌ Visual Designer returned empty response on attempt {attempt}")
+                if attempt >= MAX_A11Y_RETRIES:
+                    theme_data = default_theme
+                    break
+                continue
+
+            # Extract JSON from response
+            json_match = re.search(r'```json\s*([\s\S]*?)\s*```', theme_content)
+            if json_match:
+                theme_json_str = json_match.group(1).strip()
+            else:
+                generic_match = re.search(r'```\s*([\s\S]*?)\s*```', theme_content)
+                if generic_match:
+                    theme_json_str = generic_match.group(1).strip()
+                else:
+                    theme_json_str = theme_content.strip()
+
+            # Validate JSON
+            try:
+                theme_data = json.loads(theme_json_str)
+                if not isinstance(theme_data, dict):
+                    logging.warning("⚠️ Visual Designer returned non-dict JSON (%s), using default", type(theme_data).__name__)
+                    theme_data = default_theme
+            except json.JSONDecodeError:
+                logging.exception("❌ Visual Designer returned invalid JSON on attempt %d", attempt)
+                if attempt >= MAX_A11Y_RETRIES:
+                    theme_data = default_theme
+                    break
+                continue
+
+            # A11y Critic Review
+            logging.info(f"🔍 A11y Critic reviewing theme (attempt {attempt})...")
+
+            a11y_input = f"""## Theme to Review
+```json
+{json.dumps(theme_data, indent=2)}
+```
+
+Please evaluate the accessibility of this color palette."""
+
+            a11y_msg = client_anthropic.messages.create(
+                model=MODEL_CRITIC,
+                max_tokens=500,
+                system=a11y_critic_prompt,
+                messages=[{"role": "user", "content": a11y_input}]
+            )
+            _record_model_cost("anthropic", MODEL_CRITIC, "pipeline_visual_designer_a11y", client_id, a11y_msg, {"attempt": attempt})
+
+            a11y_response_text = _extract_response_text(a11y_msg)
+            if not a11y_response_text:
+                logging.warning(f"⚠️ A11y Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                break
+
+            a11y_response = a11y_response_text.strip()
+
+            # Decision - PASS or FAIL
+            if a11y_response.startswith("FAIL"):
+                logging.warning(f"⚠️ A11y Critic rejected theme on attempt {attempt}")
+                previous_feedback = a11y_response
+
+                # Record to memory for learning
+                memory.record_failure(
+                    category="a11y",
+                    issue=f"Theme failed accessibility check: {a11y_response[:200]}",
+                    fix="Regenerated theme with improved contrast",
+                    metadata={"client_id": client_id, "attempt": attempt}
+                )
+
+                if attempt >= MAX_A11Y_RETRIES:
+                    logging.error(f"❌ Max a11y retries ({MAX_A11Y_RETRIES}) reached. Using last generated theme.")
+                    break
+            elif a11y_response.startswith("PASS"):
+                logging.info(f"✅ A11y Critic approved theme on attempt {attempt}")
+                break
+            else:
+                logging.warning("⚠️ A11y Critic response unclear (no PASS/FAIL). Proceeding with theme.")
+                break
+
+        # Ensure we have a valid theme
+        if not theme_data:
             theme_data = default_theme
-            logging.warning("⚠️ Using default theme for %s", client_id)
 
         # Save theme.json
         theme_path = os.path.join(client_path, "theme.json")
@@ -734,17 +913,24 @@ Please evaluate this content against the intake and brief."""
 
 def run_builder(client_path):
     """
-    Generate a Next.js page component for a client and write it to the repository, then invoke QA.
-    
-    Reads the client's brief and content, optionally incorporates a local library manifest and a design theme (theme.json), sends a generation request to the coder model, extracts the resulting TypeScript React code, writes it to ./app/clients/{client_id}/page.tsx, records model cost, and then triggers the QA pipeline.
-    
+    Generate a Next.js page with self-correcting Generate->Validate->Repair loop.
+
+    This function implements a multi-phase engineering cycle:
+    1. Load memory (learned rules) and golden references into prompt
+    2. Phase 1 (Syntax): Generate code -> check_syntax -> retry with error log if fail
+    3. Phase 2 (Visual): If syntax passes -> save file -> run_qa
+    4. Phase 3 (Repair): If QA fails -> record to memory -> feed screenshot + report -> retry
+    5. Phase 4 (Commit): When QA passes (or max retries hit), finalize
+
     Parameters:
-        client_path (str): Path to the client directory (contains brief.md, content.md, and optionally theme.json). The function derives the client ID from the basename of this path.
+        client_path (str): Path to the client directory (contains brief.md, content.md,
+                          and optionally theme.json). Client ID is derived from basename.
     """
     client_id = os.path.basename(client_path)
-    logging.info(f"🧱 Builder assembling {client_id}...")
+    logging.info(f"🧱 Builder assembling {client_id} (Self-Correcting Mode)...")
 
     with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
+        # Load inputs
         with open(os.path.join(client_path, "brief.md"), "r", encoding="utf-8") as f:
             brief = f.read()
         with open(os.path.join(client_path, "content.md"), "r", encoding="utf-8") as f:
@@ -757,7 +943,7 @@ def run_builder(client_path):
         else:
             logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
 
-        # Load theme.json if it exists (generated by Visual Designer)
+        # Load theme.json if it exists
         theme_section = ""
         theme_path = os.path.join(client_path, "theme.json")
         if os.path.exists(theme_path):
@@ -765,130 +951,307 @@ def run_builder(client_path):
                 with open(theme_path, "r", encoding="utf-8") as f:
                     theme_data = json.load(f)
                 theme_section = f"""
-        DESIGN THEME:
-        Apply these colors, fonts, and styles using Tailwind CSS classes:
-        {json.dumps(theme_data, indent=2)}
+DESIGN THEME:
+Apply these colors, fonts, and styles using Tailwind CSS classes:
+{json.dumps(theme_data, indent=2)}
 
-        - Use the "primary" color for main CTAs and headings
-        - Use the "secondary" color for secondary elements
-        - Use the "accent" color for highlights and hover states
-        - Apply the "background" setting to the page background
-        - Use "font_heading" for h1, h2, h3 elements
-        - Use "font_body" for paragraph text
-        - Apply "border_radius" to buttons and cards
-        """
+- Use the "primary" color for main CTAs and headings
+- Use the "secondary" color for secondary elements
+- Use the "accent" color for highlights and hover states
+- Apply the "background" setting to the page background
+- Use "font_heading" for h1, h2, h3 elements
+- Use "font_body" for paragraph text
+- Apply "border_radius" to buttons and cards
+"""
                 logging.info(f"✅ Loaded theme.json for {client_id}")
             except (json.JSONDecodeError, IOError) as e:
                 logging.warning(f"⚠️ Failed to load theme.json: {e}")
-        else:
-            logging.info(f"[i] No theme.json found for {client_id}, using default styles")
 
-        prompt = f"""
-        You are a React Engineer.
-        Your goal: Create the `page.tsx` file for a Next.js landing page.
+        # Load memory (evolutionary learning) and golden references
+        memory_prompt = memory.get_memory_prompt()
+        golden_reference = memory.get_golden_reference_prompt()
 
-        1. Read the Content and Brief.
-        2. Select components ONLY from the Library Manifest below.
-        3. Map the content into the component props.
-        4. Apply the design theme colors and fonts using Tailwind CSS.
-        5. Output ONLY the code for `page.tsx` inside a code block.
+        # Build base system prompt
+        base_prompt = f"""You are a React Engineer building production-quality Next.js landing pages.
 
-        MANIFEST:
-        {manifest}
-        {theme_section}
-        """
-        
-        msg = client_anthropic.messages.create(
-            model=MODEL_CODER, max_tokens=4000, system=prompt,
-            messages=[{"role": "user", "content": f"Brief: {brief}\n\nContent: {content}"}]
-        )
-        _record_model_cost("anthropic", MODEL_CODER, "pipeline_builder", client_id, msg)
-        
-        raw_response = msg.content[0].text
-        
-        # Robust Code Extraction (Fix #2)
-        # Looks for ```tsx or ```typescript or just ``` and captures content inside
-        match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
-        if match:
-            code = match.group(1).strip()
-        else:
-            logging.warning("⚠️ No code blocks found in Builder response. Using raw output (might fail).")
-            code = raw_response
-        
+{memory_prompt}
+{golden_reference}
+
+Your goal: Create the `page.tsx` file for a Next.js landing page.
+
+RULES:
+1. Read the Content and Brief carefully.
+2. Select components ONLY from the Library Manifest below.
+3. Map the content into the component props accurately.
+4. Apply the design theme colors and fonts using Tailwind CSS.
+5. Ensure ALL imports are correct and components exist.
+6. Output ONLY the code for `page.tsx` inside a ```tsx code block.
+7. Do NOT use placeholder text like [Your text here] - use actual content from the brief.
+
+MANIFEST:
+{manifest}
+
+{theme_section}
+"""
+
         target_file = f"./app/clients/{client_id}/page.tsx"
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
-        
-        with open(target_file, "w", encoding="utf-8") as f:
-            f.write(code)
-    
-    logging.info("✅ Build Complete.")
-    run_qa(client_path)
 
-def run_qa(client_path):
-    client_id = os.path.basename(client_path)
-    
-    # Server Check with Auto-Start (Fix #4)
-    server_ready = ensure_server_running()
-    
-    if not server_ready:
-        logging.error("❌ Server unavailable. QA Failed.")
-        send_discord_alert(client_id, "WARNING", "QA Skipped - Server Down")
-        # We proceed to commit anyway so the code is saved, but we warn the user
-    else:
-        with time_tracker.track_span("pipeline_qa", client_id, {"stage": "qa"}):
-            logging.info("🕵️‍♂️ QA Inspector starting...")
-            url = f"http://localhost:3000/clients/{client_id}"
-            screenshot_path = f"{client_path}/qa_mobile.jpg"
-            
-            try:
-                with sync_playwright() as p:
-                    browser = p.chromium.launch()
-                    page = browser.new_page(viewport={"width": 390, "height": 844})
-                    page.goto(url)
-                    page.wait_for_timeout(3000) # Wait for hydration
-                    page.screenshot(path=screenshot_path, full_page=True)
-                    browser.close()
+        # Main Engineering Cycle
+        code = None
+        final_qa_status = "SKIPPED"
+        final_qa_report = "Build did not complete"
+        syntax_feedback = None
+        visual_feedback = None
+        screenshot_path = None
+        total_attempts = 0
+        max_total_attempts = MAX_SYNTAX_RETRIES + MAX_VISUAL_REPAIR_RETRIES
 
-                # Analyze with Vision Model
-                with open(screenshot_path, "rb") as f:
-                    img_b64 = base64.b64encode(f.read()).decode("utf-8")
-                    
-                msg = client_anthropic.messages.create(
-                    model=MODEL_QA, max_tokens=1000,
-                    messages=[{
-                        "role": "user",
-                        "content": [
-                            {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
-                            {"type": "text", "text": "Review this UI. Return 'PASS' if good. If bad, list high severity issues."}
-                        ]
-                    }]
+        while total_attempts < max_total_attempts:
+            total_attempts += 1
+            logging.info(f"🔄 Builder cycle {total_attempts}/{max_total_attempts}...")
+
+            # Build user message with any feedback
+            user_content = f"Brief: {brief}\n\nContent: {content}"
+
+            if syntax_feedback:
+                user_content += f"""
+
+## SYNTAX ERROR FROM PREVIOUS ATTEMPT
+The previous code had TypeScript compilation errors. Please fix these issues:
+```
+{syntax_feedback}
+```
+Generate corrected code that compiles without errors."""
+
+            if visual_feedback and screenshot_path:
+                user_content += f"""
+
+## VISUAL QA FEEDBACK FROM PREVIOUS ATTEMPT
+The previous code rendered but had visual issues detected by our QA system:
+{visual_feedback}
+
+Please fix the visual issues while maintaining correct syntax."""
+
+            # Generate code
+            msg = client_anthropic.messages.create(
+                model=MODEL_CODER,
+                max_tokens=4000,
+                system=base_prompt,
+                messages=[{"role": "user", "content": user_content}]
+            )
+            _record_model_cost(
+                "anthropic", MODEL_CODER, "pipeline_builder",
+                client_id, msg, {"attempt": total_attempts, "has_syntax_feedback": bool(syntax_feedback), "has_visual_feedback": bool(visual_feedback)}
+            )
+
+            raw_response = msg.content[0].text
+
+            # Extract code from response
+            match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
+            if match:
+                code = match.group(1).strip()
+            else:
+                logging.warning("⚠️ No code blocks found in Builder response. Using raw output.")
+                code = raw_response
+
+            # Phase 1: Syntax Check
+            logging.info(f"🔍 Phase 1: Syntax validation (attempt {total_attempts})...")
+            syntax_ok, syntax_error = check_syntax(code, client_id)
+
+            if not syntax_ok:
+                logging.warning(f"⚠️ Syntax check failed on attempt {total_attempts}")
+                syntax_feedback = syntax_error
+
+                # Record to memory
+                memory.record_failure(
+                    category="syntax",
+                    issue=f"TypeScript compilation failed: {syntax_error[:300]}",
+                    fix="Will retry with error feedback",
+                    metadata={"client_id": client_id, "attempt": total_attempts}
                 )
-                _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
-                
-                report = msg.content[0].text
-                with open(f"{client_path}/qa_report.md", "w", encoding="utf-8") as f: f.write(report)
-                
-                status = "SUCCESS" if "PASS" in report else "QA_FAILED"
-                send_discord_alert(client_id, status, report)
 
-            except Exception as e:
-                logging.error(f"❌ Visual QA Error: {e}")
-                send_discord_alert(client_id, "WARNING", f"QA Crashed: {str(e)}")
+                # Clear visual feedback since we haven't gotten there yet
+                visual_feedback = None
+                continue  # Retry with syntax feedback
 
-    # Finalization Steps (Fix #1 & #3)
-    # 1. Commit and Push everything to Git
+            # Syntax passed - clear syntax feedback
+            syntax_feedback = None
+            logging.info(f"✅ Syntax check passed on attempt {total_attempts}")
+
+            # Phase 2: Save and run Visual QA
+            logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
+
+            # Save the code
+            with open(target_file, "w", encoding="utf-8") as f:
+                f.write(code)
+
+            # Run QA
+            qa_status, qa_report, screenshot_path = run_qa(client_path)
+
+            # Phase 3: Check QA results
+            if qa_status == "PASS":
+                logging.info(f"✅ Visual QA passed on attempt {total_attempts}")
+                final_qa_status = qa_status
+                final_qa_report = qa_report
+                break  # Success! Exit the loop
+
+            elif qa_status == "FAIL":
+                logging.warning(f"⚠️ Visual QA failed on attempt {total_attempts}")
+                visual_feedback = qa_report
+
+                # Record to memory
+                memory.record_failure(
+                    category="visual",
+                    issue=f"Visual QA failed: {qa_report[:300]}",
+                    fix="Will retry with visual feedback",
+                    metadata={"client_id": client_id, "attempt": total_attempts}
+                )
+
+                # If we have screenshot, we could inject it (for future vision-based repair)
+                # For now, we just use the text report
+                final_qa_status = qa_status
+                final_qa_report = qa_report
+                continue  # Retry with visual feedback
+
+            else:
+                # ERROR or SKIPPED - can't repair, use what we have
+                logging.warning(f"⚠️ QA returned {qa_status} - cannot repair, using current code")
+                final_qa_status = qa_status
+                final_qa_report = qa_report
+                break
+
+        # Phase 4: Finalization
+        logging.info(f"🏁 Builder completed after {total_attempts} attempts. Final status: {final_qa_status}")
+
+        # Compile rules periodically (after learning from this session)
+        if total_attempts > 1:
+            memory.compile_and_save_rules()
+
+    # Finalize the client (notifications, git, mark processed)
+    finalize_client(client_path, final_qa_status, final_qa_report)
+
+def run_qa(client_path) -> Tuple[str, str, str]:
+    """
+    Run visual QA on a generated page and return the results.
+
+    This function now returns values instead of handling finalization,
+    enabling the Builder to use QA results in a repair loop.
+
+    Parameters:
+        client_path (str): Path to the client directory
+
+    Returns:
+        Tuple[str, str, str]: (status, report_text, screenshot_path)
+        - status: "PASS", "FAIL", "ERROR", or "SKIPPED"
+        - report_text: The QA report content or error message
+        - screenshot_path: Path to the screenshot file (may not exist on error)
+    """
+    client_id = os.path.basename(client_path)
+    screenshot_path = os.path.join(client_path, "qa_mobile.jpg")
+
+    # Server Check with Auto-Start
+    server_ready = ensure_server_running()
+
+    if not server_ready:
+        logging.error("❌ Server unavailable. QA Skipped.")
+        return ("SKIPPED", "Server unavailable - QA could not run", screenshot_path)
+
+    with time_tracker.track_span("pipeline_qa", client_id, {"stage": "qa"}):
+        logging.info("🕵️‍♂️ QA Inspector starting...")
+        url = f"http://localhost:3000/clients/{client_id}"
+
+        try:
+            # Capture screenshot
+            with sync_playwright() as p:
+                browser = p.chromium.launch()
+                page = browser.new_page(viewport={"width": 390, "height": 844})
+                page.goto(url)
+                page.wait_for_timeout(3000)  # Wait for hydration
+                page.screenshot(path=screenshot_path, full_page=True)
+                browser.close()
+
+            # Analyze with Vision Model
+            with open(screenshot_path, "rb") as f:
+                img_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+            msg = client_anthropic.messages.create(
+                model=MODEL_QA, max_tokens=1000,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                        {"type": "text", "text": """Review this mobile UI screenshot. Evaluate:
+1. Visual completeness (no broken layouts, missing sections)
+2. Text readability (no overlapping, truncated text)
+3. Button/CTA visibility
+4. Overall professional appearance
+
+Return 'PASS' if the page looks good and functional.
+If there are issues, return 'FAIL: [list specific visual problems]'."""}
+                    ]
+                }]
+            )
+            _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
+
+            report = msg.content[0].text
+            with open(os.path.join(client_path, "qa_report.md"), "w", encoding="utf-8") as f:
+                f.write(report)
+
+            # Determine status from report
+            if "PASS" in report and not report.strip().startswith("FAIL"):
+                status = "PASS"
+                logging.info(f"✅ QA passed for {client_id}")
+            else:
+                status = "FAIL"
+                logging.warning(f"⚠️ QA failed for {client_id}")
+
+            return (status, report, screenshot_path)
+
+        except Exception as e:
+            error_msg = f"Visual QA Error: {str(e)}"
+            logging.error(f"❌ {error_msg}")
+            return ("ERROR", error_msg, screenshot_path)
+
+
+def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
+    """
+    Finalize a client job: send notifications, commit to git, and mark as processed.
+
+    Parameters:
+        client_path: Path to the client directory
+        qa_status: Final QA status ("PASS", "FAIL", "ERROR", "SKIPPED")
+        qa_report: The QA report text
+    """
+    client_id = os.path.basename(client_path)
+
+    # Map status to Discord alert type
+    discord_status_map = {
+        "PASS": "SUCCESS",
+        "FAIL": "QA_FAILED",
+        "ERROR": "WARNING",
+        "SKIPPED": "WARNING"
+    }
+    discord_status = discord_status_map.get(qa_status, "WARNING")
+    send_discord_alert(client_id, discord_status, qa_report)
+
+    # Commit and Push to Git
     git_commit_and_push(client_id)
-    
-    # 2. Mark as processed ONLY after everything is done/saved
+
+    # Mark as processed
     logging.info(f"🏁 Finalizing job for {client_id}...")
     try:
-        os.rename(f"{client_path}/intake.md", f"{client_path}/intake-processed.md")
+        intake_path = os.path.join(client_path, "intake.md")
+        processed_path = os.path.join(client_path, "intake-processed.md")
+        if os.path.exists(intake_path):
+            os.rename(intake_path, processed_path)
     except OSError as e:
         logging.error(f"⚠️ Failed to rename intake.md: {e}")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
-    print("\n🏭  FACTORY V3.0 ONLINE: Router-Critic-Library Mode  🏭")
+    print("\n🏭  FACTORY V4.0 ONLINE: Self-Correcting & Evolutionary Mode  🏭")
+    print("    Features: Memory System | Syntax Guard | Visual Repair | A11y Critic")
 
     # Validate prompt library before starting
     logging.info("📚 Validating prompt library...")
