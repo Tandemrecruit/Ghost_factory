@@ -6,8 +6,7 @@ import subprocess
 import base64
 import re
 import json
-import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
@@ -401,22 +400,25 @@ def run_visual_designer(client_path):
             else:
                 theme_json_str = theme_content.strip()
 
-        # Validate JSON
+        # Validate JSON and ensure it's a dict (model could return list or scalar)
+        default_theme = {
+            "primary": "#3B82F6",
+            "secondary": "#1E40AF",
+            "accent": "#F59E0B",
+            "background": "white",
+            "font_heading": "Inter",
+            "font_body": "Inter",
+            "border_radius": "0.5rem",
+            "source": "generated"
+        }
         try:
             theme_data = json.loads(theme_json_str)
+            if not isinstance(theme_data, dict):
+                logging.warning("⚠️ Visual Designer returned non-dict JSON (%s), using default", type(theme_data).__name__)
+                theme_data = default_theme
         except json.JSONDecodeError:
             logging.exception("❌ Visual Designer returned invalid JSON")
-            # Create a default theme as fallback
-            theme_data = {
-                "primary": "#3B82F6",
-                "secondary": "#1E40AF",
-                "accent": "#F59E0B",
-                "background": "white",
-                "font_heading": "Inter",
-                "font_body": "Inter",
-                "border_radius": "0.5rem",
-                "source": "generated"
-            }
+            theme_data = default_theme
             logging.warning("⚠️ Using default theme for %s", client_id)
 
         # Save theme.json
@@ -561,10 +563,13 @@ Please evaluate this brief against the original intake."""
             with open(os.path.join(client_path, "brief.md"), "w", encoding="utf-8") as f:
                 f.write(brief_content)
 
-        # Wait for visual designer to complete (ThreadPoolExecutor context manager handles this)
+        # Wait for visual designer to complete
+        # NOTE: The ThreadPoolExecutor context manager calls shutdown(wait=True) on exit,
+        # so we always wait for completion regardless of timeout. The timeout here only
+        # controls when we log a warning - it doesn't actually limit blocking time.
         try:
-            visual_designer_future.result(timeout=60)  # Wait up to 60 seconds
-        except (TimeoutError, concurrent.futures.TimeoutError, concurrent.futures.CancelledError) as e:
+            visual_designer_future.result(timeout=60)
+        except (TimeoutError, FuturesTimeoutError, CancelledError) as e:
             logging.warning("⚠️ Visual Designer timed out or was cancelled: %s", type(e).__name__)
 
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
@@ -654,7 +659,7 @@ Generate improved website content that addresses the feedback above."""
 
             # Skip critic review if intake is not available
             if skip_critic:
-                logging.info(f"⏭️ Skipping Copy Critic review - no intake available")
+                logging.info("Skipping Copy Critic review - no intake available")
                 break
 
             # Copy Critic reviews the content
