@@ -378,6 +378,7 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         return (False, "Empty code string provided")
 
     temp_file = None
+    temp_path = None
     try:
         # Create a temporary .tsx file
         with tempfile.NamedTemporaryFile(
@@ -436,7 +437,7 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
 
     finally:
         # Clean up temp file
-        if temp_file and os.path.exists(temp_path):
+        if temp_path is not None and os.path.exists(temp_path):
             try:
                 os.unlink(temp_path)
             except Exception:
