@@ -139,14 +139,14 @@ def validate_prompt_library():
 
 def select_niche_persona(client_id, intake):
     """
-    Router function: Classify the client into a niche and return the matching strategy prompt filename.
-
-    Args:
-        client_id: The client identifier (used for logging and cost tracking)
-        intake: The intake content (already loaded to avoid duplicate file reads)
-
+    Classify a client's intake into a niche and return the corresponding strategy prompt filename.
+    
+    Parameters:
+        client_id (str): Client identifier used for logging and cost tracking.
+        intake (str): The intake text to be classified.
+    
     Returns:
-        str: Filename of the matching strategy prompt (e.g., "saas.md", "local_service.md", "ecommerce.md")
+        str: Filename of the matched strategy prompt (for example "saas.md", "local_service.md", "ecommerce.md", "personal_brand.md", or "webinar.md").  
     """
     logging.info(f"🔀 Router classifying {client_id}...")
 
@@ -352,10 +352,14 @@ def send_discord_alert(client_name, status, report=None):
 
 def run_visual_designer(client_path):
     """
-    Visual Designer agent that generates theme.json for the client.
-
-    Runs in parallel with the Architect to generate a color palette
-    and typography settings based on the client's intake.
+    Generate a theme JSON file for a client from their intake content and save it as theme.json in the client's directory.
+    
+    Parameters:
+        client_path (str): Filesystem path of the client directory; must contain an intake.md file.
+    
+    Returns:
+        dict: Theme data written to theme.json (colors, fonts, and styling values) if generation or fallback succeeded.
+        None: If intake.md is missing or the designer failed to produce usable output.
     """
     client_id = os.path.basename(client_path)
     logging.info(f"🎨 Visual Designer generating theme for {client_id}...")
@@ -423,13 +427,12 @@ def run_visual_designer(client_path):
 
 def run_architect(client_path):
     """
-    Architect agent with Router-Critic-Library architecture.
-
-    1. Spawns Visual Designer in parallel to generate theme.json
-    2. Router: Classifies client into a niche (SaaS, Local, Ecom, Personal Brand, Webinar)
-    3. Strategist: Generates brief using niche-specific prompt
-    4. Critic: Reviews brief against intake, requests regeneration if needed
-    5. Data Logging: Saves original AI output as brief.orig.md
+    Orchestrates the Architect stage: routes the client to a niche, generates a strategy brief with retrying critic validation, and advances the pipeline.
+    
+    Spawns the Visual Designer in parallel to produce a theme.json, runs a Router to classify the client's niche, invokes the Strategist to generate a project brief using the niche-specific prompt, and runs a Critic loop that may request regenerated briefs up to MAX_CRITIC_RETRIES. Saves the immutable original brief to brief.orig.md and a working copy to brief.md. Does not rename intake.md; after architect work completes it invokes the Copywriter and waits briefly for the Visual Designer to finish (logs and proceeds if the designer fails or times out).
+    
+    Parameters:
+        client_path (str): Filesystem path to the client's directory (must contain intake.md); the client ID is derived from the directory basename.
     """
     client_id = os.path.basename(client_path)
     logging.info(f"🏗️  Architect analyzing {client_id}...")
@@ -559,12 +562,17 @@ Please evaluate this brief against the original intake."""
 
 def run_copywriter(client_path):
     """
-    Copywriter agent with Copy Critic loop.
-
-    1. Generates website content from the brief
-    2. Critic reviews for hallucinations, placeholders, and weak CTAs
-    3. Retries if FAIL, up to MAX_CRITIC_RETRIES
-    4. Saves original AI output as content.orig.md
+    Generate website copy from the client's brief, iteratively validate it with a Copy Critic, and save results.
+    
+    Runs a critic loop (up to MAX_CRITIC_RETRIES) that:
+    - Generates website content (hero, features, testimonials) from the brief.
+    - Sends the generated content to a copy critic for review; if the critic returns `FAIL` the feedback is fed back and the model retries.
+    - Stops early on a `PASS` or an unclear critic response.
+    
+    Saves the immutable original AI output to `content.orig.md` and the working copy to `content.md`, then invokes the builder stage.
+    
+    Raises:
+        RuntimeError: If the copywriter model returns no content for every attempt and generation ultimately fails.
     """
     client_id = os.path.basename(client_path)
     logging.info(f"✍️  Copywriter writing for {client_id}...")
@@ -693,6 +701,14 @@ Please evaluate this content against the intake and brief."""
     run_builder(client_path)
 
 def run_builder(client_path):
+    """
+    Generate a Next.js page component for a client and write it to the repository, then invoke QA.
+    
+    Reads the client's brief and content, optionally incorporates a local library manifest and a design theme (theme.json), sends a generation request to the coder model, extracts the resulting TypeScript React code, writes it to ./app/clients/{client_id}/page.tsx, records model cost, and then triggers the QA pipeline.
+    
+    Parameters:
+        client_path (str): Path to the client directory (contains brief.md, content.md, and optionally theme.json). The function derives the client ID from the basename of this path.
+    """
     client_id = os.path.basename(client_path)
     logging.info(f"🧱 Builder assembling {client_id}...")
 
