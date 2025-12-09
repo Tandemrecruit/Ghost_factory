@@ -983,10 +983,11 @@ RULES:
 1. Read the Content and Brief carefully.
 2. Select components ONLY from the Library Manifest below.
 3. Map the content into the component props accurately.
-4. Apply the design theme colors and fonts using Tailwind CSS.
-5. Ensure ALL imports are correct and components exist.
-6. Output ONLY the code for `page.tsx` inside a ```tsx code block.
-7. Do NOT use placeholder text like [Your text here] - use actual content from the brief.
+4. Apply the design theme colors and fonts using Tailwind CSS utility classes.
+5. Use Tailwind utility classes (e.g., `bg-primary`, `text-accent`) instead of hardcoding hex color values. Treat the theme JSON as semantic colors, not raw literals.
+6. Ensure ALL imports are correct and components exist.
+7. Output ONLY the code for `page.tsx` inside a ```tsx code block.
+8. Do NOT use placeholder text like [Your text here] - use actual content from the brief.
 
 MANIFEST:
 {manifest}
@@ -1045,7 +1046,16 @@ Please fix the visual issues while maintaining correct syntax."""
                 client_id, msg, {"attempt": total_attempts, "has_syntax_feedback": bool(syntax_feedback), "has_visual_feedback": bool(visual_feedback)}
             )
 
-            raw_response = msg.content[0].text
+            raw_response = _extract_response_text(msg, default="")
+            if not raw_response:
+                logging.error(f"❌ Builder returned empty response on attempt {total_attempts} for {client_id}")
+                memory.record_failure(
+                    category="builder",
+                    issue="Builder returned empty or malformed response",
+                    fix="Will retry with same inputs",
+                    metadata={"client_id": client_id, "attempt": total_attempts},
+                )
+                continue
 
             # Extract code from response
             match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
@@ -1210,7 +1220,7 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
 
         except Exception as e:
             error_msg = f"Visual QA Error: {str(e)}"
-            logging.error(f"❌ {error_msg}")
+            logging.exception(f"❌ {error_msg}")
             return ("ERROR", error_msg, screenshot_path)
 
 

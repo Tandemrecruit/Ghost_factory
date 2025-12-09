@@ -38,12 +38,12 @@ Use these approximate calculations:
 # Output Format
 
 ## If Accessible (all critical combinations pass AA):
-```
+```text
 PASS
 ```
 
 ## If Accessibility Issues Found:
-```
+```text
 FAIL: [Brief summary of accessibility issues]
 
 ## Issues Found:
@@ -72,7 +72,7 @@ Input theme:
 ```
 
 Output:
-```
+```text
 PASS
 ```
 (Navy blue on white has excellent contrast ~8.5:1)
@@ -89,7 +89,7 @@ Input theme:
 ```
 
 Output:
-```
+```text
 FAIL: Light blue and cream colors have insufficient contrast against white background.
 
 ## Issues Found:

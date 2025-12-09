@@ -69,7 +69,7 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
         return True
 
     except Exception as e:
-        logging.error(f"[Memory] Failed to record error: {e}")
+        logging.exception(f"[Memory] Failed to record error: {e}")
         return False
 
 
@@ -172,7 +172,7 @@ def compile_and_save_rules() -> bool:
         return True
 
     except Exception as e:
-        logging.error(f"[Memory] Failed to compile rules: {e}")
+        logging.exception(f"[Memory] Failed to compile rules: {e}")
         return False
 
 
@@ -294,7 +294,7 @@ def add_golden_sample(filename: str, content: str) -> bool:
         return True
 
     except Exception as e:
-        logging.error(f"[Memory] Failed to add golden sample: {e}")
+        logging.exception(f"[Memory] Failed to add golden sample: {e}")
         return False
 
 
@@ -328,7 +328,7 @@ def get_error_stats() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logging.error(f"[Memory] Failed to get error stats: {e}")
+        logging.exception(f"[Memory] Failed to get error stats: {e}")
         return {"total": 0, "by_category": {}, "recent": [], "error": str(e)}
 
 
@@ -362,5 +362,5 @@ def clear_old_errors(keep_last_n: int = 100) -> int:
         return removed_count
 
     except Exception as e:
-        logging.error(f"[Memory] Failed to clear old errors: {e}")
+        logging.exception(f"[Memory] Failed to clear old errors: {e}")
         return 0
