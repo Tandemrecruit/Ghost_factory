@@ -15,7 +15,7 @@ Create a high-pressure "Registration Page" brief for a webinar or live event.
 3. **The Presenter:** "Who is teaching this?" (Credibility).
 4. **Who this is for:** "Perfect for..." vs "NOT for..."
 5. **Bonus Stack:** "Register now and get these 3 PDF cheat sheets for free."
-6. **FAQ:** "Will there be a replay?" (Answer: No).
+6. **FAQ:** "Will there be a replay?" (Check intake for replay policy; default to "No" if not specified to create urgency).
 
 # Output
 Return a structured Markdown brief.

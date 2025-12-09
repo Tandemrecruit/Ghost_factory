@@ -388,12 +388,17 @@ def run_visual_designer(client_path):
             return None
 
         # Extract JSON from response (may be wrapped in markdown code block)
-        json_match = re.search(r'```(?:json)?(.*?)```', theme_content, re.DOTALL)
+        # Use specific json language tag to avoid matching other code blocks
+        json_match = re.search(r'```json\s*([\s\S]*?)\s*```', theme_content)
         if json_match:
             theme_json_str = json_match.group(1).strip()
         else:
-            # Try to parse raw response as JSON
-            theme_json_str = theme_content.strip()
+            # Fallback: try generic code block or raw response
+            generic_match = re.search(r'```\s*([\s\S]*?)\s*```', theme_content)
+            if generic_match:
+                theme_json_str = generic_match.group(1).strip()
+            else:
+                theme_json_str = theme_content.strip()
 
         # Validate JSON
         try:
@@ -408,7 +413,8 @@ def run_visual_designer(client_path):
                 "background": "white",
                 "font_heading": "Inter",
                 "font_body": "Inter",
-                "border_radius": "0.5rem"
+                "border_radius": "0.5rem",
+                "source": "generated"
             }
             logging.warning(f"⚠️ Using default theme for {client_id}")
 
@@ -439,9 +445,13 @@ def run_architect(client_path):
         intake = f.read()
 
     # Spawn Visual Designer in parallel using ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=1) as executor:
+    # max_workers=2 allows true concurrency: Visual Designer runs while Architect works
+    # The Visual Designer only needs intake.md which is already loaded, so no file conflicts
+    with ThreadPoolExecutor(max_workers=2) as executor:
         visual_designer_future = executor.submit(run_visual_designer, client_path)
 
+        # NOTE: Visual Designer timing is intentionally excluded from pipeline_architect span
+        # since it runs concurrently. Its own timing is tracked via pipeline_visual_designer span.
         with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
             # Step 1: Router - Classify the client niche
             niche_prompt_file = select_niche_persona(client_id, intake)
@@ -537,7 +547,10 @@ Please evaluate this brief against the original intake."""
                     logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
                     break
 
-            # Step 6: Save the brief
+            # Step 6: Validate and save the brief
+            if not brief_content:
+                raise RuntimeError(f"Failed to generate brief for {client_id} after {MAX_CRITIC_RETRIES} attempts")
+
             # Save immutable original for future optimization analysis
             with open(os.path.join(client_path, "brief.orig.md"), "w", encoding="utf-8") as f:
                 f.write(brief_content)
@@ -668,6 +681,7 @@ Please evaluate this content against the intake and brief."""
             critic_response = critic_response_text.strip()
 
             # Decision - PASS or FAIL
+            # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
             if critic_response.startswith("FAIL"):
                 logging.warning(f"⚠️ Copy Critic rejected content on attempt {attempt}")
                 previous_feedback = critic_response
@@ -680,6 +694,10 @@ Please evaluate this content against the intake and brief."""
             else:
                 logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with content.")
                 break
+
+        # Validate content before saving
+        if not content:
+            raise RuntimeError(f"Failed to generate content for {client_id} after {MAX_CRITIC_RETRIES} attempts")
 
         # Save immutable original for future analysis
         with open(os.path.join(client_path, "content.orig.md"), "w", encoding="utf-8") as f:
