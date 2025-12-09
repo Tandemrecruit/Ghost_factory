@@ -17,8 +17,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - [SANITIZER] - %(me
 
 client = OpenAI()
 
-# UPDATED: Using current generation model for Dec 2025
-MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano")
+# Model: GPT-5 Nano - $0.05/$0.40 per 1M tokens (20x cheaper than Haiku)
+# Perfect for structured extraction tasks like intake sanitization
+MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano-latest")
 
 SYSTEM_PROMPT = """
 You are an Intake Sanitizer for a landing-page studio.
