@@ -28,21 +28,15 @@ client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
-# Models - Using aliases that auto-resolve to latest versions
-# Pricing tiers (as of late 2025): Opus > Sonnet > Haiku
-# 
-# Task mapping rationale:
-#   - STRATEGY: Opus - Complex reasoning, brand analysis, architecture decisions
-#   - CODER: Sonnet - Best balance of code quality vs cost
-#   - COPY: Sonnet - Creative writing with good instruction following
-#   - QA: Haiku - Fast, cheap, good enough for visual inspection pass/fail
-#
-MODEL_STRATEGY = "claude-opus-4-5-latest"   # ~$15/$75 per 1M tokens - worth it for strategy
-MODEL_CODER = "claude-sonnet-4-5-latest"    # ~$3/$15 per 1M tokens - sweet spot for code
-MODEL_COPY = "claude-sonnet-4-5-latest"     # Same tier as coder
-MODEL_QA = "claude-haiku-4-5-latest"        # ~$1/$5 per 1M tokens - fast & cheap for QA  
-MODEL_ROUTER = "claude-haiku-4-5-latest"     # Fast classification
-MODEL_CRITIC = "claude-sonnet-4-5-latest"    # Quality review 
+# Model Configuration
+# Tier order: Opus > Sonnet > Haiku (cost and capability)
+# For current pricing, see docs/internal/pricing_model.md
+MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
+MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation - quality/cost balance
+MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
+MODEL_QA = "claude-haiku-4-5-20251015"         # Visual inspection - fast & cost-effective
+MODEL_ROUTER = "claude-haiku-4-5-20251015"     # Fast classification
+MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review         
 
 # Config
 WATCH_DIR = "./clients"
