@@ -74,23 +74,54 @@ def _load_prompt(prompt_path):
         return f.read()
 
 
-def select_niche_persona(client_path):
+# Required prompt files for the Router-Critic-Library architecture
+REQUIRED_PROMPTS = [
+    "router.md",
+    "strategy/saas.md",
+    "strategy/local_service.md",
+    "strategy/ecommerce.md",
+    "critique/strategy_critic.md",
+]
+
+
+def validate_prompt_library():
+    """
+    Validate that all required prompt files exist at startup.
+    Returns True if all prompts are present, False otherwise.
+    Logs specific errors for any missing files.
+    """
+    all_valid = True
+
+    if not os.path.exists(PROMPTS_DIR):
+        logging.error(f"❌ Prompts directory not found: {PROMPTS_DIR}")
+        return False
+
+    for prompt_file in REQUIRED_PROMPTS:
+        full_path = os.path.join(PROMPTS_DIR, prompt_file)
+        if not os.path.exists(full_path):
+            logging.error(f"❌ Missing required prompt: {full_path}")
+            all_valid = False
+        else:
+            logging.debug(f"✓ Found prompt: {prompt_file}")
+
+    if all_valid:
+        logging.info(f"✅ All {len(REQUIRED_PROMPTS)} prompt files validated.")
+
+    return all_valid
+
+
+def select_niche_persona(client_id, intake):
     """
     Router function: Classify the client into a niche and return the matching strategy prompt filename.
 
     Args:
-        client_path: Path to the client directory containing intake.md
+        client_id: The client identifier (used for logging and cost tracking)
+        intake: The intake content (already loaded to avoid duplicate file reads)
 
     Returns:
         str: Filename of the matching strategy prompt (e.g., "saas.md", "local_service.md", "ecommerce.md")
     """
-    client_id = os.path.basename(client_path)
     logging.info(f"🔀 Router classifying {client_id}...")
-
-    # Load intake
-    intake_path = os.path.join(client_path, "intake.md")
-    with open(intake_path, "r", encoding="utf-8") as f:
-        intake = f.read()
 
     # Load router prompt
     router_prompt = _load_prompt("router.md")
@@ -295,13 +326,13 @@ def run_architect(client_path):
     client_id = os.path.basename(client_path)
     logging.info(f"🏗️  Architect analyzing {client_id}...")
 
-    with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
-        # Load intake
-        with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
-            intake = f.read()
+    # Load intake ONCE (before time tracking to avoid including file I/O in span)
+    with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
+        intake = f.read()
 
+    with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
         # Step 1: Router - Classify the client niche
-        niche_prompt_file = select_niche_persona(client_path)
+        niche_prompt_file = select_niche_persona(client_id, intake)
         strategy_prompt = _load_prompt(f"strategy/{niche_prompt_file}")
 
         # Step 2: Load the Critic prompt
@@ -369,14 +400,15 @@ Please evaluate this brief against the original intake."""
             critic_response = critic_msg.content[0].text.strip()
 
             # Step 5: Decision - PASS or FAIL
-            if "PASS" in critic_response:
-                logging.info(f"✅ Critic approved brief on attempt {attempt}")
-                break
-            elif "FAIL" in critic_response:
+            # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
+            if critic_response.startswith("FAIL"):
                 logging.warning(f"⚠️ Critic rejected brief on attempt {attempt}")
                 previous_feedback = critic_response
                 if attempt >= MAX_CRITIC_RETRIES:
                     logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
+            elif critic_response.startswith("PASS"):
+                logging.info(f"✅ Critic approved brief on attempt {attempt}")
+                break
             else:
                 # Ambiguous response - treat as pass but log warning
                 logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
@@ -537,7 +569,14 @@ def run_qa(client_path):
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
     print("\n🏭  FACTORY V3.0 ONLINE: Router-Critic-Library Mode  🏭")
-    
+
+    # Validate prompt library before starting
+    logging.info("📚 Validating prompt library...")
+    if not validate_prompt_library():
+        logging.error("❌ FATAL: Required prompt files are missing. Cannot start factory.")
+        logging.error("Please ensure all files exist in the prompts/ directory.")
+        exit(1)
+
     # Ensure environment is ready (Fix #5)
     logging.info("🎭 Checking Playwright browsers...")
     try:
