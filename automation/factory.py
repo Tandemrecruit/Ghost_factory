@@ -6,6 +6,7 @@ import subprocess
 import base64
 import re
 import json
+import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -403,8 +404,8 @@ def run_visual_designer(client_path):
         # Validate JSON
         try:
             theme_data = json.loads(theme_json_str)
-        except json.JSONDecodeError as e:
-            logging.error(f"❌ Visual Designer returned invalid JSON: {e}")
+        except json.JSONDecodeError:
+            logging.exception("❌ Visual Designer returned invalid JSON")
             # Create a default theme as fallback
             theme_data = {
                 "primary": "#3B82F6",
@@ -416,7 +417,7 @@ def run_visual_designer(client_path):
                 "border_radius": "0.5rem",
                 "source": "generated"
             }
-            logging.warning(f"⚠️ Using default theme for {client_id}")
+            logging.warning("⚠️ Using default theme for %s", client_id)
 
         # Save theme.json
         theme_path = os.path.join(client_path, "theme.json")
@@ -544,7 +545,7 @@ Please evaluate this brief against the original intake."""
                     break
                 else:
                     # Ambiguous response - treat as pass but log warning
-                    logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
+                    logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
                     break
 
             # Step 6: Validate and save the brief
@@ -554,7 +555,7 @@ Please evaluate this brief against the original intake."""
             # Save immutable original for future optimization analysis
             with open(os.path.join(client_path, "brief.orig.md"), "w", encoding="utf-8") as f:
                 f.write(brief_content)
-            logging.info(f"💾 Saved original AI output to brief.orig.md")
+            logging.info("Saved original AI output to brief.orig.md")
 
             # Save the working copy
             with open(os.path.join(client_path, "brief.md"), "w", encoding="utf-8") as f:
@@ -563,8 +564,8 @@ Please evaluate this brief against the original intake."""
         # Wait for visual designer to complete (ThreadPoolExecutor context manager handles this)
         try:
             visual_designer_future.result(timeout=60)  # Wait up to 60 seconds
-        except Exception as e:
-            logging.warning(f"⚠️ Visual Designer failed or timed out: {e}")
+        except (TimeoutError, concurrent.futures.TimeoutError, concurrent.futures.CancelledError) as e:
+            logging.warning("⚠️ Visual Designer timed out or was cancelled: %s", type(e).__name__)
 
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
     # This prevents the "Limbo" state if the script crashes later.
@@ -700,7 +701,7 @@ Please evaluate this content against the intake and brief."""
                 logging.info(f"✅ Copy Critic approved content on attempt {attempt}")
                 break
             else:
-                logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with content.")
+                logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with content.")
                 break
 
         # Validate content before saving
@@ -710,7 +711,7 @@ Please evaluate this content against the intake and brief."""
         # Save immutable original for future analysis
         with open(os.path.join(client_path, "content.orig.md"), "w", encoding="utf-8") as f:
             f.write(content)
-        logging.info(f"💾 Saved original AI output to content.orig.md")
+        logging.info("Saved original AI output to content.orig.md")
 
         # Save the working copy
         with open(os.path.join(client_path, "content.md"), "w", encoding="utf-8") as f:
@@ -759,7 +760,7 @@ def run_builder(client_path):
             except (json.JSONDecodeError, IOError) as e:
                 logging.warning(f"⚠️ Failed to load theme.json: {e}")
         else:
-            logging.info(f"ℹ️ No theme.json found for {client_id}, using default styles")
+            logging.info(f"[i] No theme.json found for {client_id}, using default styles")
 
         prompt = f"""
         You are a React Engineer.
