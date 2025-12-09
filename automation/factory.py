@@ -101,6 +101,7 @@ REQUIRED_PROMPTS = [
     "strategy/saas.md",
     "strategy/local_service.md",
     "strategy/ecommerce.md",
+    "strategy/personal_brand.md",
     "critique/strategy_critic.md",
 ]
 
@@ -168,7 +169,8 @@ def select_niche_persona(client_id, intake):
     valid_niches = {
         "saas": "saas.md",
         "local_service": "local_service.md",
-        "ecommerce": "ecommerce.md"
+        "ecommerce": "ecommerce.md",
+        "personal_brand": "personal_brand.md"
     }
 
     if niche not in valid_niches:
