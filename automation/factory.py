@@ -24,15 +24,19 @@ client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Models (Dec 2025)
-MODEL_STRATEGY = "claude-opus-4-5-20251101"    
-MODEL_CODER = "claude-sonnet-4-5-20250929"     
-MODEL_COPY = "claude-sonnet-4-5-20250929"      
-MODEL_QA = "claude-haiku-4-5-20251015"         
+MODEL_STRATEGY = "claude-opus-4-5-20251101"
+MODEL_CODER = "claude-sonnet-4-5-20250929"
+MODEL_COPY = "claude-sonnet-4-5-20250929"
+MODEL_QA = "claude-haiku-4-5-20251015"
+MODEL_ROUTER = "claude-haiku-4-5-20251015"     # Fast classification
+MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review         
 
 # Config
 WATCH_DIR = "./clients"
 LIBRARY_PATH = "./design-system/manifest.md"
+PROMPTS_DIR = "./prompts"
 BATCH_INTERVAL = 3600  # Check every 1 hour
+MAX_CRITIC_RETRIES = 3  # Hard stop for critic loop to prevent infinite API costs
 
 def _extract_usage_tokens(response):
     """Best-effort extraction of token usage from API responses."""
@@ -59,6 +63,121 @@ def _record_model_cost(provider, model, activity, client_id, response, metadata=
         )
     except Exception as e:
         logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
+
+
+def _extract_response_text(response, default=None):
+    """
+    Safely extract text content from an Anthropic API response.
+
+    Args:
+        response: The API response object
+        default: Value to return if extraction fails (default: None)
+
+    Returns:
+        str: The extracted text, or default if extraction fails
+    """
+    try:
+        if response and hasattr(response, 'content') and response.content:
+            first_block = response.content[0]
+            if hasattr(first_block, 'text') and first_block.text:
+                return first_block.text
+        return default
+    except (IndexError, AttributeError, TypeError):
+        return default
+
+
+def _load_prompt(prompt_path):
+    """Load a prompt from the prompts directory."""
+    full_path = os.path.join(PROMPTS_DIR, prompt_path)
+    if not os.path.exists(full_path):
+        raise FileNotFoundError(f"Prompt file not found: {full_path}")
+    with open(full_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+# Required prompt files for the Router-Critic-Library architecture
+REQUIRED_PROMPTS = [
+    "router.md",
+    "strategy/saas.md",
+    "strategy/local_service.md",
+    "strategy/ecommerce.md",
+    "critique/strategy_critic.md",
+]
+
+
+def validate_prompt_library():
+    """
+    Validate that all required prompt files exist at startup.
+    Returns True if all prompts are present, False otherwise.
+    Logs specific errors for any missing files.
+    """
+    all_valid = True
+
+    if not os.path.exists(PROMPTS_DIR):
+        logging.error(f"❌ Prompts directory not found: {PROMPTS_DIR}")
+        return False
+
+    for prompt_file in REQUIRED_PROMPTS:
+        full_path = os.path.join(PROMPTS_DIR, prompt_file)
+        if not os.path.exists(full_path):
+            logging.error(f"❌ Missing required prompt: {full_path}")
+            all_valid = False
+        else:
+            logging.debug(f"✓ Found prompt: {prompt_file}")
+
+    if all_valid:
+        logging.info(f"✅ All {len(REQUIRED_PROMPTS)} prompt files validated.")
+
+    return all_valid
+
+
+def select_niche_persona(client_id, intake):
+    """
+    Router function: Classify the client into a niche and return the matching strategy prompt filename.
+
+    Args:
+        client_id: The client identifier (used for logging and cost tracking)
+        intake: The intake content (already loaded to avoid duplicate file reads)
+
+    Returns:
+        str: Filename of the matching strategy prompt (e.g., "saas.md", "local_service.md", "ecommerce.md")
+    """
+    logging.info(f"🔀 Router classifying {client_id}...")
+
+    # Load router prompt
+    router_prompt = _load_prompt("router.md")
+
+    # Ask LLM to classify
+    msg = client_anthropic.messages.create(
+        model=MODEL_ROUTER,
+        max_tokens=50,
+        system=router_prompt,
+        messages=[{"role": "user", "content": intake}]
+    )
+    _record_model_cost("anthropic", MODEL_ROUTER, "router_classify", client_id, msg)
+
+    # Parse response - expect one of: saas, local_service, ecommerce
+    response_text = _extract_response_text(msg)
+    if not response_text:
+        logging.warning("⚠️ Router returned empty response, defaulting to local_service")
+        return "local_service.md"
+
+    niche = response_text.strip().lower()
+
+    # Validate and map to filename
+    valid_niches = {
+        "saas": "saas.md",
+        "local_service": "local_service.md",
+        "ecommerce": "ecommerce.md"
+    }
+
+    if niche not in valid_niches:
+        logging.warning(f"⚠️ Router returned unknown niche '{niche}', defaulting to local_service")
+        niche = "local_service"
+
+    logging.info(f"📋 Client classified as: {niche}")
+    return valid_niches[niche]
+
 
 # 2. HELPER FUNCTIONS
 
@@ -222,23 +341,126 @@ def send_discord_alert(client_name, status, report=None):
 # 3. WORKER AGENTS
 
 def run_architect(client_path):
+    """
+    Architect agent with Router-Critic-Library architecture.
+
+    1. Router: Classifies client into a niche (SaaS, Local, Ecom)
+    2. Strategist: Generates brief using niche-specific prompt
+    3. Critic: Reviews brief against intake, requests regeneration if needed
+    4. Data Logging: Saves original AI output as brief.orig.md
+    """
     client_id = os.path.basename(client_path)
     logging.info(f"🏗️  Architect analyzing {client_id}...")
+
+    # Load intake ONCE (before time tracking to avoid including file I/O in span)
+    with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
+        intake = f.read()
+
     with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
-        with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
-            intake = f.read()
-        
-        prompt = "You are a Senior Strategist. Create a Project Brief from these notes. Sections: Overview, Brand Colors, Sitemap, Layout Strategy."
-        
-        msg = client_anthropic.messages.create(
-            model=MODEL_STRATEGY, max_tokens=2000, system=prompt,
-            messages=[{"role": "user", "content": intake}]
-        )
-        _record_model_cost("anthropic", MODEL_STRATEGY, "pipeline_architect", client_id, msg)
-        
+        # Step 1: Router - Classify the client niche
+        niche_prompt_file = select_niche_persona(client_id, intake)
+        strategy_prompt = _load_prompt(f"strategy/{niche_prompt_file}")
+
+        # Step 2: Load the Critic prompt
+        critic_prompt = _load_prompt("critique/strategy_critic.md")
+
+        # Step 3: Critic Loop with max retries
+        brief_content = None
+        previous_feedback = None
+        attempt = 0
+
+        while attempt < MAX_CRITIC_RETRIES:
+            attempt += 1
+            logging.info(f"📝 Strategist generating brief (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+
+            # Build messages for the strategist
+            if previous_feedback:
+                # Include feedback from previous failed attempt
+                user_content = f"""## Client Intake
+{intake}
+
+## Previous Attempt Feedback
+The previous brief was rejected by our QA system. Please address these issues:
+{previous_feedback}
+
+Generate an improved Project Brief that addresses the feedback above."""
+            else:
+                user_content = intake
+
+            # Generate brief
+            msg = client_anthropic.messages.create(
+                model=MODEL_STRATEGY,
+                max_tokens=2000,
+                system=strategy_prompt,
+                messages=[{"role": "user", "content": user_content}]
+            )
+            _record_model_cost(
+                "anthropic", MODEL_STRATEGY, "pipeline_architect",
+                client_id, msg, {"attempt": attempt, "niche": niche_prompt_file}
+            )
+
+            brief_content = _extract_response_text(msg)
+            if not brief_content:
+                logging.error(f"❌ Strategist returned empty response on attempt {attempt}")
+                if attempt >= MAX_CRITIC_RETRIES:
+                    raise RuntimeError(f"Strategist failed to generate brief after {MAX_CRITIC_RETRIES} attempts")
+                continue  # Retry without critic feedback
+
+            # Step 4: Critic reviews the brief
+            logging.info(f"🔍 Critic reviewing brief (attempt {attempt})...")
+
+            critic_input = f"""## Original Client Intake
+{intake}
+
+## Generated Project Brief
+{brief_content}
+
+Please evaluate this brief against the original intake."""
+
+            critic_msg = client_anthropic.messages.create(
+                model=MODEL_CRITIC,
+                max_tokens=500,
+                system=critic_prompt,
+                messages=[{"role": "user", "content": critic_input}]
+            )
+            _record_model_cost(
+                "anthropic", MODEL_CRITIC, "pipeline_architect_critic",
+                client_id, critic_msg, {"attempt": attempt}
+            )
+
+            critic_response_text = _extract_response_text(critic_msg)
+            if not critic_response_text:
+                logging.warning(f"⚠️ Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                break
+
+            critic_response = critic_response_text.strip()
+
+            # Step 5: Decision - PASS or FAIL
+            # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
+            if critic_response.startswith("FAIL"):
+                logging.warning(f"⚠️ Critic rejected brief on attempt {attempt}")
+                previous_feedback = critic_response
+                if attempt >= MAX_CRITIC_RETRIES:
+                    logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
+                    break  # Explicit break to exit loop after max retries
+            elif critic_response.startswith("PASS"):
+                logging.info(f"✅ Critic approved brief on attempt {attempt}")
+                break
+            else:
+                # Ambiguous response - treat as pass but log warning
+                logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
+                break
+
+        # Step 6: Save the brief
+        # Save immutable original for future optimization analysis
+        with open(f"{client_path}/brief.orig.md", "w", encoding="utf-8") as f:
+            f.write(brief_content)
+        logging.info(f"💾 Saved original AI output to brief.orig.md")
+
+        # Save the working copy
         with open(f"{client_path}/brief.md", "w", encoding="utf-8") as f:
-            f.write(msg.content[0].text)
-    
+            f.write(brief_content)
+
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
     # This prevents the "Limbo" state if the script crashes later.
     run_copywriter(client_path)
@@ -383,8 +605,15 @@ def run_qa(client_path):
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
-    print("\n🏭  FACTORY V2.1 ONLINE: Robust Mode  🏭")
-    
+    print("\n🏭  FACTORY V3.0 ONLINE: Router-Critic-Library Mode  🏭")
+
+    # Validate prompt library before starting
+    logging.info("📚 Validating prompt library...")
+    if not validate_prompt_library():
+        logging.error("❌ FATAL: Required prompt files are missing. Cannot start factory.")
+        logging.error("Please ensure all files exist in the prompts/ directory.")
+        exit(1)
+
     # Ensure environment is ready (Fix #5)
     logging.info("🎭 Checking Playwright browsers...")
     try:
