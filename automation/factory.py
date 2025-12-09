@@ -25,11 +25,13 @@ client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
-# Models (Dec 2025)
-MODEL_STRATEGY = "claude-opus-4-5-20251101"
-MODEL_CODER = "claude-sonnet-4-5-20250929"
-MODEL_COPY = "claude-sonnet-4-5-20250929"
-MODEL_QA = "claude-haiku-4-5-20251015"
+# Model Configuration
+# Tier order: Opus > Sonnet > Haiku (cost and capability)
+# For current pricing, see docs/internal/pricing_model.md
+MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
+MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation - quality/cost balance
+MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
+MODEL_QA = "claude-haiku-4-5-20251015"         # Visual inspection - fast & cost-effective
 MODEL_ROUTER = "claude-haiku-4-5-20251015"     # Fast classification
 MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review         
 
