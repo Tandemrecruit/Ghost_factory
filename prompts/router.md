@@ -22,5 +22,9 @@ Analyze the provided Client Intake. Categorize the business into ONE of the foll
    - Coaches, creators, consultants, or solo experts selling themselves.
    - Keywords: "course", "coaching", "newsletter", "personal".
 
+5. **WEBINAR_FUNNEL**
+   - Live events, masterclasses, or workshop registrations.
+   - Keywords: "register", "seat", "training", "live", "masterclass".
+
 # Output Format
 Return ONLY the category name (e.g., "SAAS_B2B"). Do not add explanation or punctuation.
