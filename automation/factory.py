@@ -421,17 +421,17 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
 
     except subprocess.TimeoutExpired:
         error_msg = "TypeScript compilation timed out (30s limit)"
-        logging.error(f"❌ {error_msg} for {client_id}")
+        logging.exception(f"❌ {error_msg} for {client_id}")
         return (False, error_msg)
 
     except FileNotFoundError:
         error_msg = "npx/tsc not found. Ensure Node.js and TypeScript are installed."
-        logging.error(f"❌ {error_msg}")
+        logging.exception(f"❌ {error_msg}")
         return (False, error_msg)
 
     except Exception as e:
-        error_msg = f"Syntax check error: {str(e)}"
-        logging.error(f"❌ {error_msg} for {client_id}")
+        error_msg = f"Syntax check error: {e!s}"
+        logging.exception(f"❌ Syntax check error for {client_id}")
         return (False, error_msg)
 
     finally:
@@ -1219,8 +1219,8 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
             return (status, report, screenshot_path)
 
         except Exception as e:
-            error_msg = f"Visual QA Error: {str(e)}"
-            logging.exception(f"❌ {error_msg}")
+            error_msg = f"Visual QA Error: {e!s}"
+            logging.exception("❌ Visual QA Error")
             return ("ERROR", error_msg, screenshot_path)
 
 
@@ -1255,8 +1255,8 @@ def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
         processed_path = os.path.join(client_path, "intake-processed.md")
         if os.path.exists(intake_path):
             os.rename(intake_path, processed_path)
-    except OSError as e:
-        logging.error(f"⚠️ Failed to rename intake.md: {e}")
+    except OSError:
+        logging.exception("⚠️ Failed to rename intake.md")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":

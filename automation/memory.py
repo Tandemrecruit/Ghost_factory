@@ -68,8 +68,8 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
         logging.info(f"[Memory] Recorded {category} failure: {issue[:50]}...")
         return True
 
-    except Exception as e:
-        logging.exception(f"[Memory] Failed to record error: {e}")
+    except Exception:
+        logging.exception("[Memory] Failed to record error")
         return False
 
 
@@ -171,8 +171,8 @@ def compile_and_save_rules() -> bool:
         logging.info(f"[Memory] Compiled rules from {len(logs)} errors to {DYNAMIC_RULES_PATH}")
         return True
 
-    except Exception as e:
-        logging.exception(f"[Memory] Failed to compile rules: {e}")
+    except Exception:
+        logging.exception("[Memory] Failed to compile rules")
         return False
 
 
@@ -293,8 +293,8 @@ def add_golden_sample(filename: str, content: str) -> bool:
         logging.info(f"[Memory] Added golden sample: {filename}")
         return True
 
-    except Exception as e:
-        logging.exception(f"[Memory] Failed to add golden sample: {e}")
+    except Exception:
+        logging.exception("[Memory] Failed to add golden sample")
         return False
 
 
@@ -328,7 +328,7 @@ def get_error_stats() -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logging.exception(f"[Memory] Failed to get error stats: {e}")
+        logging.exception("[Memory] Failed to get error stats")
         return {"total": 0, "by_category": {}, "recent": [], "error": str(e)}
 
 
@@ -361,6 +361,6 @@ def clear_old_errors(keep_last_n: int = 100) -> int:
         logging.info(f"[Memory] Cleared {removed_count} old errors, kept {keep_last_n}")
         return removed_count
 
-    except Exception as e:
-        logging.exception(f"[Memory] Failed to clear old errors: {e}")
+    except Exception:
+        logging.exception("[Memory] Failed to clear old errors")
         return 0
