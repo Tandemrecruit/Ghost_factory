@@ -5,6 +5,8 @@ import requests
 import subprocess
 import base64
 import re
+import json
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
@@ -102,7 +104,10 @@ REQUIRED_PROMPTS = [
     "strategy/local_service.md",
     "strategy/ecommerce.md",
     "strategy/personal_brand.md",
+    "strategy/webinar.md",
     "critique/strategy_critic.md",
+    "critique/copy_critic.md",
+    "design/palette_generator.md",
 ]
 
 
@@ -168,9 +173,12 @@ def select_niche_persona(client_id, intake):
     # Validate and map to filename
     valid_niches = {
         "saas": "saas.md",
+        "saas_b2b": "saas.md",
         "local_service": "local_service.md",
         "ecommerce": "ecommerce.md",
-        "personal_brand": "personal_brand.md"
+        "ecommerce_dtc": "ecommerce.md",
+        "personal_brand": "personal_brand.md",
+        "webinar_funnel": "webinar.md"
     }
 
     if niche not in valid_niches:
@@ -342,43 +350,132 @@ def send_discord_alert(client_name, status, report=None):
 
 # 3. WORKER AGENTS
 
+def run_visual_designer(client_path):
+    """
+    Visual Designer agent that generates theme.json for the client.
+
+    Runs in parallel with the Architect to generate a color palette
+    and typography settings based on the client's intake.
+    """
+    client_id = os.path.basename(client_path)
+    logging.info(f"🎨 Visual Designer generating theme for {client_id}...")
+
+    with time_tracker.track_span("pipeline_visual_designer", client_id, {"stage": "visual_designer"}):
+        # Load intake
+        intake_path = os.path.join(client_path, "intake.md")
+        if not os.path.exists(intake_path):
+            logging.warning(f"⚠️ No intake.md found for visual designer in {client_id}")
+            return None
+
+        with open(intake_path, "r", encoding="utf-8") as f:
+            intake = f.read()
+
+        # Load the palette generator prompt
+        designer_prompt = _load_prompt("design/palette_generator.md")
+
+        # Generate theme
+        msg = client_anthropic.messages.create(
+            model=MODEL_COPY,  # Use Sonnet for design decisions
+            max_tokens=500,
+            system=designer_prompt,
+            messages=[{"role": "user", "content": intake}]
+        )
+        _record_model_cost("anthropic", MODEL_COPY, "pipeline_visual_designer", client_id, msg)
+
+        theme_content = _extract_response_text(msg)
+        if not theme_content:
+            logging.error(f"❌ Visual Designer returned empty response for {client_id}")
+            return None
+
+        # Extract JSON from response (may be wrapped in markdown code block)
+        # Use specific json language tag to avoid matching other code blocks
+        json_match = re.search(r'```json\s*([\s\S]*?)\s*```', theme_content)
+        if json_match:
+            theme_json_str = json_match.group(1).strip()
+        else:
+            # Fallback: try generic code block or raw response
+            generic_match = re.search(r'```\s*([\s\S]*?)\s*```', theme_content)
+            if generic_match:
+                theme_json_str = generic_match.group(1).strip()
+            else:
+                theme_json_str = theme_content.strip()
+
+        # Validate JSON and ensure it's a dict (model could return list or scalar)
+        default_theme = {
+            "primary": "#3B82F6",
+            "secondary": "#1E40AF",
+            "accent": "#F59E0B",
+            "background": "white",
+            "font_heading": "Inter",
+            "font_body": "Inter",
+            "border_radius": "0.5rem",
+            "source": "generated"
+        }
+        try:
+            theme_data = json.loads(theme_json_str)
+            if not isinstance(theme_data, dict):
+                logging.warning("⚠️ Visual Designer returned non-dict JSON (%s), using default", type(theme_data).__name__)
+                theme_data = default_theme
+        except json.JSONDecodeError:
+            logging.exception("❌ Visual Designer returned invalid JSON")
+            theme_data = default_theme
+            logging.warning("⚠️ Using default theme for %s", client_id)
+
+        # Save theme.json
+        theme_path = os.path.join(client_path, "theme.json")
+        with open(theme_path, "w", encoding="utf-8") as f:
+            json.dump(theme_data, f, indent=2)
+
+        logging.info(f"✅ Visual Designer saved theme.json for {client_id}")
+        return theme_data
+
+
 def run_architect(client_path):
     """
     Architect agent with Router-Critic-Library architecture.
 
-    1. Router: Classifies client into a niche (SaaS, Local, Ecom)
-    2. Strategist: Generates brief using niche-specific prompt
-    3. Critic: Reviews brief against intake, requests regeneration if needed
-    4. Data Logging: Saves original AI output as brief.orig.md
+    1. Spawns Visual Designer in parallel to generate theme.json
+    2. Router: Classifies client into a niche (SaaS, Local, Ecom, Personal Brand, Webinar)
+    3. Strategist: Generates brief using niche-specific prompt
+    4. Critic: Reviews brief against intake, requests regeneration if needed
+    5. Data Logging: Saves original AI output as brief.orig.md
     """
     client_id = os.path.basename(client_path)
     logging.info(f"🏗️  Architect analyzing {client_id}...")
 
     # Load intake ONCE (before time tracking to avoid including file I/O in span)
-    with open(f"{client_path}/intake.md", "r", encoding="utf-8") as f:
+    with open(os.path.join(client_path, "intake.md"), "r", encoding="utf-8") as f:
         intake = f.read()
 
-    with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
-        # Step 1: Router - Classify the client niche
-        niche_prompt_file = select_niche_persona(client_id, intake)
-        strategy_prompt = _load_prompt(f"strategy/{niche_prompt_file}")
+    # Spawn Visual Designer in parallel using ThreadPoolExecutor
+    # max_workers=2 allows true concurrency: Visual Designer runs while Architect works
+    # The Visual Designer only needs intake.md which is already loaded, so no file conflicts
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        visual_designer_future = executor.submit(run_visual_designer, client_path)
 
-        # Step 2: Load the Critic prompt
-        critic_prompt = _load_prompt("critique/strategy_critic.md")
+        # NOTE: Visual Designer timing is intentionally excluded from pipeline_architect span
+        # since it runs concurrently. Its own timing is tracked via pipeline_visual_designer span.
+        with time_tracker.track_span("pipeline_architect", client_id, {"stage": "architect"}):
+            # Step 1: Router - Classify the client niche
+            niche_prompt_file = select_niche_persona(client_id, intake)
+            strategy_prompt = _load_prompt(f"strategy/{niche_prompt_file}")
 
-        # Step 3: Critic Loop with max retries
-        brief_content = None
-        previous_feedback = None
-        attempt = 0
+            # Step 2: Load the Critic prompt
+            critic_prompt = _load_prompt("critique/strategy_critic.md")
 
-        while attempt < MAX_CRITIC_RETRIES:
-            attempt += 1
-            logging.info(f"📝 Strategist generating brief (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+            # Step 3: Critic Loop with max retries
+            brief_content = None
+            previous_feedback = None
+            attempt = 0
 
-            # Build messages for the strategist
-            if previous_feedback:
-                # Include feedback from previous failed attempt
-                user_content = f"""## Client Intake
+            while attempt < MAX_CRITIC_RETRIES:
+                attempt += 1
+                logging.info(f"📝 Strategist generating brief (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+
+                # Build messages for the strategist
+                if previous_feedback:
+                    # Include feedback from previous failed attempt
+                    user_content = f"""## Client Intake
 {intake}
 
 ## Previous Attempt Feedback
@@ -386,38 +483,198 @@ The previous brief was rejected by our QA system. Please address these issues:
 {previous_feedback}
 
 Generate an improved Project Brief that addresses the feedback above."""
-            else:
-                user_content = intake
+                else:
+                    user_content = intake
 
-            # Generate brief
-            msg = client_anthropic.messages.create(
-                model=MODEL_STRATEGY,
-                max_tokens=2000,
-                system=strategy_prompt,
-                messages=[{"role": "user", "content": user_content}]
-            )
-            _record_model_cost(
-                "anthropic", MODEL_STRATEGY, "pipeline_architect",
-                client_id, msg, {"attempt": attempt, "niche": niche_prompt_file}
-            )
+                # Generate brief
+                msg = client_anthropic.messages.create(
+                    model=MODEL_STRATEGY,
+                    max_tokens=2000,
+                    system=strategy_prompt,
+                    messages=[{"role": "user", "content": user_content}]
+                )
+                _record_model_cost(
+                    "anthropic", MODEL_STRATEGY, "pipeline_architect",
+                    client_id, msg, {"attempt": attempt, "niche": niche_prompt_file}
+                )
 
-            brief_content = _extract_response_text(msg)
-            if not brief_content:
-                logging.error(f"❌ Strategist returned empty response on attempt {attempt}")
-                if attempt >= MAX_CRITIC_RETRIES:
-                    raise RuntimeError(f"Strategist failed to generate brief after {MAX_CRITIC_RETRIES} attempts")
-                continue  # Retry without critic feedback
+                brief_content = _extract_response_text(msg)
+                if not brief_content:
+                    logging.error(f"❌ Strategist returned empty response on attempt {attempt}")
+                    if attempt >= MAX_CRITIC_RETRIES:
+                        raise RuntimeError(f"Strategist failed to generate brief after {MAX_CRITIC_RETRIES} attempts")
+                    continue  # Retry without critic feedback
 
-            # Step 4: Critic reviews the brief
-            logging.info(f"🔍 Critic reviewing brief (attempt {attempt})...")
+                # Step 4: Critic reviews the brief
+                logging.info(f"🔍 Critic reviewing brief (attempt {attempt})...")
 
-            critic_input = f"""## Original Client Intake
+                critic_input = f"""## Original Client Intake
 {intake}
 
 ## Generated Project Brief
 {brief_content}
 
 Please evaluate this brief against the original intake."""
+
+                critic_msg = client_anthropic.messages.create(
+                    model=MODEL_CRITIC,
+                    max_tokens=500,
+                    system=critic_prompt,
+                    messages=[{"role": "user", "content": critic_input}]
+                )
+                _record_model_cost(
+                    "anthropic", MODEL_CRITIC, "pipeline_architect_critic",
+                    client_id, critic_msg, {"attempt": attempt}
+                )
+
+                critic_response_text = _extract_response_text(critic_msg)
+                if not critic_response_text:
+                    logging.warning(f"⚠️ Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                    break
+
+                critic_response = critic_response_text.strip()
+
+                # Step 5: Decision - PASS or FAIL
+                # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
+                if critic_response.startswith("FAIL"):
+                    logging.warning(f"⚠️ Critic rejected brief on attempt {attempt}")
+                    previous_feedback = critic_response
+                    if attempt >= MAX_CRITIC_RETRIES:
+                        logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
+                        break  # Explicit break to exit loop after max retries
+                elif critic_response.startswith("PASS"):
+                    logging.info(f"✅ Critic approved brief on attempt {attempt}")
+                    break
+                else:
+                    # Ambiguous response - treat as pass but log warning
+                    logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
+                    break
+
+            # Step 6: Validate and save the brief
+            if not brief_content:
+                raise RuntimeError(f"Failed to generate brief for {client_id} after {MAX_CRITIC_RETRIES} attempts")
+
+            # Save immutable original for future optimization analysis
+            with open(os.path.join(client_path, "brief.orig.md"), "w", encoding="utf-8") as f:
+                f.write(brief_content)
+            logging.info("Saved original AI output to brief.orig.md")
+
+            # Save the working copy
+            with open(os.path.join(client_path, "brief.md"), "w", encoding="utf-8") as f:
+                f.write(brief_content)
+
+        # Wait for visual designer to complete
+        # NOTE: The ThreadPoolExecutor context manager calls shutdown(wait=True) on exit,
+        # so we always wait for completion regardless of timeout. The timeout here only
+        # controls when we log a warning - it doesn't actually limit blocking time.
+        try:
+            visual_designer_future.result(timeout=60)
+        except (TimeoutError, FuturesTimeoutError, CancelledError) as e:
+            logging.warning("⚠️ Visual Designer timed out or was cancelled: %s", type(e).__name__)
+
+    # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
+    # This prevents the "Limbo" state if the script crashes later.
+    run_copywriter(client_path)
+
+def run_copywriter(client_path):
+    """
+    Copywriter agent with Copy Critic loop.
+
+    1. Generates website content from the brief
+    2. Critic reviews for hallucinations, placeholders, and weak CTAs
+    3. Retries if FAIL, up to MAX_CRITIC_RETRIES
+    4. Saves original AI output as content.orig.md
+    """
+    client_id = os.path.basename(client_path)
+    logging.info(f"✍️  Copywriter writing for {client_id}...")
+
+    with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
+        # Load brief and intake
+        with open(os.path.join(client_path, "brief.md"), "r", encoding="utf-8") as f:
+            brief = f.read()
+
+        # Load intake for critic comparison
+        intake = None
+        intake_path = os.path.join(client_path, "intake.md")
+        if os.path.exists(intake_path):
+            with open(intake_path, "r", encoding="utf-8") as f:
+                intake = f.read()
+        else:
+            # Fallback to processed intake if already renamed
+            intake_processed_path = os.path.join(client_path, "intake-processed.md")
+            if os.path.exists(intake_processed_path):
+                with open(intake_processed_path, "r", encoding="utf-8") as f:
+                    intake = f.read()
+
+        # Determine if critic review is possible
+        skip_critic = intake is None
+        if skip_critic:
+            logging.warning("⚠️ No intake file found - skipping Copy Critic review")
+            critic_prompt = None
+        else:
+            critic_prompt = _load_prompt("critique/copy_critic.md")
+
+        copywriter_prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
+
+        # Critic Loop with max retries
+        content = None
+        previous_feedback = None
+        attempt = 0
+
+        while attempt < MAX_CRITIC_RETRIES:
+            attempt += 1
+            logging.info(f"📝 Copywriter generating content (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+
+            # Build messages for the copywriter
+            if previous_feedback:
+                user_content = f"""## Project Brief
+{brief}
+
+## Previous Attempt Feedback
+The previous content was rejected by our Copy Critic. Please address these issues:
+{previous_feedback}
+
+Generate improved website content that addresses the feedback above."""
+            else:
+                user_content = brief
+
+            # Generate content
+            msg = client_anthropic.messages.create(
+                model=MODEL_COPY,
+                max_tokens=4000,
+                system=copywriter_prompt,
+                messages=[{"role": "user", "content": user_content}]
+            )
+            _record_model_cost(
+                "anthropic", MODEL_COPY, "pipeline_copywriter",
+                client_id, msg, {"attempt": attempt}
+            )
+
+            content = _extract_response_text(msg)
+            if not content:
+                logging.error(f"❌ Copywriter returned empty response on attempt {attempt}")
+                if attempt >= MAX_CRITIC_RETRIES:
+                    raise RuntimeError(f"Copywriter failed to generate content after {MAX_CRITIC_RETRIES} attempts")
+                continue
+
+            # Skip critic review if intake is not available
+            if skip_critic:
+                logging.info("Skipping Copy Critic review - no intake available")
+                break
+
+            # Copy Critic reviews the content
+            logging.info(f"🔍 Copy Critic reviewing content (attempt {attempt})...")
+
+            critic_input = f"""## Original Client Intake
+{intake}
+
+## Project Brief
+{brief}
+
+## Generated Website Content
+{content}
+
+Please evaluate this content against the intake and brief."""
 
             critic_msg = client_anthropic.messages.create(
                 model=MODEL_CRITIC,
@@ -426,95 +683,103 @@ Please evaluate this brief against the original intake."""
                 messages=[{"role": "user", "content": critic_input}]
             )
             _record_model_cost(
-                "anthropic", MODEL_CRITIC, "pipeline_architect_critic",
+                "anthropic", MODEL_CRITIC, "pipeline_copywriter_critic",
                 client_id, critic_msg, {"attempt": attempt}
             )
 
             critic_response_text = _extract_response_text(critic_msg)
             if not critic_response_text:
-                logging.warning(f"⚠️ Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                logging.warning(f"⚠️ Copy Critic returned empty response on attempt {attempt}. Treating as PASS.")
                 break
 
             critic_response = critic_response_text.strip()
 
-            # Step 5: Decision - PASS or FAIL
+            # Decision - PASS or FAIL
             # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
             if critic_response.startswith("FAIL"):
-                logging.warning(f"⚠️ Critic rejected brief on attempt {attempt}")
+                logging.warning(f"⚠️ Copy Critic rejected content on attempt {attempt}")
                 previous_feedback = critic_response
                 if attempt >= MAX_CRITIC_RETRIES:
-                    logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
-                    break  # Explicit break to exit loop after max retries
+                    logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated content.")
+                    break
             elif critic_response.startswith("PASS"):
-                logging.info(f"✅ Critic approved brief on attempt {attempt}")
+                logging.info(f"✅ Copy Critic approved content on attempt {attempt}")
                 break
             else:
-                # Ambiguous response - treat as pass but log warning
-                logging.warning(f"⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
+                logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with content.")
                 break
 
-        # Step 6: Save the brief
-        # Save immutable original for future optimization analysis
-        with open(f"{client_path}/brief.orig.md", "w", encoding="utf-8") as f:
-            f.write(brief_content)
-        logging.info(f"💾 Saved original AI output to brief.orig.md")
+        # Validate content before saving
+        if not content:
+            raise RuntimeError(f"Failed to generate content for {client_id} after {MAX_CRITIC_RETRIES} attempts")
+
+        # Save immutable original for future analysis
+        with open(os.path.join(client_path, "content.orig.md"), "w", encoding="utf-8") as f:
+            f.write(content)
+        logging.info("Saved original AI output to content.orig.md")
 
         # Save the working copy
-        with open(f"{client_path}/brief.md", "w", encoding="utf-8") as f:
-            f.write(brief_content)
-
-    # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
-    # This prevents the "Limbo" state if the script crashes later.
-    run_copywriter(client_path)
-
-def run_copywriter(client_path):
-    client_id = os.path.basename(client_path)
-    logging.info(f"✍️  Copywriter writing for {client_id}...")
-    with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
-        with open(f"{client_path}/brief.md", "r", encoding="utf-8") as f:
-            brief = f.read()
-
-        prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
-
-        msg = client_anthropic.messages.create(
-            model=MODEL_COPY, max_tokens=4000, system=prompt,
-            messages=[{"role": "user", "content": brief}]
-        )
-        _record_model_cost("anthropic", MODEL_COPY, "pipeline_copywriter", client_id, msg)
-
-        with open(f"{client_path}/content.md", "w", encoding="utf-8") as f:
-            f.write(msg.content[0].text)
+        with open(os.path.join(client_path, "content.md"), "w", encoding="utf-8") as f:
+            f.write(content)
 
     run_builder(client_path)
 
 def run_builder(client_path):
     client_id = os.path.basename(client_path)
     logging.info(f"🧱 Builder assembling {client_id}...")
-    
+
     with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
-        with open(f"{client_path}/brief.md", "r", encoding="utf-8") as f:
+        with open(os.path.join(client_path, "brief.md"), "r", encoding="utf-8") as f:
             brief = f.read()
-        with open(f"{client_path}/content.md", "r", encoding="utf-8") as f:
+        with open(os.path.join(client_path, "content.md"), "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         manifest = ""
         if os.path.exists(LIBRARY_PATH):
             with open(LIBRARY_PATH, "r", encoding="utf-8") as f:
                 manifest = f.read()
         else:
             logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
-        
+
+        # Load theme.json if it exists (generated by Visual Designer)
+        theme_section = ""
+        theme_path = os.path.join(client_path, "theme.json")
+        if os.path.exists(theme_path):
+            try:
+                with open(theme_path, "r", encoding="utf-8") as f:
+                    theme_data = json.load(f)
+                theme_section = f"""
+        DESIGN THEME:
+        Apply these colors, fonts, and styles using Tailwind CSS classes:
+        {json.dumps(theme_data, indent=2)}
+
+        - Use the "primary" color for main CTAs and headings
+        - Use the "secondary" color for secondary elements
+        - Use the "accent" color for highlights and hover states
+        - Apply the "background" setting to the page background
+        - Use "font_heading" for h1, h2, h3 elements
+        - Use "font_body" for paragraph text
+        - Apply "border_radius" to buttons and cards
+        """
+                logging.info(f"✅ Loaded theme.json for {client_id}")
+            except (json.JSONDecodeError, IOError) as e:
+                logging.warning(f"⚠️ Failed to load theme.json: {e}")
+        else:
+            logging.info(f"[i] No theme.json found for {client_id}, using default styles")
+
         prompt = f"""
-        You are a React Engineer. 
+        You are a React Engineer.
         Your goal: Create the `page.tsx` file for a Next.js landing page.
-        
+
         1. Read the Content and Brief.
         2. Select components ONLY from the Library Manifest below.
         3. Map the content into the component props.
-        4. Output ONLY the code for `page.tsx` inside a code block.
-        
+        4. Apply the design theme colors and fonts using Tailwind CSS.
+        5. Output ONLY the code for `page.tsx` inside a code block.
+
         MANIFEST:
         {manifest}
+        {theme_section}
         """
         
         msg = client_anthropic.messages.create(
