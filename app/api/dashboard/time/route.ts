@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { readJsonFile } from "@/lib/json-utils";
+import { isAuthorized } from "@/lib/auth-utils";
+import { validateTimeLogs } from "@/lib/schema-validator";
+import { validateMonth } from "@/lib/validation-utils";
 
 const root = process.cwd();
 const timeDir = path.join(root, "data", "time_logs");
@@ -15,12 +19,7 @@ async function fileExists(target: string) {
 }
 
 async function readJson(target: string) {
-  try {
-    const raw = await fs.readFile(target, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+  return readJsonFile(target, []);
 }
 
 async function loadEntries(month: string) {
@@ -30,15 +29,31 @@ async function loadEntries(month: string) {
   const entries = [];
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
-    entries.push(...(await readJson(path.join(monthPath, file))));
+    const fileEntries = await readJson(path.join(monthPath, file));
+    // Validate schema
+    const validation = validateTimeLogs(fileEntries);
+    if (!validation.valid) {
+      console.warn(`[Schema Validation] Invalid time entries in ${file}:`, validation.errors);
+    }
+    entries.push(...fileEntries);
   }
   return entries;
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const month = url.searchParams.get("month") ?? new Date().toISOString().slice(0, 7);
-  const entries = await loadEntries(month);
-  return NextResponse.json({ month, entries });
+  // Check authorization
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  
+  try {
+    const url = new URL(request.url);
+    const month = validateMonth(url.searchParams.get("month"));
+    const entries = await loadEntries(month);
+    return NextResponse.json({ month, entries });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Invalid request";
+    return NextResponse.json({ error: errorMessage }, { status: 400 });
+  }
 }
 

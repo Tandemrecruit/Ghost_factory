@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import { readJsonFile } from "@/lib/json-utils";
+import { isAuthorized } from "@/lib/auth-utils";
+import {
+  validateTimeLogs,
+  validateCostEntries,
+  validateRevenueEntries,
+} from "@/lib/schema-validator";
+import { validateMonth } from "@/lib/validation-utils";
 
 const root = process.cwd();
 const balanceDir = path.join(root, "data", "balance_sheets");
@@ -20,21 +28,11 @@ async function fileExists(target: string) {
 }
 
 async function readJson(target: string) {
-  try {
-    const raw = await fs.readFile(target, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
+  return readJsonFile(target, []);
 }
 
 async function loadConfig() {
-  try {
-    const raw = await fs.readFile(configPath, "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
+  return readJsonFile(configPath, {});
 }
 
 async function loadTimeEntries(month: string) {
@@ -45,7 +43,13 @@ async function loadTimeEntries(month: string) {
   const entries = [];
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
-    entries.push(...(await readJson(path.join(monthPath, file))));
+    const fileEntries = await readJson(path.join(monthPath, file));
+    // Validate schema
+    const validation = validateTimeLogs(fileEntries);
+    if (!validation.valid) {
+      console.warn(`[Schema Validation] Invalid time entries in ${file}:`, validation.errors);
+    }
+    entries.push(...fileEntries);
   }
   return entries;
 }
@@ -54,23 +58,54 @@ async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
+  
   const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
-  const costEntries = [
-    ...(await readJson(path.join(costApiDir, `${month}.json`))),
-    ...(await readJson(path.join(costHostingDir, `${month}.json`))),
-  ];
+  const revenueValidation = validateRevenueEntries(revenueEntries);
+  if (!revenueValidation.valid) {
+    console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
+  }
+  
+  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+  const apiValidation = validateCostEntries(apiCosts, "api");
+  if (!apiValidation.valid) {
+    console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
+  }
+  
+  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+  const hostingValidation = validateCostEntries(hostingCosts, "hosting");
+  if (!hostingValidation.valid) {
+    console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
+  }
+  
+  const costEntries = [...apiCosts, ...hostingCosts];
 
-  const totalSeconds = timeEntries.reduce((sum, e) => sum + (e.duration_seconds || 0), 0);
+  // Type coercion with null checks
+  const totalSeconds = timeEntries.reduce((sum, e) => {
+    const val = Number(e?.duration_seconds) || 0;
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
   const totalHours = totalSeconds / 3600;
-  const timeSavedSeconds = timeEntries.reduce((sum, e) => sum + (e.time_saved_seconds || 0), 0);
+  const timeSavedSeconds = timeEntries.reduce((sum, e) => {
+    const val = Number(e?.time_saved_seconds) || 0;
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
 
-  const revenueTotal = revenueEntries.reduce((sum, e) => sum + (e.amount_usd || 0), 0);
+  const revenueTotal = revenueEntries.reduce((sum, e) => {
+    const val = Number(e?.amount_usd) || 0;
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
   const apiCostTotal = costEntries
-    .filter((e) => e.provider)
-    .reduce((sum, e) => sum + (e.cost_usd || 0), 0);
+    .filter((e) => e?.provider)
+    .reduce((sum, e) => {
+      const val = Number(e?.cost_usd) || 0;
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
   const hostingCostTotal = costEntries
-    .filter((e) => e.type === "hosting")
-    .reduce((sum, e) => sum + (e.cost_usd || 0), 0);
+    .filter((e) => e?.type === "hosting")
+    .reduce((sum, e) => {
+      const val = Number(e?.cost_usd) || 0;
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
   const paymentFee = revenueTotal * processingRate;
   const totalCosts = apiCostTotal + hostingCostTotal + paymentFee;
   const netIncome = revenueTotal - totalCosts;
@@ -99,16 +134,31 @@ async function computeFallback(month: string) {
 }
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const month = url.searchParams.get("month") ?? new Date().toISOString().slice(0, 7);
-  const balancePath = path.join(balanceDir, `${month}.json`);
-
-  if (await fileExists(balancePath)) {
-    const data = await readJson(balancePath);
-    return NextResponse.json(data);
+  // Check authorization
+  if (!isAuthorized(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  
+  try {
+    const url = new URL(request.url);
+    const month = validateMonth(url.searchParams.get("month"));
+    const balancePath = path.join(balanceDir, `${month}.json`);
 
-  const data = await computeFallback(month);
-  return NextResponse.json(data);
+    if (await fileExists(balancePath)) {
+      const data = await readJsonFile(balancePath, null);
+      if (data === null) {
+        // If file exists but is corrupted, compute fallback
+        const fallbackData = await computeFallback(month);
+        return NextResponse.json(fallbackData);
+      }
+      return NextResponse.json(data);
+    }
+
+    const data = await computeFallback(month);
+    return NextResponse.json(data);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Invalid request";
+    return NextResponse.json({ error: errorMessage }, { status: 400 });
+  }
 }
 

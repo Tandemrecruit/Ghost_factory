@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Star } from 'lucide-react'
@@ -23,6 +26,12 @@ export function TestimonialCards({
   testimonials,
   className,
 }: TestimonialCardsProps) {
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }))
+  }
+
   return (
     <section className={cn('section-padding', className)}>
       <div className="container-wide">
@@ -62,7 +71,7 @@ export function TestimonialCards({
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                {testimonial.avatarSrc ? (
+                {testimonial.avatarSrc && !imageErrors[index] ? (
                   <div className="relative h-12 w-12 overflow-hidden rounded-full">
                     <Image
                       src={testimonial.avatarSrc}
@@ -70,6 +79,7 @@ export function TestimonialCards({
                       fill
                       className="object-cover"
                       sizes="48px"
+                      onError={() => handleImageError(index)}
                     />
                   </div>
                 ) : (

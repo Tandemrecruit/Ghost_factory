@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Icon, type IconName } from '@/lib/icons'
@@ -26,6 +29,12 @@ export function BentoGrid({
   items,
   className,
 }: BentoGridProps) {
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }))
+  }
+
   // Get size classes for grid items
   const getSizeClasses = (size: BentoItem['size'], index: number) => {
     // Default pattern if no size specified
@@ -83,7 +92,7 @@ export function BentoGrid({
               )}
             >
               {/* Background Image (if provided) */}
-              {item.imageSrc && (
+              {item.imageSrc && !imageErrors[index] ? (
                 <>
                   <Image
                     src={item.imageSrc}
@@ -91,10 +100,15 @@ export function BentoGrid({
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    onError={() => handleImageError(index)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 </>
-              )}
+              ) : item.imageSrc && imageErrors[index] ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+                  <span className="text-sm">Image unavailable</span>
+                </div>
+              ) : null}
 
               {/* Content */}
               <div

@@ -15,6 +15,9 @@ from anthropic import Anthropic
 from playwright.sync_api import sync_playwright
 from automation import time_tracker, cost_tracker
 from automation import memory
+from automation.client_utils import validate_client_id_or_raise, is_valid_client_id
+from automation.lock_utils import client_lock, is_locked
+from automation.file_utils import atomic_write
 
 # 1. SETUP
 load_dotenv()
@@ -242,6 +245,11 @@ def run_intake_sanitizer():
         return
 
     for client_id in os.listdir(WATCH_DIR):
+        # Validate client ID to prevent path traversal attacks
+        if not is_valid_client_id(client_id):
+            logging.warning(f"⚠️ Skipping invalid client ID in sanitizer: {client_id}")
+            continue
+        
         client_path = os.path.join(WATCH_DIR, client_id)
         raw_intake_path = os.path.join(client_path, "intake-raw.md")
 
@@ -438,12 +446,16 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         return (False, error_msg)
 
     finally:
-        # Clean up temp file
-        if temp_path is not None and os.path.exists(temp_path):
+        # Clean up temp file - ensure it's always removed
+        if temp_path is not None:
             try:
-                os.unlink(temp_path)
-            except Exception:
-                pass
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+            except (OSError, PermissionError) as e:
+                logging.warning(f"⚠️ Failed to clean up temp file {temp_path}: {e}")
+                # Try to register for cleanup on exit as fallback
+                import atexit
+                atexit.register(lambda: os.unlink(temp_path) if os.path.exists(temp_path) else None)
 
 
 # 3. WORKER AGENTS
@@ -465,6 +477,8 @@ def run_visual_designer(client_path):
         None: If intake.md is missing or the designer failed to produce usable output.
     """
     client_id = os.path.basename(client_path)
+    # Validate client ID to prevent path traversal
+    validate_client_id_or_raise(client_id, "run_visual_designer")
     logging.info(f"🎨 Visual Designer generating theme for {client_id}...")
 
     with time_tracker.track_span("pipeline_visual_designer", client_id, {"stage": "visual_designer"}):
@@ -626,6 +640,15 @@ def run_architect(client_path):
         client_path (str): Filesystem path to the client's directory (must contain intake.md); the client ID is derived from the directory basename.
     """
     client_id = os.path.basename(client_path)
+    # Validate client ID to prevent path traversal
+    validate_client_id_or_raise(client_id, "run_architect")
+    
+    # Check for existing brief.md - skip if already generated
+    brief_path = os.path.join(client_path, "brief.md")
+    if os.path.exists(brief_path):
+        logging.info(f"⏭️  Brief already exists for {client_id}, skipping architect stage")
+        return
+    
     logging.info(f"🏗️  Architect analyzing {client_id}...")
 
     # Load intake ONCE (before time tracking to avoid including file I/O in span)
@@ -740,13 +763,19 @@ Please evaluate this brief against the original intake."""
                 raise RuntimeError(f"Failed to generate brief for {client_id} after {MAX_CRITIC_RETRIES} attempts")
 
             # Save immutable original for future optimization analysis
-            with open(os.path.join(client_path, "brief.orig.md"), "w", encoding="utf-8") as f:
-                f.write(brief_content)
-            logging.info("Saved original AI output to brief.orig.md")
+            brief_orig_path = os.path.join(client_path, "brief.orig.md")
+            if atomic_write(brief_orig_path, brief_content):
+                logging.info("Saved original AI output to brief.orig.md")
+            else:
+                logging.error(f"Failed to write {brief_orig_path}")
 
             # Save the working copy
-            with open(os.path.join(client_path, "brief.md"), "w", encoding="utf-8") as f:
-                f.write(brief_content)
+            brief_path = os.path.join(client_path, "brief.md")
+            if atomic_write(brief_path, brief_content):
+                logging.info("Saved brief.md")
+            else:
+                logging.error(f"Failed to write {brief_path}")
+                raise RuntimeError(f"Failed to write brief.md for {client_id}")
 
         # Wait for visual designer to complete
         # NOTE: The ThreadPoolExecutor context manager calls shutdown(wait=True) on exit,
@@ -776,6 +805,13 @@ def run_copywriter(client_path):
         RuntimeError: If the copywriter model returns no content for every attempt and generation ultimately fails.
     """
     client_id = os.path.basename(client_path)
+    
+    # Check for existing content.md - skip if already generated
+    content_path = os.path.join(client_path, "content.md")
+    if os.path.exists(content_path):
+        logging.info(f"⏭️  Content already exists for {client_id}, skipping copywriter stage")
+        return
+    
     logging.info(f"✍️  Copywriter writing for {client_id}...")
 
     with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
@@ -904,13 +940,19 @@ Please evaluate this content against the intake and brief."""
             raise RuntimeError(f"Failed to generate content for {client_id} after {MAX_CRITIC_RETRIES} attempts")
 
         # Save immutable original for future analysis
-        with open(os.path.join(client_path, "content.orig.md"), "w", encoding="utf-8") as f:
-            f.write(content)
-        logging.info("Saved original AI output to content.orig.md")
+        content_orig_path = os.path.join(client_path, "content.orig.md")
+        if atomic_write(content_orig_path, content):
+            logging.info("Saved original AI output to content.orig.md")
+        else:
+            logging.error(f"Failed to write {content_orig_path}")
 
         # Save the working copy
-        with open(os.path.join(client_path, "content.md"), "w", encoding="utf-8") as f:
-            f.write(content)
+        content_path = os.path.join(client_path, "content.md")
+        if atomic_write(content_path, content):
+            logging.info("Saved content.md")
+        else:
+            logging.error(f"Failed to write {content_path}")
+            raise RuntimeError(f"Failed to write content.md for {client_id}")
 
     run_builder(client_path)
 
@@ -930,6 +972,15 @@ def run_builder(client_path):
                           and optionally theme.json). Client ID is derived from basename.
     """
     client_id = os.path.basename(client_path)
+    # Validate client ID to prevent path traversal
+    validate_client_id_or_raise(client_id, "run_builder")
+    
+    # Check for existing page.tsx - skip if already generated
+    target_file = f"./app/clients/{client_id}/page.tsx"
+    if os.path.exists(target_file):
+        logging.info(f"⏭️  Page already exists for {client_id}, skipping builder stage")
+        return
+    
     logging.info(f"🧱 Builder assembling {client_id} (Self-Correcting Mode)...")
 
     with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
@@ -998,7 +1049,7 @@ MANIFEST:
 {theme_section}
 """
 
-        target_file = f"./app/clients/{client_id}/page.tsx"
+        # target_file already set above in partial state check
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
 
         # Main Engineering Cycle
@@ -1095,9 +1146,16 @@ Please fix the visual issues while maintaining correct syntax."""
             # Phase 2: Save and run Visual QA
             logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
 
-            # Save the code
-            with open(target_file, "w", encoding="utf-8") as f:
-                f.write(code)
+            # Save the code atomically
+            if not atomic_write(target_file, code):
+                logging.error(f"Failed to write {target_file}")
+                memory.record_failure(
+                    category="builder",
+                    issue=f"Failed to write page.tsx file: {target_file}",
+                    fix="Check file permissions and disk space",
+                    metadata={"client_id": client_id, "attempt": total_attempts}
+                )
+                continue  # Retry
 
             # Run QA
             qa_status, qa_report, screenshot_path = run_qa(client_path)
@@ -1161,6 +1219,8 @@ def run_qa(client_path) -> Tuple[str, str, str]:
         - screenshot_path: Path to the screenshot file (may not exist on error)
     """
     client_id = os.path.basename(client_path)
+    # Validate client ID to prevent path traversal
+    validate_client_id_or_raise(client_id, "run_qa")
     screenshot_path = os.path.join(client_path, "qa_mobile.jpg")
 
     # Server Check with Auto-Start
@@ -1174,15 +1234,23 @@ def run_qa(client_path) -> Tuple[str, str, str]:
         logging.info("🕵️‍♂️ QA Inspector starting...")
         url = f"http://localhost:3000/clients/{client_id}"
 
+        browser = None
         try:
             # Capture screenshot
             with sync_playwright() as p:
                 browser = p.chromium.launch()
-                page = browser.new_page(viewport={"width": 390, "height": 844})
-                page.goto(url)
-                page.wait_for_timeout(3000)  # Wait for hydration
-                page.screenshot(path=screenshot_path, full_page=True)
-                browser.close()
+                try:
+                    page = browser.new_page(viewport={"width": 390, "height": 844})
+                    page.goto(url)
+                    page.wait_for_timeout(3000)  # Wait for hydration
+                    page.screenshot(path=screenshot_path, full_page=True)
+                finally:
+                    # Ensure browser is always closed, even on exception
+                    if browser:
+                        try:
+                            browser.close()
+                        except Exception as e:
+                            logging.warning(f"⚠️ Error closing browser: {e}")
 
             # Analyze with Vision Model
             with open(screenshot_path, "rb") as f:
@@ -1237,6 +1305,8 @@ def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
         qa_report: The QA report text
     """
     client_id = os.path.basename(client_path)
+    # Validate client ID to prevent path traversal
+    validate_client_id_or_raise(client_id, "finalize_client")
 
     # Map status to Discord alert type
     discord_status_map = {
@@ -1288,12 +1358,27 @@ if __name__ == "__main__":
 
         if os.path.exists(WATCH_DIR):
             for client_id in os.listdir(WATCH_DIR):
+                # Validate client ID to prevent path traversal attacks
+                if not is_valid_client_id(client_id):
+                    logging.warning(f"⚠️ Skipping invalid client ID: {client_id}")
+                    continue
+                
+                # Check if client is already being processed
+                if is_locked(client_id):
+                    logging.info(f"⏸️  Client {client_id} is already being processed, skipping")
+                    continue
+                
                 path = os.path.join(WATCH_DIR, client_id)
                 # Look for unprocessed intake files
                 if os.path.isdir(path) and os.path.exists(f"{path}/intake.md"):
                     logging.info(f"🚀 Found pending job: {client_id}")
                     try:
-                        run_architect(path)
+                        # Acquire lock before processing
+                        with client_lock(client_id):
+                            run_architect(path)
+                    except RuntimeError as e:
+                        # Lock acquisition failed - another instance is processing
+                        logging.info(f"⏸️  Could not acquire lock for {client_id}, skipping")
                     except Exception as e:
                         logging.error(f"❌ Pipeline crashed for {client_id}: {e}")
                         # Since we didn't rename intake.md, it will be retried next loop

@@ -93,7 +93,18 @@ def _append_entries(month_str: str, entries: List[Dict[str, Any]]) -> None:
                 data = json.load(f)
         except Exception:
             data = []
-    data.extend(entries)
+    
+    # Validate entries before appending
+    from automation.schema_validator import validate_revenue_entry
+    valid_entries = []
+    for entry in entries:
+        is_valid, error = validate_revenue_entry(entry)
+        if is_valid:
+            valid_entries.append(entry)
+        else:
+            logging.error(f"Invalid revenue entry rejected: {error}")
+    
+    data.extend(valid_entries)
     with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 

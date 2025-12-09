@@ -1,16 +1,16 @@
-```tsx
-import Image from "next/image";
-import { HeroSplit } from "@/components/hero-split";
-import { FeatureGrid } from "@/components/feature-grid";
-import { FeatureSteps } from "@/components/feature-steps";
-import { SectionWrapper } from "@/components/section-wrapper";
-import { PricingTiers } from "@/components/pricing-tiers";
-import { TestimonialCards } from "@/components/testimonial-cards";
-import { FaqAccordion } from "@/components/faq-accordion";
-import { CtaBanner } from "@/components/cta-banner";
-import { FooterSimple } from "@/components/footer-simple";
-import { NavSimple } from "@/components/nav-simple";
-import { TrustBadges } from "@/components/trust-badges";
+import {
+  HeroSplit,
+  FeatureGrid,
+  FeatureSteps,
+  SectionWrapper,
+  PricingTiers,
+  TestimonialCards,
+  FaqAccordion,
+  CtaBanner,
+  FooterSimple,
+  NavSimple,
+  TrustBadges,
+} from "@/components";
 
 export default function Home() {
   return (
@@ -44,7 +44,7 @@ export default function Home() {
           badges={[
             { icon: "check-circle", label: "Free shipping on all subscriptions" },
             { icon: "clock", label: "Roasted within 7 days of delivery" },
-            { icon: "x", label: "Pause or cancel anytime" },
+            { icon: "check-circle", label: "Pause or cancel anytime" },
           ]}
         />
       </SectionWrapper>
@@ -342,3 +342,24 @@ export default function Home() {
 
       <SectionWrapper background="gradient" paddingY="large">
         <CtaBanner
+          eyebrow="Ready to Start?"
+          heading="Still Reading? You Must Really Love Coffee."
+          subhead="Join hundreds of coffee lovers who've upgraded their mornings. First bag guaranteed or your money back."
+          primaryCtaLabel="Start Your Subscription"
+          primaryCtaHref="#pricing"
+        />
+      </SectionWrapper>
+
+      <FooterSimple
+        companyName="Ember Roasters"
+        links={[
+          { label: "Subscriptions", href: "#pricing" },
+          { label: "Our Story", href: "#story" },
+          { label: "FAQ", href: "#faq" },
+          { label: "Contact", href: "#contact" },
+        ]}
+        socialLinks={[
+          { platform: "instagram", href: "https://instagram.com/emberroasterspdx" },
+        ]}
+        copyrightText="© 2024 Ember Roasters. Portland, Oregon."
+      />

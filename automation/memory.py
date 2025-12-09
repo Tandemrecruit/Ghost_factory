@@ -46,8 +46,8 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
             with open(RAW_ERRORS_PATH, "r", encoding="utf-8") as f:
                 try:
                     errors = json.load(f)
-                except json.JSONDecodeError:
-                    logging.warning("Corrupted raw_errors.json, starting fresh")
+                except json.JSONDecodeError as e:
+                    logging.warning(f"Corrupted raw_errors.json at {RAW_ERRORS_PATH}: {e}, starting fresh")
                     errors = []
 
         # Create error record

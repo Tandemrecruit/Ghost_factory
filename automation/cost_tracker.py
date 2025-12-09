@@ -35,10 +35,21 @@ def _append_entry(base: Path, month_str: str, entry: Dict[str, Any]) -> None:
         try:
             with path.open("r", encoding="utf-8") as f:
                 data = json.load(f)
-        except Exception:
+        except (json.JSONDecodeError, IOError) as exc:
+            logging.warning(f"Failed to read/parse JSON file {path}: {exc}, starting with empty list")
             data = []
     else:
         data = []
+    
+    # Validate entry before appending
+    from automation.schema_validator import validate_api_cost_entry, validate_hosting_cost_entry
+    is_hosting = entry.get("type") == "hosting"
+    validator = validate_hosting_cost_entry if is_hosting else validate_api_cost_entry
+    is_valid, error = validator(entry)
+    if not is_valid:
+        logging.error(f"Invalid cost entry rejected: {error}")
+        return
+    
     data.append(entry)
     with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)

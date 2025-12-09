@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -23,6 +26,8 @@ export function HeroSplit({
   imagePosition = 'right',
   className,
 }: HeroSplitProps) {
+  const [imageError, setImageError] = useState(false)
+
   return (
     <section className={cn('py-16 md:py-20 lg:py-24', className)}>
       <div className="container-wide">
@@ -50,14 +55,21 @@ export function HeroSplit({
 
           {/* Image */}
           <div className="relative aspect-square w-full overflow-hidden rounded-2xl lg:aspect-[4/3]">
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+            {!imageError ? (
+              <Image
+                src={imageSrc}
+                alt={imageAlt}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                <span className="text-sm">Image unavailable</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -44,7 +44,14 @@ def _load_day_entries(path: Path) -> List[Dict[str, Any]]:
         return []
     try:
         with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Validate schema
+            from automation.schema_validator import validate_time_logs
+            is_valid, error, invalid_count = validate_time_logs(data)
+            if not is_valid:
+                logging.warning(f"Schema validation failed for {path}: {error}")
+                # Return data anyway but log warning
+            return data
     except Exception as exc:  # pragma: no cover - defensive
         logging.warning(f"Could not read {path}: {exc}")
         return []

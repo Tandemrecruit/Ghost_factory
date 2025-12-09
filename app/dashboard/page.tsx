@@ -16,14 +16,9 @@ import {
   YAxis,
 } from "recharts";
 import { format } from "date-fns";
+import type { TimeEntry as SchemaTimeEntry, RevenueEntry, ApiCostEntry, HostingCostEntry } from "@/lib/schema-validator";
 
-type TimeEntry = {
-  timestamp: string;
-  activity: string;
-  client_id?: string | null;
-  duration_seconds: number;
-  time_saved_seconds?: number;
-};
+type TimeEntry = SchemaTimeEntry;
 
 type StatPayload = {
   month: string;
@@ -41,13 +36,24 @@ type StatPayload = {
   running_balance: { day: string; balance_usd: number }[];
   entries: {
     time: TimeEntry[];
-    revenue: any[];
-    costs: any[];
+    revenue: RevenueEntry[];
+    costs: (ApiCostEntry | HostingCostEntry)[];
   };
 };
 
 const cardClass =
   "rounded-xl border border-border bg-muted/40 p-4 shadow-sm transition hover:shadow-md";
+
+// Helper function to safely format timestamps
+const formatTimestamp = (timestamp: string): string => {
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return format(date, "MMM d, HH:mm");
+  } catch {
+    return 'Invalid date';
+  }
+};
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<StatPayload | null>(null);
@@ -74,7 +80,10 @@ export default function DashboardPage() {
   const timeByActivity = useMemo(() => {
     const map: Record<string, number> = {};
     timeEntries.forEach((entry) => {
-      map[entry.activity] = (map[entry.activity] || 0) + entry.duration_seconds / 3600;
+      const duration = Number(entry?.duration_seconds) || 0;
+      if (!isNaN(duration) && entry?.activity) {
+        map[entry.activity] = (map[entry.activity] || 0) + duration / 3600;
+      }
     });
     return Object.entries(map).map(([activity, hours]) => ({ activity, hours: Number(hours.toFixed(2)) }));
   }, [timeEntries]);
@@ -90,10 +99,13 @@ export default function DashboardPage() {
 
   const revenueSeries = useMemo(() => {
     const rev = stats?.entries?.revenue ?? [];
-    return rev.map((r) => ({
-      date: r.timestamp?.slice(0, 10) ?? "",
-      amount: r.amount_usd ?? 0,
-    }));
+    return rev.map((r) => {
+      const amount = Number(r?.amount_usd) || 0;
+      return {
+        date: r?.timestamp?.slice(0, 10) ?? "",
+        amount: isNaN(amount) ? 0 : amount,
+      };
+    });
   }, [stats]);
 
   const balanceSeries = useMemo(() => {
@@ -179,14 +191,20 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Hours</p>
             </div>
             <div className="h-64">
-              <ResponsiveContainer>
-                <BarChart data={timeByActivity}>
-                  <XAxis dataKey="activity" stroke="var(--color-muted-foreground)" />
-                  <YAxis stroke="var(--color-muted-foreground)" />
-                  <Tooltip />
-                  <Bar dataKey="hours" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {timeByActivity.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <p className="text-sm">No time entries available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <BarChart data={timeByActivity}>
+                    <XAxis dataKey="activity" stroke="var(--color-muted-foreground)" />
+                    <YAxis stroke="var(--color-muted-foreground)" />
+                    <Tooltip />
+                    <Bar dataKey="hours" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -196,22 +214,28 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Hours</p>
             </div>
             <div className="h-64">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={timeSavedData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={4}
-                  >
-                    <Cell fill="var(--color-primary)" />
-                    <Cell fill="var(--color-accent)" />
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              {timeSavedData.every((d) => d.value === 0) ? (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <p className="text-sm">No time data available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={timeSavedData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={4}
+                    >
+                      <Cell fill="var(--color-primary)" />
+                      <Cell fill="var(--color-accent)" />
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -221,14 +245,20 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Daily</p>
             </div>
             <div className="h-64">
-              <ResponsiveContainer>
-                <LineChart data={revenueSeries}>
-                  <XAxis dataKey="date" stroke="var(--color-muted-foreground)" />
-                  <YAxis stroke="var(--color-muted-foreground)" />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="amount" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              {revenueSeries.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <p className="text-sm">No revenue data available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <LineChart data={revenueSeries}>
+                    <XAxis dataKey="date" stroke="var(--color-muted-foreground)" />
+                    <YAxis stroke="var(--color-muted-foreground)" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="amount" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -238,14 +268,20 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">Net over time</p>
             </div>
             <div className="h-64">
-              <ResponsiveContainer>
-                <LineChart data={balanceSeries}>
-                  <XAxis dataKey="day" stroke="var(--color-muted-foreground)" />
-                  <YAxis stroke="var(--color-muted-foreground)" />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="balance_usd" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              {balanceSeries.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <p className="text-sm">No balance data available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <LineChart data={balanceSeries}>
+                    <XAxis dataKey="day" stroke="var(--color-muted-foreground)" />
+                    <YAxis stroke="var(--color-muted-foreground)" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="balance_usd" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -255,14 +291,20 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">By type</p>
             </div>
             <div className="h-64">
-              <ResponsiveContainer>
-                <BarChart data={costBreakdown}>
-                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" />
-                  <YAxis stroke="var(--color-muted-foreground)" />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="var(--color-secondary)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {costBreakdown.length === 0 || costBreakdown.every((c) => c.value === 0) ? (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  <p className="text-sm">No cost data available</p>
+                </div>
+              ) : (
+                <ResponsiveContainer>
+                  <BarChart data={costBreakdown}>
+                    <XAxis dataKey="name" stroke="var(--color-muted-foreground)" />
+                    <YAxis stroke="var(--color-muted-foreground)" />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="var(--color-secondary)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -278,11 +320,11 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <p className="font-medium">{entry.activity}</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(entry.timestamp), "MMM d, HH:mm")}
+                      {formatTimestamp(entry.timestamp)}
                     </p>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {entry.client_id || "n/a"} · {(entry.duration_seconds / 60).toFixed(1)} min
+                    {entry.client_id || "n/a"} · {((Number(entry.duration_seconds) || 0) / 60).toFixed(1)} min
                   </p>
                 </div>
               ))}

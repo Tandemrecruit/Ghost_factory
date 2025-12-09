@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import fs from 'fs'
 import path from 'path'
+import { isValidClientId } from '@/lib/client-utils'
 
 interface ClientPageProps {
   params: Promise<{
@@ -10,6 +11,11 @@ interface ClientPageProps {
 
 export default async function ClientPage({ params }: ClientPageProps) {
   const { clientId } = await params
+
+  // Validate client ID to prevent path traversal attacks
+  if (!isValidClientId(clientId)) {
+    notFound()
+  }
 
   // This is a placeholder route that will be overwritten by the factory
   // when it generates actual client pages. The factory outputs directly
@@ -51,6 +57,7 @@ export async function generateStaticParams() {
 
   const clients = fs.readdirSync(clientsDir, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
+    .filter(dirent => isValidClientId(dirent.name))
     .map(dirent => ({
       clientId: dirent.name,
     }))

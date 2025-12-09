@@ -27,6 +27,7 @@ export function VideoEmbed({
   className,
 }: VideoEmbedProps) {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const aspectRatioClasses = {
     '16:9': 'aspect-video',
@@ -95,13 +96,20 @@ export function VideoEmbed({
           ) : (
             <>
               {/* Thumbnail */}
-              <Image
-                src={thumbnailSrc}
-                alt={thumbnailAlt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 1024px"
-              />
+              {!imageError ? (
+                <Image
+                  src={thumbnailSrc}
+                  alt={thumbnailAlt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 1024px"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground">
+                  <span className="text-sm">Thumbnail unavailable</span>
+                </div>
+              )}
 
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/30" />

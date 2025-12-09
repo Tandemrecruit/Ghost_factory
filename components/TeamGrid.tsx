@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Icon, type IconName } from '@/lib/icons'
@@ -30,6 +33,12 @@ export function TeamGrid({
   columns = 3,
   className,
 }: TeamGridProps) {
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }))
+  }
+
   const gridCols = {
     2: 'md:grid-cols-2',
     3: 'md:grid-cols-2 lg:grid-cols-3',
@@ -71,13 +80,14 @@ export function TeamGrid({
             >
               {/* Avatar */}
               <div className="relative mx-auto mb-4 h-40 w-40 overflow-hidden rounded-full">
-                {member.imageSrc ? (
+                {member.imageSrc && !imageErrors[index] ? (
                   <Image
                     src={member.imageSrc}
                     alt={member.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                     sizes="160px"
+                    onError={() => handleImageError(index)}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-primary/10 text-4xl font-bold text-primary">

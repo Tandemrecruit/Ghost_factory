@@ -29,6 +29,7 @@ export function NavSimple({
   className,
 }: NavSimpleProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   return (
     <header className={cn('border-b border-border bg-background', className)}>
@@ -36,13 +37,14 @@ export function NavSimple({
         <div className="flex h-16 items-center justify-between md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            {logoSrc ? (
+            {logoSrc && !imageError ? (
               <Image
                 src={logoSrc}
                 alt={logoAlt}
                 width={140}
                 height={40}
                 className="h-8 w-auto md:h-10"
+                onError={() => setImageError(true)}
               />
             ) : (
               <span className="text-xl font-bold text-foreground">

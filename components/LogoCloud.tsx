@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +25,12 @@ export function LogoCloud({
   grayscale = true,
   className,
 }: LogoCloudProps) {
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }))
+  }
+
   return (
     <section className={cn('section-padding-sm', className)}>
       <div className="container-wide">
@@ -44,6 +53,19 @@ export function LogoCloud({
         {/* Logo Grid */}
         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
           {logos.map((logo, index) => {
+            if (imageErrors[index]) {
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    'flex h-8 w-24 items-center justify-center text-xs text-muted-foreground md:h-10 md:w-32'
+                  )}
+                >
+                  {logo.name}
+                </div>
+              )
+            }
+
             const logoImage = (
               <div
                 className={cn(
@@ -57,6 +79,7 @@ export function LogoCloud({
                   fill
                   className="object-contain"
                   sizes="(max-width: 768px) 96px, 128px"
+                  onError={() => handleImageError(index)}
                 />
               </div>
             )
