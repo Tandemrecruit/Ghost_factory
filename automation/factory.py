@@ -65,6 +65,27 @@ def _record_model_cost(provider, model, activity, client_id, response, metadata=
         logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
 
 
+def _extract_response_text(response, default=None):
+    """
+    Safely extract text content from an Anthropic API response.
+
+    Args:
+        response: The API response object
+        default: Value to return if extraction fails (default: None)
+
+    Returns:
+        str: The extracted text, or default if extraction fails
+    """
+    try:
+        if response and hasattr(response, 'content') and response.content:
+            first_block = response.content[0]
+            if hasattr(first_block, 'text') and first_block.text:
+                return first_block.text
+        return default
+    except (IndexError, AttributeError, TypeError):
+        return default
+
+
 def _load_prompt(prompt_path):
     """Load a prompt from the prompts directory."""
     full_path = os.path.join(PROMPTS_DIR, prompt_path)
@@ -136,7 +157,12 @@ def select_niche_persona(client_id, intake):
     _record_model_cost("anthropic", MODEL_ROUTER, "router_classify", client_id, msg)
 
     # Parse response - expect one of: saas, local_service, ecommerce
-    niche = msg.content[0].text.strip().lower()
+    response_text = _extract_response_text(msg)
+    if not response_text:
+        logging.warning("⚠️ Router returned empty response, defaulting to local_service")
+        return "local_service.md"
+
+    niche = response_text.strip().lower()
 
     # Validate and map to filename
     valid_niches = {
@@ -373,7 +399,12 @@ Generate an improved Project Brief that addresses the feedback above."""
                 client_id, msg, {"attempt": attempt, "niche": niche_prompt_file}
             )
 
-            brief_content = msg.content[0].text
+            brief_content = _extract_response_text(msg)
+            if not brief_content:
+                logging.error(f"❌ Strategist returned empty response on attempt {attempt}")
+                if attempt >= MAX_CRITIC_RETRIES:
+                    raise RuntimeError(f"Strategist failed to generate brief after {MAX_CRITIC_RETRIES} attempts")
+                continue  # Retry without critic feedback
 
             # Step 4: Critic reviews the brief
             logging.info(f"🔍 Critic reviewing brief (attempt {attempt})...")
@@ -397,7 +428,12 @@ Please evaluate this brief against the original intake."""
                 client_id, critic_msg, {"attempt": attempt}
             )
 
-            critic_response = critic_msg.content[0].text.strip()
+            critic_response_text = _extract_response_text(critic_msg)
+            if not critic_response_text:
+                logging.warning(f"⚠️ Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                break
+
+            critic_response = critic_response_text.strip()
 
             # Step 5: Decision - PASS or FAIL
             # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
@@ -406,6 +442,7 @@ Please evaluate this brief against the original intake."""
                 previous_feedback = critic_response
                 if attempt >= MAX_CRITIC_RETRIES:
                     logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
+                    break  # Explicit break to exit loop after max retries
             elif critic_response.startswith("PASS"):
                 logging.info(f"✅ Critic approved brief on attempt {attempt}")
                 break
