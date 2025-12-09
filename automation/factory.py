@@ -588,6 +588,7 @@ def run_copywriter(client_path):
             brief = f.read()
 
         # Load intake for critic comparison
+        intake = None
         intake_path = os.path.join(client_path, "intake.md")
         if os.path.exists(intake_path):
             with open(intake_path, "r", encoding="utf-8") as f:
@@ -598,12 +599,14 @@ def run_copywriter(client_path):
             if os.path.exists(intake_processed_path):
                 with open(intake_processed_path, "r", encoding="utf-8") as f:
                     intake = f.read()
-            else:
-                intake = ""
-                logging.warning("⚠️ No intake file found for copywriter critic review")
 
-        # Load the Copy Critic prompt
-        critic_prompt = _load_prompt("critique/copy_critic.md")
+        # Determine if critic review is possible
+        skip_critic = intake is None
+        if skip_critic:
+            logging.warning("⚠️ No intake file found - skipping Copy Critic review")
+            critic_prompt = None
+        else:
+            critic_prompt = _load_prompt("critique/copy_critic.md")
 
         copywriter_prompt = "You are a Conversion Copywriter. Write website content (Hero, Features, Testimonials) based on this brief. Output Markdown."
 
@@ -647,6 +650,11 @@ Generate improved website content that addresses the feedback above."""
                 if attempt >= MAX_CRITIC_RETRIES:
                     raise RuntimeError(f"Copywriter failed to generate content after {MAX_CRITIC_RETRIES} attempts")
                 continue
+
+            # Skip critic review if intake is not available
+            if skip_critic:
+                logging.info(f"⏭️ Skipping Copy Critic review - no intake available")
+                break
 
             # Copy Critic reviews the content
             logging.info(f"🔍 Copy Critic reviewing content (attempt {attempt})...")

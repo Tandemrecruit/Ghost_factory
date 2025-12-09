@@ -26,11 +26,16 @@ If NO brand colors are mentioned:
   "primary": "#HEX",
   "secondary": "#HEX",
   "accent": "#HEX",
-  "background": "white" | "slate-900" | "cream",
+  "background": "white" | "slate-900" | "stone-100",
   "font_heading": "Inter" | "Playfair Display" | "Space Grotesk",
   "font_body": "Inter" | "Lato",
   "border_radius": "0.5rem" | "0px" | "1.5rem",
   "source": "intake" | "generated"
 }
+
+# Background Options (Tailwind CSS classes)
+- "white" - Clean, minimal look
+- "slate-900" - Dark mode / tech aesthetic
+- "stone-100" - Warm, cream-like tone for luxury/personal brands
 
 Set "source" to "intake" if you used colors from the client's intake, or "generated" if you created them.
