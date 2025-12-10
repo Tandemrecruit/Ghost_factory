@@ -55,14 +55,46 @@ async function fileExists(target: string) {
   }
 }
 
+/**
+ * Read JSON from the specified file path, returning an empty array when no usable data exists.
+ *
+ * @param target - Path to the JSON file to read
+ * @returns The parsed JSON value, or an empty array if the file is missing or cannot be parsed
+ */
 async function readJson(target: string) {
   return readJsonFile(target, []);
 }
 
+/**
+ * Load the tracker's configuration file.
+ *
+ * @returns The parsed configuration object from the config file, or an empty object (`{}`) if no configuration is present.
+ */
 async function loadConfig() {
   return readJsonFile(configPath, {});
 }
 
+/**
+ * Ensure a value is returned as an array, producing an empty array when the input is not an array.
+ *
+ * @param data - The value that may be an array
+ * @returns The input cast to an array if it was an array, otherwise an empty array
+ */
+function normalizeToArray<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data as T[];
+  return [];
+}
+
+/**
+ * Aggregate all time log entries from the specified month's directory.
+ *
+ * Reads every `.json` file in the data/time_logs/{month} directory, validates each file's contents
+ * against the time-logs schema (logs a schema warning for files with validation errors),
+ * and returns a single flattened array containing all entries.
+ *
+ * @param month - Month folder name under `data/time_logs` (for example, "2023-07")
+ * @returns An array of time log entry objects; empty if the month directory is missing or contains no JSON entries
+ */
 async function loadTimeEntries(month: string) {
   const monthPath = path.join(timeDir, month);
   const exists = await fileExists(monthPath);
@@ -83,42 +115,47 @@ async function loadTimeEntries(month: string) {
 }
 
 /**
- * Build a fallback balance summary and aggregated entries for the given month when no precomputed balance exists.
+ * Builds a fallback balance summary and aggregated raw entries for a month when no precomputed balance exists.
  *
  * @param month - Month identifier in `YYYY-MM` format
  * @returns An object containing:
  *   - `month`: the requested month string
- *   - `totals`: aggregated numeric totals (two-decimal precision) including:
- *     - `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`,
- *       `hours` (total billable hours), `time_saved_hours`, and `effective_hourly_usd`
- *   - `running_balance`: an array (empty for the fallback)
- *   - `entries`: raw arrays of `time`, `revenue`, and `costs` records used to compute the totals
+ *   - `totals`: rounded numeric totals including `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`, `hours`, `time_saved_hours`, and `effective_hourly_usd`
+ *   - `running_balance`: an empty array for the fallback
+ *   - `entries`: raw arrays used to compute totals under `time`, `revenue`, and `costs`
  */
 async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
-  
-  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
-  const revenueValidation = validateRevenueEntries(revenueEntries as any[]);
+
+  // Read raw data from JSON files
+  const rawRevenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
+  const rawApiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+  const rawHostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+
+  // Validate raw data
+  const revenueValidation = validateRevenueEntries(rawRevenueEntries);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
-  
-  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
-  const apiValidation = validateCostEntries(apiCosts as any[], "api");
+
+  const apiValidation = validateCostEntries(rawApiCosts, "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
-  
-  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
-  const hostingValidation = validateCostEntries(hostingCosts as any[], "hosting");
+
+  const hostingValidation = validateCostEntries(rawHostingCosts, "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
-  const hostingCosts = normalizeToArray<CostRecord>(rawHostingCosts);
 
-  const costEntries: CostRecord[] = [...apiCosts, ...hostingCosts];
+  // Normalize raw data to arrays
+  const revenueEntries = normalizeToArray<any>(rawRevenueEntries);
+  const apiCosts = normalizeToArray<any>(rawApiCosts);
+  const hostingCosts = normalizeToArray<any>(rawHostingCosts);
+
+  const costEntries = [...apiCosts, ...hostingCosts];
 
   // Type coercion with null checks
   const totalSeconds = timeEntries.reduce((sum, e) => {
@@ -174,6 +211,14 @@ async function computeFallback(month: string) {
   };
 }
 
+/**
+ * Handle GET requests for a month's balance sheet data.
+ *
+ * Checks authorization, validates the `month` query parameter, and returns the stored balance sheet JSON for that month when available and valid. If the stored file is missing or corrupted, returns a computed fallback summary derived from available data sources. On error returns a JSON error object.
+ *
+ * @param request - The incoming Request for the endpoint, whose URL must include a `month` query parameter.
+ * @returns A JSON response containing the monthly balance sheet data or an `{ error: string }` object. Responds with status 200 on success, 401 when unauthorized, and 400 for other request errors.
+ */
 export async function GET(request: Request) {
   // Check authorization
   if (!isAuthorized(request)) {
