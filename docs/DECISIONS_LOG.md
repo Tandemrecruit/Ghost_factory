@@ -28,3 +28,75 @@ Rationale:
 - Tool emits paid client work; reliability and debuggability are mandatory.
 Impact:
 - `automation/**`, `tests/**`, CLAUDE.md, CodeRabbit rules, GOVENANCE.md.
+
+---
+
+D-0002
+Date: 2025-12-10
+Category: architecture
+Summary: Privacy-friendly metrics tracking system (v1) for client landing pages
+Details:
+- Event types: `page_view`, `cta_click`, `conversion` — minimal set for measuring page performance.
+- No PII, no cookies, no localStorage — aggregate-friendly anonymous data only.
+- Client-side: fire-and-forget via `navigator.sendBeacon` with `fetch` fallback; never blocks rendering.
+- Server-side: POST `/api/gf-track` validates with zod, adds server timestamp.
+- Persistence strategy: webhook-first (if `GF_METRICS_WEBHOOK_URL` set), else console log in dev / no-op in prod.
+- Components get `blockId` prop (e.g., `hero_simple_v1`) and `data-gf-block` attribute for block-level attribution.
+- `MetricsProvider` wrapper handles automatic page view tracking and event delegation for CTAs/conversions.
+Rationale:
+- Clients need conversion data to evaluate landing page ROI without invasive tracking.
+- Webhook-based persistence decouples metrics from specific storage backends (future: Python pipeline, data warehouse).
+- `blockId` convention enables future A/B testing without schema changes.
+Impact:
+- New files: `lib/metrics.ts`, `lib/metrics-schema.ts`, `app/api/gf-track/route.ts`, `components/MetricsProvider.tsx`.
+- Modified: `HeroSimple`, `HeroSplit`, `PricingSimple`, `CtaBanner` (blockId prop + data attributes).
+- Config: `GF_METRICS_ENABLED`, `GF_METRICS_WEBHOOK_URL`, `GF_METRICS_WEBHOOK_SECRET` in `.env.example`.
+- Docs: `docs/internal/metrics-tracking.md`, `design-system/manifest.md` updated.
+
+---
+
+D-0003
+Date: 2025-12-09
+Category: code-style
+Summary: Python code may be complex if it is production-grade with strong logging and tests
+Details:
+- Complexity is acceptable when it improves robustness, clarity, and long-term maintainability.
+- Python modules in `automation/**` and other core codepaths should favor correctness and observability over “clever minimalism.”
+- Non-trivial flows must include structured logging (info/warn/error) and clear failure modes that surface actionable errors.
+Rationale:
+- Ghost Factory emits paid client deliverables; oversimplified code can hide edge cases and make failures harder to debug than well-structured “complex” code.
+Impact:
+- Python code in `automation/**` and related helpers.
+- Influences AGENT_ALIGNMENT docs, CodeRabbit rules, and how external agents propose refactors or new modules.
+
+---
+
+D-0004
+Date: 2025-12-09
+Category: architecture
+Summary: Frontend stack is Next.js 15 + Tailwind with accessibility and maintainability as primary priorities
+Details:
+- Standard frontend stack is Next.js 15 (App Router) plus Tailwind CSS; alternate frameworks require a new explicit decision.
+- Components and pages should use semantic HTML, sensible ARIA patterns, and mobile-first layouts by default.
+- Design choices should favor readability, reuse, and consistency over micro-optimizations or purely aesthetic complexity.
+Rationale:
+- A modern, well-supported stack reduces friction for both AI and human contributors, while an accessibility- and maintainability-first approach keeps the system sustainable as it grows.
+Impact:
+- `app/**`, `components/**`, `design-system/**`, `.cursorrules`.
+- Guides how Builder, Visual Designer, and external coding agents structure UI code.
+
+---
+
+D-0005
+Date: 2025-12-09
+Category: testing
+Summary: Use pytest and focus tests on critical pipeline behavior rather than 100% coverage
+Details:
+- pytest is the standard testing framework for Python code in this repo.
+- Test effort should prioritize end-to-end client flows and core failure modes in `automation/**` over line-by-line coverage targets.
+- Code coverage metrics are informative only; 100% coverage is not a requirement and must not block shipping v1.0 features.
+Rationale:
+- Time and attention are limited; testing should follow risk and business impact, ensuring the pipeline is trustworthy without burning cycles chasing arbitrary coverage numbers.
+Impact:
+- `tests/**`, CI configuration, and how external agents propose or update test suites.
+- Influences AGENT_ALIGNMENT testing guidance and expectations in review tools (e.g., CodeRabbit).

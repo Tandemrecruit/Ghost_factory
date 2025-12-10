@@ -7,20 +7,37 @@
   },
   "api_pricing": {
     "anthropic/claude-opus-4-5-20251101": {
-      "input_per_million": 15.0,
-      "output_per_million": 75.0
+      "input_per_million": 5.000,
+      "output_per_million": 25.000
     },
     "anthropic/claude-sonnet-4-5-20250929": {
-      "input_per_million": 3.0,
-      "output_per_million": 15.0
+      "tiered_pricing": {
+        "threshold": 200000,
+        "below_threshold": {
+          "input_per_million": 3.000,
+          "output_per_million": 15.000
+        },
+        "above_threshold": {
+          "input_per_million": 6.000,
+          "output_per_million": 22.500
+        }
+      }
     },
     "anthropic/claude-haiku-4-5-20251015": {
-      "input_per_million": 0.25,
-      "output_per_million": 1.25
+      "input_per_million": 1.000,
+      "output_per_million": 5.000
     },
-    "openai/gpt-4": {
-      "input_per_million": 10.0,
-      "output_per_million": 30.0
+    "openai/gpt-5.1": {
+      "input_per_million": 1.250,
+      "output_per_million": 10.000
+    },
+    "openai/gpt-5-nano": {
+      "input_per_million": 0.050,
+      "output_per_million": 0.400
+    },
+    "openai/gpt-5-mini": {
+      "input_per_million": 0.250,
+      "output_per_million": 2.000
     }
   },
   "token_estimates": {

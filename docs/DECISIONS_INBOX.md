@@ -1,5 +1,17 @@
 # Decisions Inbox
 
-- 2025-12-09 – python code is allowed to be complex as long as it’s production-grade, good logging, strong tests
-- 2025-12-09 – frontend: Next.js 15 + Tailwind; prioritize accessibility and maintainability
-- 2025-12-09 – tests: pytest, focus on critical pipeline behavior, not 100% coverage
+Legend:
+- [NOTE]     – brain dump, observations, “might matter later”
+- [PROPOSAL] – suggested decision or rule change (model or human)
+- [DECISION] – approved decision ready to be logged as a D-XXXX (human-only)
+
+Only Ryan should change a bullet to [DECISION].
+The Decisions Scribe only promotes [DECISION] items into the Decisions Log.
+
+---
+
+- [NOTE] 2025-12-10 – intake_sanitizer.py feels brittle around empty files; consider stricter checks
+- [PROPOSAL] 2025-12-10 – maybe standardize on `demo-hvac` as the canonical v1.0 client id
+- [DECISION] 2025-12-10 – python code is allowed to be complex as long as it’s production-grade, good logging, strong tests
+- [DECISION] 2025-12-10 – frontend: Next.js 15 + Tailwind; prioritize accessibility and maintainability
+- [DECISION] 2025-12-10 – tests: pytest, focus on critical pipeline behavior, not 100% coverage
