@@ -55,14 +55,57 @@ def _append_entry(base: Path, month_str: str, entry: Dict[str, Any]) -> None:
         json.dump(data, f, indent=2)
 
 
-def _pricing_for(model_key: str, cfg: Dict[str, Any]) -> Dict[str, float]:
+def _pricing_for(model_key: str, cfg: Dict[str, Any]) -> Dict[str, Any]:
+    """Get pricing config for a model, supporting both flat and tiered pricing."""
     pricing = cfg.get("api_pricing", {})
-    return pricing.get(model_key, {"input_per_million": 0.0, "output_per_million": 0.0})
+    return pricing.get(model_key, {
+        "input_per_million": 0.0,
+        "output_per_million": 0.0
+    })
 
 
 def _estimate_tokens(activity: str, cfg: Dict[str, Any]) -> Dict[str, int]:
     estimates = cfg.get("token_estimates", {})
     return estimates.get(activity, {"input": 0, "output": 0})
+
+
+def _calculate_cost_with_tiered_pricing(
+    input_tokens: int,
+    output_tokens: int,
+    pricing: Dict[str, Any]
+) -> tuple[float, float]:
+    """
+    Calculate input and output costs, handling tiered pricing.
+    
+    For tiered pricing, the tier is determined by input token count.
+    Returns (input_cost, output_cost).
+    """
+    if "tiered_pricing" in pricing:
+        tiered = pricing["tiered_pricing"]
+        threshold = tiered.get("threshold", 200000)
+        
+        # Tier is determined by input token count
+        if input_tokens <= threshold:
+            tier = tiered.get("below_threshold", {})
+        else:
+            tier = tiered.get("above_threshold", {})
+        
+        input_price = tier.get("input_per_million", 0.0)
+        output_price = tier.get("output_per_million", 0.0)
+        
+        cost_input = (input_tokens / 1_000_000) * input_price
+        cost_output = (output_tokens / 1_000_000) * output_price
+        
+        return (cost_input, cost_output)
+    else:
+        # Flat pricing (existing behavior)
+        input_price = pricing.get("input_per_million", 0.0)
+        output_price = pricing.get("output_per_million", 0.0)
+        
+        cost_input = (input_tokens / 1_000_000) * input_price
+        cost_output = (output_tokens / 1_000_000) * output_price
+        
+        return (cost_input, cost_output)
 
 
 def record_api_cost(
@@ -83,8 +126,7 @@ def record_api_cost(
     in_tokens = input_tokens if input_tokens is not None else estimates.get("input", 0)
     out_tokens = output_tokens if output_tokens is not None else estimates.get("output", 0)
 
-    cost_input = (in_tokens / 1_000_000) * pricing.get("input_per_million", 0.0)
-    cost_output = (out_tokens / 1_000_000) * pricing.get("output_per_million", 0.0)
+    cost_input, cost_output = _calculate_cost_with_tiered_pricing(in_tokens, out_tokens, pricing)
     total_cost = round(cost_input + cost_output, 4)
 
     now = datetime.utcnow()
