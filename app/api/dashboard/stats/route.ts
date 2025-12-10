@@ -10,6 +10,19 @@ import {
 } from "@/lib/schema-validator";
 import { validateMonth } from "@/lib/validation-utils";
 
+// Module-scoped types for dashboard data records
+export type RevenueRecord = { amount_usd?: number };
+export type CostRecord = { provider?: string; cost_usd?: number; type?: string };
+
+/**
+ * Normalize a JSON value to an array. If the value is already an array, returns it as-is.
+ * If null/undefined or non-array, returns an empty array.
+ */
+function normalizeToArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  return [];
+}
+
 const root = process.cwd();
 const balanceDir = path.join(root, "data", "balance_sheets");
 const timeDir = path.join(root, "data", "time_logs");
@@ -70,27 +83,30 @@ async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
-  
-  type RevenueRecord = { amount_usd?: number };
-  type CostRecord = { provider?: string; cost_usd?: number; type?: string };
 
-  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`)) as RevenueRecord[];
-  const revenueValidation = validateRevenueEntries(revenueEntries);
+  // Load and normalize revenue entries (guard against non-array JSON)
+  const rawRevenue = await readJson(path.join(revenueDir, `${month}.json`));
+  const revenueValidation = validateRevenueEntries(rawRevenue);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
+  const revenueEntries = normalizeToArray<RevenueRecord>(rawRevenue);
 
-  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`)) as CostRecord[];
-  const apiValidation = validateCostEntries(apiCosts, "api");
+  // Load and normalize API cost entries
+  const rawApiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+  const apiValidation = validateCostEntries(rawApiCosts, "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
+  const apiCosts = normalizeToArray<CostRecord>(rawApiCosts);
 
-  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`)) as CostRecord[];
-  const hostingValidation = validateCostEntries(hostingCosts, "hosting");
+  // Load and normalize hosting cost entries
+  const rawHostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+  const hostingValidation = validateCostEntries(rawHostingCosts, "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
+  const hostingCosts = normalizeToArray<CostRecord>(rawHostingCosts);
 
   const costEntries: CostRecord[] = [...apiCosts, ...hostingCosts];
 
