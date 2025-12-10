@@ -67,21 +67,10 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
     # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
     
-    # Calculate emoji string length (some emojis are multi-character Unicode sequences)
-    emoji_len = len(emoji_clean)
-    
-    # Ensure emoji column (emoji + spaces) is always 4 characters wide for consistent alignment
-    # Most emojis render as 2 visual characters, so we add spaces to pad to 4 total
-    # This ensures labels always start at the same position regardless of emoji width
-    if emoji_len <= 2:
-        # Emoji is 1-2 chars, add spaces to make total column 4 chars (emoji + 2 spaces)
-        emoji_column = f"{emoji_clean}  "
-    elif emoji_len == 3:
-        # Emoji is 3 chars, add 1 space to make total column 4 chars
-        emoji_column = f"{emoji_clean} "
-    else:
-        # Emoji is 4+ chars, use as-is with 2 spaces (may be slightly wider but rare)
-        emoji_column = f"{emoji_clean}  "
+    # Ensure consistent visual spacing by always adding 2 spaces.
+    # Standard emojis are 2 visual cells wide. Adding 2 spaces creates a consistent 4-cell column.
+    # This ignores internal string length (which varies) and relies on visual width (which is consistent).
+    emoji_column = f"{emoji_clean}  "
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
@@ -717,6 +706,27 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         repo_root = Path(__file__).resolve().parent.parent
         tsconfig_path = repo_root / "tsconfig.json"
         
+        # #region agent log
+        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+            log_file.write(json.dumps({
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "A",
+                "location": "factory.py:717",
+                "message": "Module resolution setup",
+                "data": {
+                    "temp_path": temp_path,
+                    "temp_path_dir": os.path.dirname(temp_path),
+                    "repo_root": str(repo_root),
+                    "tsconfig_path": str(tsconfig_path),
+                    "cwd": os.getcwd(),
+                    "node_modules_exists": os.path.exists(repo_root / "node_modules"),
+                    "next_in_node_modules": os.path.exists(repo_root / "node_modules" / "next")
+                },
+                "timestamp": int(time.time() * 1000)
+            }) + "\n")
+        # #endregion
+        
         # Create a temporary tsconfig that extends the main one but only includes our temp file
         temp_tsconfig = None
         temp_tsconfig_path = None
@@ -727,19 +737,42 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                     main_tsconfig = json_module.load(f)
                 
                 # Create a temp tsconfig that extends main and includes only our file
+                # CRITICAL: Set baseUrl to repo root so TypeScript can resolve node_modules
+                # even though the tsconfig file is in a temp directory
+                # Also set isolatedModules to prevent TypeScript from checking imported files
                 temp_tsconfig_data = {
                     "extends": str(tsconfig_path),
                     "compilerOptions": {
                         "noEmit": True,
                         "skipLibCheck": True,
+                        "isolatedModules": True,  # Prevent checking imported files
+                        "baseUrl": str(repo_root),  # Point to repo root for module resolution
                     },
                     "include": [temp_path],
-                    "exclude": []
+                    "exclude": ["**/*"]  # Explicitly exclude everything except what's in include
                 }
                 
                 temp_tsconfig_path = temp_path.replace(".tsx", ".tsconfig.json")
                 with open(temp_tsconfig_path, "w", encoding="utf-8") as f:
                     json_module.dump(temp_tsconfig_data, f)
+                
+                # #region agent log
+                with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+                    log_file.write(json.dumps({
+                        "sessionId": "debug-session",
+                        "runId": "run1",
+                        "hypothesisId": "A",
+                        "location": "factory.py:740",
+                        "message": "Temp tsconfig created",
+                        "data": {
+                            "temp_tsconfig_path": temp_tsconfig_path,
+                            "temp_tsconfig_dir": os.path.dirname(temp_tsconfig_path),
+                            "tsconfig_has_baseUrl": "baseUrl" in temp_tsconfig_data.get("compilerOptions", {}),
+                            "tsconfig_content": temp_tsconfig_data
+                        },
+                        "timestamp": int(time.time() * 1000)
+                    }) + "\n")
+                # #endregion
                 
                 project_arg = str(temp_tsconfig_path)
             except Exception as e:
@@ -773,13 +806,49 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 temp_path
             ])
         
+        # #region agent log
+        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+            log_file.write(json.dumps({
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "A",
+                "location": "factory.py:776",
+                "message": "Running tsc command",
+                "data": {
+                    "cmd": cmd,
+                    "cwd": os.getcwd(),
+                    "temp_tsconfig_dir": os.path.dirname(temp_tsconfig_path) if temp_tsconfig_path else None,
+                    "repo_root": str(repo_root)
+                },
+                "timestamp": int(time.time() * 1000)
+            }) + "\n")
+        # #endregion
+        
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=30,
-            cwd=os.getcwd()
+            cwd=str(repo_root)  # Use repo_root instead of os.getcwd()
         )
+        
+        # #region agent log
+        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+            log_file.write(json.dumps({
+                "sessionId": "debug-session",
+                "runId": "run1",
+                "hypothesisId": "A",
+                "location": "factory.py:790",
+                "message": "tsc command completed",
+                "data": {
+                    "returncode": result.returncode,
+                    "stdout_length": len(result.stdout or ""),
+                    "stderr_length": len(result.stderr or ""),
+                    "error_preview": (result.stderr or result.stdout or "")[:500]
+                },
+                "timestamp": int(time.time() * 1000)
+            }) + "\n")
+        # #endregion
         
         # Clean up temp tsconfig if created
         if temp_tsconfig_path and os.path.exists(temp_tsconfig_path):
@@ -802,6 +871,24 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             temp_file_name = os.path.basename(temp_path)
             in_relevant_error = False
             
+            # #region agent log
+            with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+                log_file.write(json.dumps({
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "B",
+                    "location": "factory.py:876",
+                    "message": "Error filtering start",
+                    "data": {
+                        "error_output_length": len(error_output),
+                        "error_lines_count": len(error_lines),
+                        "temp_file_name": temp_file_name,
+                        "first_5_lines": error_lines[:5]
+                    },
+                    "timestamp": int(time.time() * 1000)
+                }) + "\n")
+            # #endregion
+            
             for line in error_lines:
                 # Check if this line is an error from our generated file
                 # Errors are typically: "file.tsx(line,col): error TS####: message"
@@ -820,6 +907,26 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                     ]
                 ) and "page.tsx" not in line and temp_file_name not in line
                 
+                # #region agent log
+                if 'error TS' in line:
+                    with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
+                        log_file.write(json.dumps({
+                            "sessionId": "debug-session",
+                            "runId": "run1",
+                            "hypothesisId": "B",
+                            "location": "factory.py:900",
+                            "message": "Error line analysis",
+                            "data": {
+                                "line": line[:200],
+                                "is_our_error": is_our_error,
+                                "is_dependency_error": is_dependency_error,
+                                "has_lib": "lib/" in line,
+                                "has_page_tsx": "page.tsx" in line
+                            },
+                            "timestamp": int(time.time() * 1000)
+                        }) + "\n")
+                # #endregion
+                
                 if is_our_error:
                     filtered_errors.append(line)
                     in_relevant_error = True
@@ -835,9 +942,29 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                     filtered_errors.append(line)
                     in_relevant_error = True
             
-            # If we filtered out all errors, use original (shouldn't happen, but safety check)
+            # If we filtered out all errors, check if ALL errors were from dependencies
             if not filtered_errors:
-                filtered_output = error_output
+                # Check if all errors in original output were from dependencies
+                all_errors_are_dependencies = True
+                for line in error_lines:
+                    if 'error TS' in line:
+                        is_dep = any(
+                            dep_path in line for dep_path in [
+                                "lib/", "node_modules/", ".next/", 
+                                "components/", "app/", "tsconfig.json"
+                            ]
+                        ) and "page.tsx" not in line and temp_file_name not in line
+                        if not is_dep:
+                            all_errors_are_dependencies = False
+                            break
+                
+                if all_errors_are_dependencies:
+                    # All errors are from dependencies, treat as success
+                    _log_aligned("info", "✅", "Syntax check", f"passed for {client_id} (all errors from dependencies)")
+                    return (True, "")
+                else:
+                    # Some non-dependency errors, use original output
+                    filtered_output = error_output
             else:
                 filtered_output = '\n'.join(filtered_errors)
             

@@ -41,21 +41,8 @@ def _log_memory(level: str, emoji: str, label: str, message: str):
     # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
     
-    # Calculate emoji string length (some emojis are multi-character Unicode sequences)
-    emoji_len = len(emoji_clean)
-    
-    # Ensure emoji column (emoji + spaces) is always 4 characters wide for consistent alignment
-    # Most emojis render as 2 visual characters, so we add spaces to pad to 4 total
-    # This ensures labels always start at the same position regardless of emoji width
-    if emoji_len <= 2:
-        # Emoji is 1-2 chars, add spaces to make total column 4 chars (emoji + 2 spaces)
-        emoji_column = f"{emoji_clean}  "
-    elif emoji_len == 3:
-        # Emoji is 3 chars, add 1 space to make total column 4 chars
-        emoji_column = f"{emoji_clean} "
-    else:
-        # Emoji is 4+ chars, use as-is with 2 spaces (may be slightly wider but rare)
-        emoji_column = f"{emoji_clean}  "
+    # Ensure consistent visual spacing by always adding 2 spaces.
+    emoji_column = f"{emoji_clean}  "
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"

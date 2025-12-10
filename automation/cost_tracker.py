@@ -86,9 +86,15 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
         label: Fixed-width label (padded to 20 chars)
         message: The actual log message content
     """
+    # Normalize emoji spacing
+    emoji_clean = emoji.strip()
+    
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
-    formatted_message = f"{emoji} {padded_label} {message}"
+    
+    # Use 2 spaces for consistency with factory.py
+    # Assumes standard emoji visual width of 2 cells + 2 spaces = 4 visual cells
+    formatted_message = f"{emoji_clean}  {padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)

@@ -1920,5 +1920,38 @@
     "output_tokens": 4000,
     "cost_usd": 0.078,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T21:15:58.402806",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T21:17:18.690608",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T21:18:48.933779",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
   }
 ]
