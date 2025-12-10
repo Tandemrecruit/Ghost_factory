@@ -24,14 +24,18 @@ const isBrowser = typeof window !== 'undefined'
 let metricsEnabled: boolean | null = null
 
 /**
- * Set whether metrics are enabled (called by MetricsProvider)
+ * Set the runtime flag that enables or disables metrics collection.
+ *
+ * @param enabled - `true` to enable metrics, `false` to disable them
  */
 export function setMetricsEnabled(enabled: boolean): void {
   metricsEnabled = enabled
 }
 
 /**
- * Check if metrics are enabled
+ * Determine whether metrics collection is enabled.
+ *
+ * @returns `true` if metrics collection has been explicitly enabled, `false` otherwise.
  */
 export function isMetricsEnabled(): boolean {
   // Default to false if not explicitly set
@@ -39,8 +43,12 @@ export function isMetricsEnabled(): boolean {
 }
 
 /**
- * Send event(s) to the tracking endpoint
- * Fire-and-forget: never throws, never blocks
+ * Send a single tracking event to the configured tracking endpoint using a fire-and-forget strategy.
+ *
+ * This is a no-op outside a browser or when metrics are disabled. It attempts to deliver the event without
+ * blocking rendering and treats network failures as non-fatal (errors are logged in development only).
+ *
+ * @param event - The tracking event to send (must conform to `MetricsClientEvent`, including its `type` and payload)
  */
 function sendEvent(event: MetricsClientEvent): void {
   if (!isBrowser || !isMetricsEnabled()) {
@@ -80,7 +88,12 @@ function sendEvent(event: MetricsClientEvent): void {
 }
 
 /**
- * Log debug messages in development only
+ * Logs a debug message to the console when NODE_ENV is 'development'.
+ *
+ * The message is prefixed with "[GF_METRICS]" and additional values are forwarded to console.debug.
+ *
+ * @param message - The primary debug message or format string
+ * @param args - Additional values to include with the message
  */
 function logDebug(message: string, ...args: unknown[]): void {
   if (process.env.NODE_ENV === 'development') {
@@ -98,7 +111,9 @@ export interface TrackArgs {
 }
 
 /**
- * Track a page view event
+ * Sends a page view tracking event to the Ghost Factory metrics endpoint.
+ *
+ * @param args - Tracking parameters including `clientId` and `pageId`; may include optional `blockId`, `variantId`, and `metadata`
  */
 export function trackPageView(args: TrackArgs): void {
   sendEvent({
@@ -108,7 +123,9 @@ export function trackPageView(args: TrackArgs): void {
 }
 
 /**
- * Track a CTA click event
+ * Send a 'cta_click' metrics event using the provided tracking arguments.
+ *
+ * @param args - Tracking details: `clientId`, `pageId`, and optional `blockId`, `variantId`, and `metadata`
  */
 export function trackCtaClick(args: TrackArgs): void {
   sendEvent({
@@ -118,7 +135,9 @@ export function trackCtaClick(args: TrackArgs): void {
 }
 
 /**
- * Track a conversion event
+ * Send a conversion event to the metrics endpoint for the current client and page.
+ *
+ * @param args - Tracking details including `clientId`, `pageId`, optional `blockId`, optional `variantId`, and optional `metadata`
  */
 export function trackConversion(args: TrackArgs): void {
   sendEvent({
@@ -128,7 +147,10 @@ export function trackConversion(args: TrackArgs): void {
 }
 
 /**
- * Generic track function for custom event types
+ * Emit a metrics event with the given event type and tracking arguments.
+ *
+ * @param type - The metrics event type to record
+ * @param args - Tracking details (e.g., `clientId`, `pageId`, optional `blockId`, `variantId`, and `metadata`)
  */
 export function track(type: MetricsEventType, args: TrackArgs): void {
   sendEvent({
@@ -138,7 +160,11 @@ export function track(type: MetricsEventType, args: TrackArgs): void {
 }
 
 /**
- * Send multiple events in a batch
+ * Send multiple metrics events as a single batched request.
+ *
+ * No-op when executed outside a browser, when metrics are disabled, or when `events` is empty. Network failures are non-fatal.
+ *
+ * @param events - Array of metrics events to include in the batch
  */
 export function trackBatch(events: MetricsClientEvent[]): void {
   if (!isBrowser || !isMetricsEnabled() || events.length === 0) {

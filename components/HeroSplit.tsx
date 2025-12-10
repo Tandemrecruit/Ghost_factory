@@ -18,6 +18,20 @@ export interface HeroSplitProps {
   className?: string
 }
 
+/**
+ * Renders a two-column hero section with heading, subhead, primary CTA, and an image, allowing the image to appear on the left or right.
+ *
+ * @param heading - Main heading text displayed prominently.
+ * @param subhead - Supporting paragraph text shown below the heading.
+ * @param imageSrc - URL or path to the hero image.
+ * @param imageAlt - Alt text for the hero image for accessibility.
+ * @param primaryCtaLabel - Text for the primary call-to-action button.
+ * @param primaryCtaHref - Destination URL for the primary call-to-action.
+ * @param imagePosition - Placement of the image; `"right"` (default) or `"left"` which reorders columns on large screens.
+ * @param blockId - Optional block identifier added to the section's `data-gf-block` attribute for metrics (defaults to `"hero_split_v1"`).
+ * @param className - Optional additional CSS class names applied to the top-level section.
+ * @returns A section element containing the hero layout with responsive text and image columns.
+ */
 export function HeroSplit({
   heading,
   subhead,

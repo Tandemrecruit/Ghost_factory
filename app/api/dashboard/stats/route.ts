@@ -54,6 +54,18 @@ async function loadTimeEntries(month: string) {
   return entries;
 }
 
+/**
+ * Build a fallback balance summary and aggregated entries for the given month when no precomputed balance exists.
+ *
+ * @param month - Month identifier in `YYYY-MM` format
+ * @returns An object containing:
+ *   - `month`: the requested month string
+ *   - `totals`: aggregated numeric totals (two-decimal precision) including:
+ *     - `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`,
+ *       `hours` (total billable hours), `time_saved_hours`, and `effective_hourly_usd`
+ *   - `running_balance`: an array (empty for the fallback)
+ *   - `entries`: raw arrays of `time`, `revenue`, and `costs` records used to compute the totals
+ */
 async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
@@ -164,4 +176,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
 }
-
