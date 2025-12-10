@@ -98,26 +98,21 @@ async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
-
-  // Load and normalize revenue entries (guard against non-array JSON)
-  const rawRevenue = await readJson(path.join(revenueDir, `${month}.json`));
-  const revenueValidation = validateRevenueEntries(rawRevenue);
+  
+  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
+  const revenueValidation = validateRevenueEntries(revenueEntries as any[]);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
-  const revenueEntries = normalizeToArray<RevenueRecord>(rawRevenue);
-
-  // Load and normalize API cost entries
-  const rawApiCosts = await readJson(path.join(costApiDir, `${month}.json`));
-  const apiValidation = validateCostEntries(rawApiCosts, "api");
+  
+  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+  const apiValidation = validateCostEntries(apiCosts as any[], "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
-  const apiCosts = normalizeToArray<CostRecord>(rawApiCosts);
-
-  // Load and normalize hosting cost entries
-  const rawHostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
-  const hostingValidation = validateCostEntries(rawHostingCosts, "hosting");
+  
+  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+  const hostingValidation = validateCostEntries(hostingCosts as any[], "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
