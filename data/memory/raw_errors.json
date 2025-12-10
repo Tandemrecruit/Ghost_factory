@@ -988,5 +988,15 @@
       "client_id": "demo-hvac",
       "attempt": 3
     }
+  },
+  {
+    "timestamp": "2025-12-10T21:47:17.631063",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(332,185): error TS1005: ',' expected.\npage.tsx(332,188): error TS1005: ',' expected.\npage.tsx(332,193): error TS1005: ',' expected.\npage.tsx(332,197): error TS1005: ',' expected.\npage.tsx(332,203): error TS1005: ',' expected.\npage.tsx(332,211): error TS1005: ',' expected.\npage.tsx(332,216):",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
   }
 ]

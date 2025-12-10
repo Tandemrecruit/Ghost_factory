@@ -18,6 +18,11 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic, RateLimitError
 from playwright.sync_api import sync_playwright
+try:
+    from PIL import Image
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
 
 # Ensure local package imports work even if editable install isn't active
 try:
@@ -1663,7 +1668,7 @@ MANIFEST:
         last_error_type = None
 
         # Start heartbeat so we can see progress during long builder cycles
-        heartbeat_stop, heartbeat_thread = _start_heartbeat(f"Builder for {client_id}", interval=10.0)
+        heartbeat_stop, heartbeat_thread = _start_heartbeat(f"Builder for {client_id}", interval=30.0)
 
         try:
             while total_attempts < max_total_attempts:
@@ -1993,6 +1998,80 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                         except Exception as e:
                             _log_aligned("warning", "⚠️", "QA", f"Error closing browser: {e}")
 
+            # Resize image if dimensions exceed 8000 pixels (Anthropic API limit)
+            max_dimension = 8000
+            if os.path.exists(screenshot_path):
+                if PIL_AVAILABLE:
+                    try:
+                        with Image.open(screenshot_path) as img:
+                            width, height = img.size
+                            # #region agent log
+                            try:
+                                with open(log_path, "a", encoding="utf-8") as f:
+                                    f.write(json_module.dumps({
+                                        "sessionId": "debug-session",
+                                        "runId": "run1",
+                                        "hypothesisId": "C",
+                                        "location": "factory.py:1996",
+                                        "message": "Screenshot dimensions check",
+                                        "data": {
+                                            "client_id": client_id,
+                                            "original_width": width,
+                                            "original_height": height,
+                                            "max_dimension": max_dimension,
+                                            "needs_resize": width > max_dimension or height > max_dimension
+                                        },
+                                        "timestamp": int(time.time() * 1000)
+                                    }) + "\n")
+                            except: pass
+                            # #endregion
+                            
+                            if width > max_dimension or height > max_dimension:
+                                # Calculate new dimensions maintaining aspect ratio
+                                if width > height:
+                                    new_width = max_dimension
+                                    new_height = int(height * (max_dimension / width))
+                                else:
+                                    new_height = max_dimension
+                                    new_width = int(width * (max_dimension / height))
+                                
+                                # Resize image
+                                resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                                resized_img.save(screenshot_path, "JPEG", quality=85)
+                                
+                                # #region agent log
+                                try:
+                                    with open(log_path, "a", encoding="utf-8") as f:
+                                        f.write(json_module.dumps({
+                                            "sessionId": "debug-session",
+                                            "runId": "run1",
+                                            "hypothesisId": "C",
+                                            "location": "factory.py:2020",
+                                            "message": "Screenshot resized",
+                                            "data": {
+                                                "client_id": client_id,
+                                                "new_width": new_width,
+                                                "new_height": new_height,
+                                                "original_width": width,
+                                                "original_height": height
+                                            },
+                                            "timestamp": int(time.time() * 1000)
+                                        }) + "\n")
+                                except: pass
+                                # #endregion
+                                
+                                _log_aligned("info", "📐", "QA", f"resized screenshot from {width}x{height} to {new_width}x{new_height}")
+                    except Exception as e:
+                        _log_aligned("warning", "⚠️", "QA", f"Failed to resize screenshot: {e}, using original")
+                else:
+                    # PIL not available - check file size as a rough proxy for dimensions
+                    # This is not perfect but better than nothing
+                    file_size = os.path.getsize(screenshot_path)
+                    # Rough estimate: if file is > 50MB, it's likely too large
+                    # (8000x8000 JPEG at quality 85 is roughly 20-30MB)
+                    if file_size > 50 * 1024 * 1024:  # 50MB
+                        _log_aligned("warning", "⚠️", "QA", "Screenshot may be too large and PIL unavailable for resizing. Install Pillow: pip install Pillow")
+            
             # Analyze with Vision Model
             with open(screenshot_path, "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode("utf-8")
