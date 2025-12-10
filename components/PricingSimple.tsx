@@ -12,9 +12,23 @@ export interface PricingSimpleProps {
   ctaLabel: string
   ctaHref: string
   guaranteeText?: string
+  /** Block ID for metrics tracking - defaults to 'pricing_simple_v1' */
+  blockId?: string
   className?: string
 }
 
+/**
+ * Render a centered pricing card with a heading, price, feature list, and a primary call-to-action.
+ *
+ * Renders optional eyebrow text, description, and guarantee text when provided. The component sets a
+ * data-gf-block attribute on the root section using `blockId` to support metrics/analytics hooks.
+ *
+ * @param period - One of `"month"`, `"year"`, or `"one-time"`; determines the period label shown next to the price.
+ * @param features - An array of feature description strings to render as the feature list.
+ * @param blockId - Optional block identifier injected into the root element as `data-gf-block`; defaults to `"pricing_simple_v1"`.
+ * @param className - Optional additional CSS classes applied to the root section.
+ * @returns The pricing card React element.
+ */
 export function PricingSimple({
   eyebrow,
   heading,
@@ -25,6 +39,7 @@ export function PricingSimple({
   ctaLabel,
   ctaHref,
   guaranteeText,
+  blockId = 'pricing_simple_v1',
   className,
 }: PricingSimpleProps) {
   const periodLabel = {
@@ -34,7 +49,7 @@ export function PricingSimple({
   }
 
   return (
-    <section className={cn('section-padding', className)}>
+    <section data-gf-block={blockId} className={cn('section-padding', className)}>
       <div className="container-narrow">
         <div className="mx-auto max-w-lg rounded-2xl border border-border bg-background p-8 shadow-xl md:p-10">
           {/* Header */}
@@ -76,6 +91,7 @@ export function PricingSimple({
           <Link
             href={ctaHref}
             className="btn-primary block w-full text-center text-lg"
+            data-gf-cta="primary"
           >
             {ctaLabel}
           </Link>

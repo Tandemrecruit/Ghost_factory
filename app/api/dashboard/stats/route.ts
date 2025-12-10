@@ -10,6 +10,34 @@ import {
 } from "@/lib/schema-validator";
 import { validateMonth } from "@/lib/validation-utils";
 
+// Module-scoped types for dashboard data records
+export type RevenueRecord = { amount_usd?: number };
+export type CostRecord = { provider?: string; cost_usd?: number; type?: string };
+
+/**
+ * Normalize a JSON value to an array. If the value is already an array, returns it as-is.
+ * If null/undefined or non-array, returns an empty array.
+ */
+function normalizeToArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  return [];
+}
+
+/**
+ * Sum numeric values from an array, treating NaN/null/undefined as 0.
+ * Centralizes the "parse as number, treat NaN as 0" pattern.
+ *
+ * @param items - Array of items to sum
+ * @param getter - Function to extract the numeric value from each item
+ * @returns Sum of all valid numeric values
+ */
+function safeSum<T>(items: T[], getter: (item: T) => unknown): number {
+  return items.reduce((sum, item) => {
+    const val = Number(getter(item)) || 0;
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+}
+
 const root = process.cwd();
 const balanceDir = path.join(root, "data", "balance_sheets");
 const timeDir = path.join(root, "data", "time_logs");
@@ -54,56 +82,69 @@ async function loadTimeEntries(month: string) {
   return entries;
 }
 
+/**
+ * Build a fallback balance summary and aggregated entries for the given month when no precomputed balance exists.
+ *
+ * @param month - Month identifier in `YYYY-MM` format
+ * @returns An object containing:
+ *   - `month`: the requested month string
+ *   - `totals`: aggregated numeric totals (two-decimal precision) including:
+ *     - `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`,
+ *       `hours` (total billable hours), `time_saved_hours`, and `effective_hourly_usd`
+ *   - `running_balance`: an array (empty for the fallback)
+ *   - `entries`: raw arrays of `time`, `revenue`, and `costs` records used to compute the totals
+ */
 async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
   
   const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
-  const revenueValidation = validateRevenueEntries(revenueEntries);
+  const revenueValidation = validateRevenueEntries(revenueEntries as any[]);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
   
   const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
-  const apiValidation = validateCostEntries(apiCosts, "api");
+  const apiValidation = validateCostEntries(apiCosts as any[], "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
   
   const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
-  const hostingValidation = validateCostEntries(hostingCosts, "hosting");
+  const hostingValidation = validateCostEntries(hostingCosts as any[], "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
-  
-  const costEntries = [...apiCosts, ...hostingCosts];
+  const hostingCosts = normalizeToArray<CostRecord>(rawHostingCosts);
+
+  const costEntries: CostRecord[] = [...apiCosts, ...hostingCosts];
 
   // Type coercion with null checks
   const totalSeconds = timeEntries.reduce((sum, e) => {
-    const val = Number(e?.duration_seconds) || 0;
+    const val = Number(e?.duration_seconds);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
   const totalHours = totalSeconds / 3600;
   const timeSavedSeconds = timeEntries.reduce((sum, e) => {
-    const val = Number(e?.time_saved_seconds) || 0;
+    const val = Number(e?.time_saved_seconds);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
   const revenueTotal = revenueEntries.reduce((sum, e) => {
-    const val = Number(e?.amount_usd) || 0;
+    const val = Number(e?.amount_usd);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
   const apiCostTotal = costEntries
     .filter((e) => e?.provider)
     .reduce((sum, e) => {
-      const val = Number(e?.cost_usd) || 0;
+      const val = Number(e?.cost_usd);
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
   const hostingCostTotal = costEntries
     .filter((e) => e?.type === "hosting")
     .reduce((sum, e) => {
-      const val = Number(e?.cost_usd) || 0;
+      const val = Number(e?.cost_usd);
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
   const paymentFee = revenueTotal * processingRate;
@@ -161,4 +202,3 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 400 });
   }
 }
-
