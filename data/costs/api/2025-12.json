@@ -1854,5 +1854,27 @@
     "output_tokens": 4000,
     "cost_usd": 0.078,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:59:31.373768",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T21:01:16.732137",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
   }
 ]

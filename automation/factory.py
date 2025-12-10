@@ -64,21 +64,25 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
         label: Fixed-width label (padded to 20 chars)
         message: The actual log message content
     """
-    # Normalize emoji spacing (strip trailing spaces, function will add space)
+    # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
+    
+    # Pad emoji to fixed 3-character display width for consistent alignment
+    # This ensures labels start at the same position regardless of emoji width
+    emoji_padded = f"{emoji_clean:<3}"
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
     
     # Prevent line wrapping: truncate message if too long
-    # Account for: emoji (2-3 chars) + space (2) + label (20) + space (1) = ~26 chars overhead
+    # Account for: emoji (3 chars) + space (2) + label (20) + space (1) = 26 chars overhead
     # Target max width: 120 chars, so message max: ~94 chars
     max_message_width = 94
     if len(message) > max_message_width:
         message = message[:max_message_width - 3] + "..."
     
-    # Use two spaces after emoji to ensure visible separation (some emojis are wide)
-    formatted_message = f"{emoji_clean}  {padded_label} {message}"
+    # Use two spaces after emoji to ensure visible separation
+    formatted_message = f"{emoji_padded}  {padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)
