@@ -35,6 +35,11 @@ async function loadConfig() {
   return readJsonFile(configPath, {});
 }
 
+function normalizeToArray<T>(data: unknown): T[] {
+  if (Array.isArray(data)) return data as T[];
+  return [];
+}
+
 async function loadTimeEntries(month: string) {
   const monthPath = path.join(timeDir, month);
   const exists = await fileExists(monthPath);
@@ -58,25 +63,33 @@ async function computeFallback(month: string) {
   const cfg = await loadConfig();
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
-  
-  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
-  const revenueValidation = validateRevenueEntries(revenueEntries);
+
+  // Read raw data from JSON files
+  const rawRevenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
+  const rawApiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+  const rawHostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+
+  // Validate raw data
+  const revenueValidation = validateRevenueEntries(rawRevenueEntries);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
-  
-  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
-  const apiValidation = validateCostEntries(apiCosts, "api");
+
+  const apiValidation = validateCostEntries(rawApiCosts, "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
-  
-  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
-  const hostingValidation = validateCostEntries(hostingCosts, "hosting");
+
+  const hostingValidation = validateCostEntries(rawHostingCosts, "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
-  
+
+  // Normalize raw data to arrays
+  const revenueEntries = normalizeToArray<any>(rawRevenueEntries);
+  const apiCosts = normalizeToArray<any>(rawApiCosts);
+  const hostingCosts = normalizeToArray<any>(rawHostingCosts);
+
   const costEntries = [...apiCosts, ...hostingCosts];
 
   // Type coercion with null checks
