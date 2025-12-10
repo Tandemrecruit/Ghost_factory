@@ -59,15 +59,37 @@ async function readJson(target: string) {
   return readJsonFile(target, []);
 }
 
+/**
+ * Load the tracker's configuration file.
+ *
+ * @returns The parsed configuration object from the config file, or an empty object (`{}`) if no configuration is present.
+ */
 async function loadConfig() {
   return readJsonFile(configPath, {});
 }
 
+/**
+ * Ensure a value is returned as an array, producing an empty array when the input is not an array.
+ *
+ * @param data - The value that may be an array
+ * @returns The input cast to an array if it was an array, otherwise an empty array
+ */
 function normalizeToArray<T>(data: unknown): T[] {
   if (Array.isArray(data)) return data as T[];
   return [];
 }
 
+/**
+ * Aggregate and return all time log entries found in the month's directory.
+ *
+ * Reads every `.json` file in the data/time_logs/{month} directory, validates each file's contents
+ * against the time-logs schema (logging a schema warning for any file with validation errors),
+ * and returns a single flattened array containing all entries. If the month directory does not exist,
+ * returns an empty array.
+ *
+ * @param month - The month folder name or identifier under `data/time_logs` (for example, `"2023-07"`)
+ * @returns An array of time log entry objects; empty if the month directory is missing or contains no JSON entries
+ */
 async function loadTimeEntries(month: string) {
   const monthPath = path.join(timeDir, month);
   const exists = await fileExists(monthPath);
@@ -88,16 +110,14 @@ async function loadTimeEntries(month: string) {
 }
 
 /**
- * Build a fallback balance summary and aggregated entries for the given month when no precomputed balance exists.
+ * Constructs a fallback balance summary and aggregated raw entries for a given month when no precomputed balance is available.
  *
  * @param month - Month identifier in `YYYY-MM` format
- * @returns An object containing:
+ * @returns An object with:
  *   - `month`: the requested month string
- *   - `totals`: aggregated numeric totals (two-decimal precision) including:
- *     - `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`,
- *       `hours` (total billable hours), `time_saved_hours`, and `effective_hourly_usd`
+ *   - `totals`: aggregated numeric totals (rounded to two decimal places) including `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`, `hours`, `time_saved_hours`, and `effective_hourly_usd`
  *   - `running_balance`: an array (empty for the fallback)
- *   - `entries`: raw arrays of `time`, `revenue`, and `costs` records used to compute the totals
+ *   - `entries`: raw arrays used to compute totals under `time`, `revenue`, and `costs`
  */
 async function computeFallback(month: string) {
   const cfg = await loadConfig();
