@@ -8,6 +8,10 @@ process.env.GF_METRICS_ENABLED = 'false'
 global.fetch = vi.fn()
 
 // Mock navigator.sendBeacon
+// Ensure navigator exists before mocking (Node.js test environments may not have it)
+if (!global.navigator) {
+  global.navigator = {} as Navigator
+}
 Object.defineProperty(global.navigator, 'sendBeacon', {
   value: vi.fn(),
   writable: true,

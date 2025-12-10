@@ -23,6 +23,21 @@ function normalizeToArray<T>(value: unknown): T[] {
   return [];
 }
 
+/**
+ * Sum numeric values from an array, treating NaN/null/undefined as 0.
+ * Centralizes the "parse as number, treat NaN as 0" pattern.
+ *
+ * @param items - Array of items to sum
+ * @param getter - Function to extract the numeric value from each item
+ * @returns Sum of all valid numeric values
+ */
+function safeSum<T>(items: T[], getter: (item: T) => unknown): number {
+  return items.reduce((sum, item) => {
+    const val = Number(getter(item)) || 0;
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+}
+
 const root = process.cwd();
 const balanceDir = path.join(root, "data", "balance_sheets");
 const timeDir = path.join(root, "data", "time_logs");
@@ -121,22 +136,15 @@ async function computeFallback(month: string) {
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
-  const revenueTotal = revenueEntries.reduce((sum: number, e) => {
-    const val = Number(e?.amount_usd) || 0;
-    return sum + (isNaN(val) ? 0 : val);
-  }, 0);
-  const apiCostTotal = costEntries
-    .filter((e) => e?.provider)
-    .reduce((sum: number, e) => {
-      const val = Number(e?.cost_usd) || 0;
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
-  const hostingCostTotal = costEntries
-    .filter((e) => e?.type === "hosting")
-    .reduce((sum: number, e) => {
-      const val = Number(e?.cost_usd) || 0;
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
+  const revenueTotal = safeSum(revenueEntries, (e) => e?.amount_usd);
+  const apiCostTotal = safeSum(
+    costEntries.filter((e) => e?.provider),
+    (e) => e?.cost_usd
+  );
+  const hostingCostTotal = safeSum(
+    costEntries.filter((e) => e?.type === "hosting"),
+    (e) => e?.cost_usd
+  );
   const paymentFee = revenueTotal * processingRate;
   const totalCosts = apiCostTotal + hostingCostTotal + paymentFee;
   const netIncome = revenueTotal - totalCosts;

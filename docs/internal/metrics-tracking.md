@@ -70,12 +70,15 @@ For `/clients/[clientId]` pages, wrap content with `MetricsProvider`:
 // app/clients/[clientId]/page.tsx
 import { MetricsProvider } from '@/components'
 
-export default async function ClientPage({ params }) {
-  const { clientId } = await params
+export default function ClientPage({
+  params,
+}: {
+  params: { clientId: string }
+}) {
   const metricsEnabled = process.env.GF_METRICS_ENABLED === 'true'
 
   return (
-    <MetricsProvider clientId={clientId} enabled={metricsEnabled}>
+    <MetricsProvider clientId={params.clientId} enabled={metricsEnabled}>
       <NavSimple ... />
       <HeroSimple ... />
       <FeatureGrid ... />

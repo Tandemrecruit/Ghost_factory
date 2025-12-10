@@ -107,12 +107,14 @@ Key performance-sensitive components support an optional `blockId` prop for metr
 | `CtaBanner` | `cta_banner_v1` | Call-to-action banner |
 
 **Usage:**
+
 ```tsx
 <HeroSimple blockId="hero_main" ... />  // Custom ID
 <HeroSimple ... />                       // Uses default 'hero_simple_v1'
 ```
 
 **Override Examples (for A/B tests):**
+
 ```tsx
 <HeroSimple blockId="hero_simple_v1_variant_b" ... />
 <PricingSimple blockId="pricing_urgency_test" ... />

@@ -23,6 +23,12 @@ export const MetricsMetadata = z.record(z.string(), z.union([
 export type MetricsMetadata = z.infer<typeof MetricsMetadata>
 
 // Single event schema
+//
+// NOTE: url and referrer fields are intentionally omitted for privacy.
+// Full URLs may contain PII (query params, user tokens, etc.) and referrer
+// tracking is commonly used for cross-site profiling. Our privacy-first
+// approach uses clientId + pageId for aggregation without capturing
+// potentially sensitive navigation data.
 export const MetricsEventSchema = z.object({
   // Required fields
   type: MetricsEventType,

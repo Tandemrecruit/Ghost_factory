@@ -109,6 +109,9 @@ describe('Metrics Client', () => {
     })
 
     it('trackCtaClick sends event with blockId and metadata', () => {
+      // Force fetch path for reliable payload inspection
+      mockSendBeacon.mockReturnValueOnce(false)
+
       trackCtaClick({
         clientId: 'ember-roasters',
         pageId: 'ember-roasters',
@@ -116,11 +119,15 @@ describe('Metrics Client', () => {
         metadata: { cta_label: 'Book Now' },
       })
 
-      expect(mockSendBeacon).toHaveBeenCalled()
+      expect(mockFetch).toHaveBeenCalled()
 
-      // Verify the payload structure
-      const blobArg = mockSendBeacon.mock.calls[0][1] as Blob
-      expect(blobArg.type).toBe('application/json')
+      // Verify payload structure via fetch body
+      const call = mockFetch.mock.calls[0]
+      const body = JSON.parse(call[1].body)
+
+      expect(body.type).toBe('cta_click')
+      expect(body.blockId).toBe('hero_simple_v1')
+      expect(body.metadata).toEqual({ cta_label: 'Book Now' })
     })
 
     it('trackConversion sends event with variantId', () => {

@@ -131,7 +131,8 @@ export function MetricsProvider({
      *                an element marked with `data-gf-cta="primary"` will trigger tracking.
      */
     function handleClick(event: MouseEvent) {
-      const target = event.target as Element
+      const target = event.target
+      if (!(target instanceof Element)) return
       const ctaElement = target.closest('[data-gf-cta="primary"]')
 
       if (ctaElement) {
@@ -154,7 +155,8 @@ export function MetricsProvider({
      * @param event - Mouse event used to locate the nearest conversion element (anchor[data-gf-conversion="primary"] or button[data-gf-conversion="primary"]:not([type="submit"])) and extract its block id for tracking
      */
     function handleConversionClick(event: MouseEvent) {
-      const target = event.target as Element
+      const target = event.target
+      if (!(target instanceof Element)) return
       const conversionElement = target.closest(
         'a[data-gf-conversion="primary"], button[data-gf-conversion="primary"]:not([type="submit"])'
       )
@@ -181,7 +183,8 @@ export function MetricsProvider({
      * @param event - The submit event whose `target` is expected to be the submitted form
      */
     function handleSubmit(event: Event) {
-      const form = event.target as HTMLFormElement
+      const form = event.target
+      if (!(form instanceof HTMLFormElement)) return
 
       // Check if form has conversion attribute
       if (form.getAttribute('data-gf-conversion') !== 'primary') {
