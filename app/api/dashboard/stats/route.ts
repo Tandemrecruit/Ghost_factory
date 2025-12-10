@@ -127,24 +127,31 @@ async function computeFallback(month: string) {
 
   // Type coercion with null checks
   const totalSeconds = timeEntries.reduce((sum, e) => {
-    const val = Number(e?.duration_seconds) || 0;
+    const val = Number(e?.duration_seconds);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
   const totalHours = totalSeconds / 3600;
   const timeSavedSeconds = timeEntries.reduce((sum, e) => {
-    const val = Number(e?.time_saved_seconds) || 0;
+    const val = Number(e?.time_saved_seconds);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
-  const revenueTotal = safeSum(revenueEntries, (e) => e?.amount_usd);
-  const apiCostTotal = safeSum(
-    costEntries.filter((e) => e?.provider),
-    (e) => e?.cost_usd
-  );
-  const hostingCostTotal = safeSum(
-    costEntries.filter((e) => e?.type === "hosting"),
-    (e) => e?.cost_usd
-  );
+  const revenueTotal = revenueEntries.reduce((sum, e) => {
+    const val = Number(e?.amount_usd);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+  const apiCostTotal = costEntries
+    .filter((e) => e?.provider)
+    .reduce((sum, e) => {
+      const val = Number(e?.cost_usd);
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+  const hostingCostTotal = costEntries
+    .filter((e) => e?.type === "hosting")
+    .reduce((sum, e) => {
+      const val = Number(e?.cost_usd);
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
   const paymentFee = revenueTotal * processingRate;
   const totalCosts = apiCostTotal + hostingCostTotal + paymentFee;
   const netIncome = revenueTotal - totalCosts;
