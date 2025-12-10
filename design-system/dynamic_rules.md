@@ -1,8 +1,8 @@
 # Dynamic Rules - Top Avoidable Mistakes
 
-*Auto-generated from 100 recorded errors. Last updated: 2025-12-10 21:48 UTC*
+*Auto-generated from 104 recorded errors. Last updated: 2025-12-10 22:31 UTC*
 
-## Rule 1: Avoid Syntax Errors (78 occurrences)
+## Rule 1: Avoid Syntax Errors (80 occurrences)
 
 **Common Problem:** TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.
 
@@ -18,7 +18,7 @@
 
 ---
 
-## Rule 3: Avoid Visual Errors (1 occurrences)
+## Rule 3: Avoid Visual Errors (3 occurrences)
 
 **Common Problem:** Visual QA failed: FAIL: [Multiple visual problems detected]
 

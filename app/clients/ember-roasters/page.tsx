@@ -1,377 +1,407 @@
 import {
-  HeroSplit,
-  FeatureGrid,
+  HeroSimple,
   FeatureSteps,
-  SectionWrapper,
+  FeatureGrid,
+  BentoGrid,
+  LogoCloud,
   PricingTiers,
   TestimonialCards,
   FaqAccordion,
   CtaBanner,
-  FooterSimple,
+  SectionWrapper,
   NavSimple,
-  TrustBadges,
-} from "@/components";
+  FooterSimple
+} from '@/components'
 
-/**
- * Render the Ember Roasters marketing homepage.
- *
- * The component composes the landing page from modular sections — navigation, hero, trust badges,
- * feature grid and steps, story/origins, pricing tiers, guarantees, testimonials, FAQ, CTA banner,
- * and footer — each provided via presentational subcomponents and static content.
- *
- * @returns The React element tree for the Ember Roasters landing page.
- */
-export default function Home() {
+export default function Page() {
   return (
-    <>
+    <div className="min-h-screen bg-stone-100">
       <NavSimple
         logoSrc="/images/ember-logo.svg"
         logoAlt="Ember Roasters"
         links={[
           { label: "How It Works", href: "#how-it-works" },
+          { label: "Our Coffee", href: "#origins" },
           { label: "Pricing", href: "#pricing" },
-          { label: "Our Story", href: "#story" },
-          { label: "FAQ", href: "#faq" },
+          { label: "About", href: "#story" }
         ]}
-        ctaLabel="Start Your Subscription"
+        ctaLabel="Start Subscription"
         ctaHref="#pricing"
       />
 
-      <HeroSplit
-        heading="Coffee Worth Waking Up For"
-        subhead="Small-batch coffee roasted fresh every week and delivered to your door. Every bag shows the roast date—because freshness isn't a feature, it's everything."
-        imageSrc="/images/hero-coffee.jpg"
-        imageAlt="Fresh roasted coffee beans being poured"
-        primaryCtaLabel="Start Your Subscription"
-        primaryCtaHref="#pricing"
-        imagePosition="right"
-      />
-
-      <SectionWrapper background="white" paddingY="small">
-        <TrustBadges
-          heading=""
-          badges={[
-            { icon: "check-circle", label: "Free shipping on all subscriptions" },
-            { icon: "clock", label: "Roasted within 7 days of delivery" },
-            { icon: "check-circle", label: "Pause or cancel anytime" },
-          ]}
+      {/* Hero Section */}
+      <SectionWrapper background="dark" paddingY="large">
+        <HeroSimple
+          heading="Your Mornings Deserve Better Than Last Month's Coffee"
+          subhead="Fresh-roasted specialty coffee delivered to your door—every bag roasted to order, never sitting on a shelf. Subscribe and taste the difference freshness makes."
+          primaryCtaLabel="Start Your Subscription"
+          primaryCtaHref="#pricing"
         />
+        <div className="text-center mt-6">
+          <a href="#pricing" className="text-accent hover:text-secondary transition-colors text-sm font-medium">
+            Or try a single bag first
+          </a>
+        </div>
+        <div className="flex justify-center mt-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/30 rounded-lg">
+            <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm font-medium text-stone-900">Ships within 48 hours of roasting • Roast date on every bag</span>
+          </div>
+        </div>
       </SectionWrapper>
 
+      {/* Social Proof Bar */}
+      <SectionWrapper background="white" paddingY="small">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-primary mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Trusted by coffee lovers nationwide
+          </h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8 text-center max-w-4xl mx-auto">
+          <div>
+            <div className="text-3xl font-bold text-primary mb-2">⭐ 4.9/5</div>
+            <p className="text-stone-700 text-sm">from 2,400+ reviews</p>
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-stone-900 mb-2">Featured in:</div>
+            <p className="text-stone-700 text-sm italic">Bon Appétit • Portland Monthly • Sprudge</p>
+          </div>
+          <div>
+            <div className="text-3xl font-bold text-primary mb-2">12,000+</div>
+            <p className="text-stone-700 text-sm">subscribers brewing better mornings</p>
+          </div>
+        </div>
+      </SectionWrapper>
+
+      {/* How It Works */}
       <SectionWrapper background="gray" paddingY="large">
+        <div id="how-it-works">
+          <FeatureSteps
+            eyebrow="Simple Process"
+            heading="Three Steps to Your Best Coffee"
+            subhead=""
+            steps={[
+              {
+                stepNumber: "1",
+                title: "Pick Your Frequency",
+                description: "Select how much coffee you need—from casual sipper to full-blown obsessed. Adjust or pause anytime."
+              },
+              {
+                stepNumber: "2",
+                title: "We Roast Fresh",
+                description: "Every Monday, we roast your order. No warehouses. No sitting around. Just fresh beans on their way to you."
+              },
+              {
+                stepNumber: "3",
+                title: "Delivered to Your Door",
+                description: "Your coffee arrives in 2-3 days with the roast date stamped right on the bag. Brew within two weeks for peak flavor."
+              }
+            ]}
+          />
+        </div>
+      </SectionWrapper>
+
+      {/* Why Ember */}
+      <SectionWrapper background="white" paddingY="large">
         <FeatureGrid
-          eyebrow="Our Promise"
-          heading="Three Things We'll Never Compromise On"
+          eyebrow="What Makes Us Different"
+          heading="Why Coffee Nerds (and Regular Humans) Choose Ember"
           subhead=""
           features={[
             {
-              title: "Roasted Fresh, Weekly",
-              description:
-                "Every bag leaves our roastery within days of roasting—not weeks or months. You'll see the exact roast date printed on every package, guaranteeing you're brewing coffee at its peak flavor window. No stale beans. No mystery dates. Just coffee the way it's meant to taste.",
-              icon: "calendar",
+              title: "Roasted Fresh Weekly",
+              description: "Most grocery store coffee was roasted months ago. Ours? Days ago. Every batch is roasted to order, and every bag is stamped with its roast date. You'll taste the difference in that first sip—brighter, more complex, actually fresh. Because coffee is produce, not a pantry staple.",
+              icon: "zap"
             },
             {
-              title: "Sourced Direct from Farmers",
-              description:
-                "We work directly with small farms in Ethiopia, Colombia, and Guatemala—building relationships that let us secure exceptional beans while ensuring farmers get paid fairly. You get better coffee. They get a better deal. Everyone wins.",
-              icon: "globe",
+              title: "Direct From Farmers",
+              description: "We work directly with farming families in Ethiopia, Colombia, and Guatemala—cutting out the middlemen and paying fair prices. Better relationships mean better coffee. You get exceptional beans with actual stories, and farmers get the sustainability to invest in next year's harvest.",
+              icon: "globe"
             },
             {
-              title: "Free Shipping, Always",
-              description:
-                "All subscription orders ship free, every single time. No minimums. No surprises at checkout. Just fresh coffee showing up like clockwork. Because a $7 shipping charge shouldn't stand between you and great coffee.",
-              icon: "gift",
-            },
+              title: "Stupid-Simple Subscription",
+              description: "Pause when you're traveling. Cancel if you want. Change your plan or frequency whenever. No contracts, no phone calls, no \"are you sure?\" guilt trips. We're confident you'll stick around because the coffee's that good—not because we've trapped you.",
+              icon: "check"
+            }
           ]}
           columns={3}
         />
       </SectionWrapper>
 
-      <SectionWrapper background="white" paddingY="large">
-        <FeatureSteps
-          eyebrow="Simple Process"
-          heading="Dead Simple (Just Like We Like It)"
-          subhead=""
-          steps={[
-            {
-              stepNumber: "1",
-              title: "Choose Your Plan",
-              description:
-                "Pick the subscription that matches your coffee habit. One bag monthly, two bags, or go all-in with our Obsessed tier. Switch anytime.",
-            },
-            {
-              stepNumber: "2",
-              title: "We Roast & Ship",
-              description:
-                "Every week, we roast small batches and ship them out fresh. Your coffee arrives within days of roasting—not weeks.",
-            },
-            {
-              stepNumber: "3",
-              title: "Brew & Enjoy",
-              description:
-                "Open the bag. Smell that? That's what fresh coffee actually smells like. Now brew it however you love it and taste the difference roast dates make.",
-            },
-          ]}
-        />
-      </SectionWrapper>
-
-      <SectionWrapper background="primary" paddingY="large">
-        <div className="max-w-4xl mx-auto text-center text-white mb-12">
-          <p className="text-sm font-semibold uppercase tracking-wider mb-4 opacity-90">
-            Our Story
-          </p>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            The Beans Behind Your Brew
-          </h2>
-          <div className="prose prose-lg prose-invert mx-auto text-left">
-            <p>
-              Great coffee starts long before we fire up the roaster. It starts
-              with farmers who care as much about quality as we do.
-            </p>
-            <p>
-              We've spent years building direct relationships with small farms
-              in Ethiopia's Yirgacheffe region, Colombia's coffee-growing
-              mountains, and the volcanic soils of Guatemala. These aren't
-              transactional relationships—we return to the same farms season
-              after season, working together to improve quality and ensure
-              everyone gets paid fairly.
-            </p>
-            <p>
-              When you cut out the middlemen and work directly with producers,
-              something magic happens: farmers can focus on quality over
-              quantity, and you get beans that actually taste like something.
-            </p>
-            <p className="font-semibold">
-              No jargon. No pretension. Just honest coffee from people who give
-              a damn.
-            </p>
+      {/* Coffee Origins */}
+      <SectionWrapper background="gray" paddingY="large">
+        <div id="origins" className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-secondary font-semibold mb-2 text-sm uppercase tracking-wide">Our Sources</p>
+            <h2 className="text-4xl font-bold text-primary mb-4" style={{ fontFamily: 'Playfair Display, serif' }}>
+              Meet Your Coffee
+            </h2>
           </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">Ethiopia — Yirgacheffe</h3>
-            <p className="opacity-90">
-              Bright, floral, complex. The birthplace of coffee.
-            </p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">Colombia — Huila</h3>
-            <p className="opacity-90">
-              Balanced, sweet, classic. Crowd-pleaser for a reason.
-            </p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
-            <h3 className="text-xl font-bold mb-2">Guatemala — Antigua</h3>
-            <p className="opacity-90">
-              Rich, chocolatey, bold. Built for morning rituals.
-            </p>
-          </div>
+          
+          <BentoGrid
+            eyebrow=""
+            heading=""
+            subhead=""
+            items={[
+              {
+                title: "Ethiopia – Yirgacheffe",
+                description: "Bright, floral, almost tea-like. Our Ethiopian beans come from smallholder farmers in Yirgacheffe, where coffee grows wild in the highlands. Expect notes of bergamot, jasmine, and stone fruit. This is coffee that tastes like sunshine feels. Partners: Kebel Cooperative • Altitude: 1,900-2,200m",
+                icon: "sparkles",
+                size: "large"
+              },
+              {
+                title: "Colombia – Huila",
+                description: "Smooth, chocolatey, crowd-pleasing. From the mountains of Huila, these beans are grown by third-generation farmers who know their craft. Rich caramel sweetness with a bright citrus finish. This is the coffee that makes everyone happy. Partners: Finca El Paraíso • Altitude: 1,600-1,850m",
+                icon: "star",
+                size: "medium"
+              },
+              {
+                title: "Guatemala – Antigua",
+                description: "Full-bodied with a satisfying richness. Antigua's volcanic soil produces coffee with deep chocolate notes, hints of spice, and a velvety texture. This is your \"I need to focus\" morning coffee or your \"I deserve this\" afternoon ritual. Partners: Bella Vista Estate • Altitude: 1,500-1,700m",
+                icon: "target",
+                size: "medium"
+              }
+            ]}
+          />
         </div>
       </SectionWrapper>
 
+      {/* Pricing Tiers */}
       <SectionWrapper background="white" paddingY="large">
         <div id="pricing">
           <PricingTiers
-            eyebrow="Plans & Pricing"
+            eyebrow="Choose Your Plan"
             heading="Choose Your Coffee Commitment"
-            subhead="All plans include free shipping and the freedom to pause, skip, or cancel anytime. About $0.50 per cup—less than your daily coffee shop run."
+            subhead="All plans include free shipping, flexible scheduling, and the freedom to pause or cancel anytime."
             tiers={[
               {
                 name: "Explorer",
                 price: "$24",
                 period: "month",
-                description: "Solo coffee drinkers or those testing the waters",
+                description: "Perfect for: Casual drinkers, coffee curious, or \"I just need my morning cup\" folks",
                 features: [
-                  "1 bag (12 oz) monthly",
-                  "Rotates through our featured origins",
+                  "12oz bag (20-24 cups)",
+                  "Your choice of origin or rotating selection",
                   "Roasted fresh weekly",
                   "Free shipping",
+                  "Cancel anytime",
+                  "~$1.00 per cup"
                 ],
-                ctaLabel: "Start Exploring",
-                ctaHref: "#checkout",
-                highlighted: false,
+                ctaLabel: "Choose Explorer",
+                ctaHref: "/checkout/explorer",
+                highlighted: false
               },
               {
                 name: "Enthusiast",
                 price: "$42",
                 period: "month",
-                description:
-                  "Households with multiple coffee drinkers or variety seekers",
+                description: "Perfect for: Daily drinkers, work-from-home warriors, households of 2",
                 features: [
-                  "2 bags (12 oz each) monthly",
-                  "Choose your own origins or let us surprise you",
+                  "2 × 12oz bags (40-48 cups)",
+                  "Mix & match origins or try our rotating selection",
                   "Roasted fresh weekly",
                   "Free shipping",
+                  "Cancel anytime",
                   "Early access to limited micro-lots",
+                  "~$0.88 per cup • Save $6"
                 ],
                 ctaLabel: "Choose Enthusiast",
-                ctaHref: "#checkout",
+                ctaHref: "/checkout/enthusiast",
                 highlighted: true,
-                badge: "MOST POPULAR",
+                badge: "MOST POPULAR"
               },
               {
                 name: "Obsessed",
                 price: "$72",
                 period: "month",
-                description: "True coffee devotees who go through multiple cups daily",
+                description: "Perfect for: True coffee lovers, espresso addicts, generous sharers",
                 features: [
-                  "4 bags (12 oz each) monthly",
-                  "Full control over origin selection",
+                  "4 × 12oz bags (80-96 cups)",
+                  "Mix & match any origins",
                   "Roasted fresh weekly",
                   "Free shipping",
-                  "First access to all exclusive micro-lots",
-                  "Quarterly bonus: surprise tasting pack",
+                  "Cancel anytime",
+                  "Exclusive micro-lots + experimental roasts",
+                  "Quarterly brewing tips from our roasting team",
+                  "~$0.75 per cup • Save $24"
                 ],
-                ctaLabel: "Go All In",
-                ctaHref: "#checkout",
-                highlighted: false,
-              },
+                ctaLabel: "Choose Obsessed",
+                ctaHref: "/checkout/obsessed",
+                highlighted: false
+              }
             ]}
           />
-        </div>
-
-        <div className="max-w-4xl mx-auto mt-12 text-center space-y-6">
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-2 flex items-center justify-center gap-2">
-              <span className="text-2xl">🛡️</span> Money-Back Guarantee
-            </h3>
-            <p className="text-gray-700">
-              If your first bag doesn't blow you away, we'll replace it free or
-              refund you completely. No hard feelings.
-            </p>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-2">Pause or Cancel Anytime</h3>
-            <p className="text-gray-700">
-              Life happens. Manage your subscription online in seconds—no phone
-              calls, no hassles.
-            </p>
+          <div className="text-center mt-12 max-w-2xl mx-auto">
+            <div className="bg-accent/10 border border-accent/30 rounded-lg p-6">
+              <h3 className="text-xl font-bold text-primary mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                Less than your weekly latte habit
+              </h3>
+              <p className="text-stone-700">
+                That $5 daily café Americano? That's $150/month. Our Enthusiast plan delivers better coffee—fresher, ethically sourced, brewed exactly how you like it—for $42.
+              </p>
+            </div>
           </div>
         </div>
       </SectionWrapper>
 
+      {/* Testimonials */}
       <SectionWrapper background="gray" paddingY="large">
         <TestimonialCards
-          eyebrow="Social Proof"
-          heading="What People Are Saying"
+          eyebrow="Customer Love"
+          heading="What Our Subscribers Are Saying"
           testimonials={[
             {
-              quote:
-                "I thought I knew what good coffee tasted like until I tried Ember. The difference fresh roasting makes is absolutely wild. I'm never going back.",
-              name: "Sarah M.",
-              role: "Enthusiast subscriber since 2023",
-              company: "Seattle, WA",
-              avatarSrc: "/images/testimonial-sarah.jpg",
-            },
-            {
-              quote:
-                "Finally, a subscription that doesn't feel like I'm locked into some sketchy contract. I paused for a month when I traveled, restarted when I got back—easy as that. And the coffee? Incredible.",
+              quote: "I didn't realize how stale my old coffee was until I tried Ember. The difference is insane—it actually smells like *coffee* when I open the bag. I'm three months in and honestly can't go back to grocery store beans.",
               name: "Marcus T.",
-              role: "Explorer subscriber since 2024",
-              company: "Austin, TX",
-              avatarSrc: "/images/testimonial-marcus.jpg",
+              role: "Enthusiast Subscriber",
+              company: "Seattle, WA",
+              avatarSrc: "/images/avatar-marcus.jpg"
             },
             {
-              quote:
-                "As someone with a $2,000 espresso setup, I'm picky about my beans. Ember's roast dates and sourcing transparency sold me immediately. These are the only beans I use now.",
+              quote: "The subscription is so easy. I never run out, I never have to think about it, and every bag has been consistently excellent. Plus, I love that I know exactly where my coffee comes from and that farmers are getting paid fairly.",
               name: "Jennifer K.",
-              role: "Obsessed subscriber since 2023",
-              company: "Denver, CO",
-              avatarSrc: "/images/testimonial-jennifer.jpg",
+              role: "Explorer Subscriber",
+              company: "Austin, TX",
+              avatarSrc: "/images/avatar-jennifer.jpg"
             },
             {
-              quote:
-                "I was spending $6 a day at coffee shops. Now I'm spending $42 a month and drinking better coffee at home. The math checks out, and my mornings are infinitely better.",
+              quote: "I'm picky about my espresso, and Ember's Guatemala roast is *chef's kiss*. Rich, smooth, pulls beautifully every time. And when I had a question about grind size, their team responded within an hour with genuinely helpful advice. These folks care.",
               name: "David L.",
-              role: "Enthusiast subscriber since 2024",
+              role: "Obsessed Subscriber",
               company: "Portland, OR",
-              avatarSrc: "/images/testimonial-david.jpg",
-            },
+              avatarSrc: "/images/avatar-david.jpg"
+            }
           ]}
         />
       </SectionWrapper>
 
+      {/* Our Story */}
       <SectionWrapper background="white" paddingY="large">
-        <div id="faq">
-          <FaqAccordion
-            eyebrow="Support"
-            heading="Questions We Get Asked A Lot"
-            subhead=""
-            faqs={[
-              {
-                question: 'How fresh is "fresh," really?',
-                answer:
-                  "We roast every Monday and Thursday. Most subscriptions ship within 2-3 days of roasting, and you'll receive your coffee within a week of the roast date. Every bag is clearly marked so you know exactly how fresh your beans are. Compare that to grocery store coffee (often 3-6 months old) or even other 'specialty' subscriptions (2-4 weeks old). The difference in taste is dramatic.",
-              },
-              {
-                question: "Is this actually cheaper than my daily coffee shop run?",
-                answer:
-                  "Let's do the math: Our Enthusiast plan breaks down to about $0.50 per cup. If you're buying one $5 latte daily, you're spending $150/month. Even cutting that to 3x weekly is $60/month—and you're still drinking better coffee at home with our subscription.",
-              },
-              {
-                question: "Can I really cancel anytime? What's the catch?",
-                answer:
-                  'Really. No catch. Log into your account, click "cancel," done. We\'d rather you come back on your own terms than feel trapped. Coffee should make you happy, not stressed. You can also pause deliveries if you\'re traveling or drowning in beans—we get it.',
-              },
-              {
-                question: "What if I don't like the coffee?",
-                answer:
-                  "If your first bag doesn't meet your expectations, reach out. We'll send a replacement free, or refund you completely. We're confident you'll love it, but if you don't, we want to make it right.",
-              },
-              {
-                question: "How do you ship? How long does it take?",
-                answer:
-                  "We ship via USPS Priority Mail. Most orders arrive within 2-4 business days. You'll get tracking info as soon as your order ships. All subscription orders ship free—that's our promise.",
-              },
-              {
-                question: "Can I choose which origins I receive?",
-                answer:
-                  "Explorer subscribers get our featured monthly selections. Enthusiast and Obsessed subscribers can customize their origin choices through your account dashboard. Or just let us surprise you—we're pretty good at this.",
-              },
-              {
-                question: "What brewing methods work best?",
-                answer:
-                  "Our coffee is roasted to shine across all brewing methods: pour-over, French press, drip, espresso, AeroPress—you name it. We provide brewing tips with each order, but honestly, good beans are pretty forgiving.",
-              },
-              {
-                question: "Do you offer decaf?",
-                answer:
-                  "Not yet, but we're working on sourcing a decaf that meets our quality standards. It's harder than you'd think. Join our email list and we'll let you know when we nail it.",
-              },
-              {
-                question: 'What\'s a "micro-lot" and why should I care?',
-                answer:
-                  "Micro-lots are small-batch, ultra-premium coffees—think limited harvest from a specific section of a farm. They're often experimental varieties or special processing methods. Enthusiast and Obsessed subscribers get early or exclusive access to these when we source them. They're special, and they don't last long.",
-              },
-            ]}
-          />
+        <div id="story" className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-primary mb-6" style={{ fontFamily: 'Playfair Display, serif' }}>
+              We're Coffee Nerds (But We Promise Not to Be Annoying About It)
+            </h2>
+          </div>
+          <div className="prose prose-lg max-w-3xl mx-auto">
+            <p className="text-stone-700 leading-relaxed mb-4">
+              Ember Roasters started in 2019 in a tiny Portland warehouse when founder Maya Chen couldn't find coffee that was both exceptional *and* unpretentious. Too much specialty coffee culture felt exclusive—like you needed a degree in coffee science just to order a bag. Meanwhile, mass-market coffee tasted like, well, nothing.
+            </p>
+            <p className="text-stone-700 leading-relaxed mb-4">
+              So we built something different. A roastery obsessed with freshness, direct farmer relationships, and actual flavor—without the gatekeeping. We roast small batches every week, work directly with farming families who care as much about quality as we do, and ship beans while they're still singing.
+            </p>
+            <p className="text-stone-700 leading-relaxed mb-4">
+              We're here for the ritual of morning coffee, the comfort of a perfect cup, and the simple joy of something made with care. Whether you're brewing pourover at 6am or just need fuel to survive Monday, you deserve better than stale beans.
+            </p>
+            <p className="text-primary font-bold text-xl text-center mt-8" style={{ fontFamily: 'Playfair Display, serif' }}>
+              Welcome to Ember. Let's make your mornings better.
+            </p>
+          </div>
         </div>
       </SectionWrapper>
 
-      <SectionWrapper background="gradient" paddingY="large">
-        <CtaBanner
-          eyebrow="Ready to Start?"
-          heading="Still Reading? You Must Really Love Coffee."
-          subhead="Join hundreds of coffee lovers who've upgraded their mornings. First bag guaranteed or your money back."
-          primaryCtaLabel="Start Your Subscription"
-          primaryCtaHref="#pricing"
+      {/* FAQ */}
+      <SectionWrapper background="gray" paddingY="large">
+        <FaqAccordion
+          eyebrow="Common Questions"
+          heading="Questions? We've Got Answers."
+          subhead=""
+          faqs={[
+            {
+              question: "How fresh is the coffee when it arrives?",
+              answer: "Extremely fresh. We roast every Monday and ship orders within 48 hours of roasting. Your coffee typically arrives 2-4 days after roasting (depending on your location), and every bag is stamped with its roast date. For reference, most grocery store coffee was roasted 3-6 months before it hits shelves. Freshness matters—a lot."
+            },
+            {
+              question: "Can I pause or cancel my subscription?",
+              answer: "Absolutely. Log into your account anytime to pause, skip a delivery, or cancel. No phone calls, no hassles, no \"are you sure?\" guilt trips. We want you to stay because you love the coffee, not because we've made it difficult to leave."
+            },
+            {
+              question: "What if I don't like the coffee I receive?",
+              answer: "We'll make it right. If you're not happy with your order, email us within 30 days and we'll send a replacement or issue a full refund—your choice. We're confident you'll love our coffee, but if something's off, we want to know."
+            },
+            {
+              question: "Do you ship nationwide? How much is shipping?",
+              answer: "We ship to all 50 states, and shipping is always free on subscriptions. One-time purchases get free shipping on orders over $30. We ship via USPS Priority Mail, so most orders arrive within 2-3 business days."
+            },
+            {
+              question: "Can I customize my subscription?",
+              answer: "Yes! You can choose specific origins or get our rotating selection, adjust frequency (weekly, bi-weekly, or monthly), mix and match different coffees in multi-bag plans, change your plan level anytime, and add one-time purchases to any subscription order. Just log into your account to make changes."
+            },
+            {
+              question: "How is your coffee sourced?",
+              answer: "We work directly with farming families and cooperatives in Ethiopia, Colombia, and Guatemala—relationships we've built over years, not transactions with brokers. We pay well above Fair Trade minimums, visit farms regularly, and prioritize long-term partnerships that let farmers invest in quality and sustainability. Every bean has a story, and we're happy to share it."
+            },
+            {
+              question: "What roast levels do you offer?",
+              answer: "Most of our coffees are light-to-medium roasts that highlight origin characteristics—bright, complex, and flavorful without being sour or overly acidic. We believe great beans deserve roasting that showcases their natural qualities rather than covering them up. If you prefer darker roasts, our Guatemala Antigua has more body and richness."
+            },
+            {
+              question: "What grind should I choose?",
+              answer: "We recommend ordering whole beans and grinding fresh at home for maximum flavor, but we're happy to grind for you. Options include: Whole bean (our recommendation), Coarse (French press, cold brew), Medium (drip coffee makers), and Fine (espresso machines, Aeropress). Select your preference at checkout or in your subscription settings."
+            }
+          ]}
         />
       </SectionWrapper>
 
+      {/* Final CTA */}
+      <SectionWrapper background="primary" paddingY="large">
+        <CtaBanner
+          eyebrow="Ready to Upgrade?"
+          heading="Your Best Mornings Start Here"
+          subhead="Join 12,000+ subscribers who've upgraded their coffee ritual. Fresh-roasted, ethically sourced, delivered to your door. Cancel anytime, satisfaction guaranteed."
+          primaryCtaLabel="Start Your Subscription"
+          primaryCtaHref="#pricing"
+          secondaryCtaLabel="Try a single bag first"
+          secondaryCtaHref="/shop"
+          background="primary"
+        />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 max-w-4xl mx-auto">
+          <div className="text-center">
+            <svg className="w-8 h-8 text-accent mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-white text-sm font-medium">Cancel anytime, no commitments</p>
+          </div>
+          <div className="text-center">
+            <svg className="w-8 h-8 text-accent mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-white text-sm font-medium">Free shipping on all subscriptions</p>
+          </div>
+          <div className="text-center">
+            <svg className="w-8 h-8 text-accent mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <p className="text-white text-sm font-medium">30-day satisfaction guarantee</p>
+          </div>
+          <div className="text-center">
+            <svg className="w-8 h-8 text-accent mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <p className="text-white text-sm font-medium">Roasted fresh weekly</p>
+          </div>
+        </div>
+      </SectionWrapper>
+
+      {/* Footer */}
       <FooterSimple
         companyName="Ember Roasters"
         links={[
-          { label: "Subscriptions", href: "#pricing" },
-          { label: "Our Story", href: "#story" },
+          { label: "About", href: "#story" },
           { label: "FAQ", href: "#faq" },
-          { label: "Contact", href: "#contact" },
+          { label: "Contact", href: "/contact" },
+          { label: "Privacy", href: "/privacy" },
+          { label: "Terms", href: "/terms" }
         ]}
         socialLinks={[
-          { platform: "instagram", href: "https://instagram.com/emberroasterspdx" },
+          { platform: "instagram", href: "https://instagram.com/emberroasters" },
+          { platform: "facebook", href: "https://facebook.com/emberroasters" },
+          { platform: "twitter", href: "https://twitter.com/emberroasters" }
         ]}
-        copyrightText="© 2024 Ember Roasters. Portland, Oregon."
+        copyrightText="© 2025 Ember Roasters. Fresh-roasted in Portland, Oregon."
       />
-    </>
-  );
+    </div>
+  )
 }

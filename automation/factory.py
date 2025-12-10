@@ -499,6 +499,10 @@ def run_intake_sanitizer():
         return
 
     for client_id in os.listdir(WATCH_DIR):
+        # Skip dotfiles
+        if client_id.startswith("."):
+            continue
+
         # Validate client ID to prevent path traversal attacks
         if not is_valid_client_id(client_id):
             _log_aligned("warning", "⚠️", "Sanitizer", f"Skipping invalid client ID: {client_id}")
@@ -718,27 +722,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         repo_root = Path(__file__).resolve().parent.parent
         tsconfig_path = repo_root / "tsconfig.json"
         
-        # #region agent log
-        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-            log_file.write(json.dumps({
-                "sessionId": "debug-session",
-                "runId": "run1",
-                "hypothesisId": "A",
-                "location": "factory.py:717",
-                "message": "Module resolution setup",
-                "data": {
-                    "temp_path": temp_path,
-                    "temp_path_dir": os.path.dirname(temp_path),
-                    "repo_root": str(repo_root),
-                    "tsconfig_path": str(tsconfig_path),
-                    "cwd": os.getcwd(),
-                    "node_modules_exists": os.path.exists(repo_root / "node_modules"),
-                    "next_in_node_modules": os.path.exists(repo_root / "node_modules" / "next")
-                },
-                "timestamp": int(time.time() * 1000)
-            }) + "\n")
-        # #endregion
-        
         # Create a temporary tsconfig that extends the main one but only includes our temp file
         temp_tsconfig = None
         temp_tsconfig_path = None
@@ -774,29 +757,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 with open(temp_tsconfig_path, "w", encoding="utf-8") as f:
                     json_module.dump(temp_tsconfig_data, f)
                 
-                # #region agent log
-                with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-                    log_file.write(json.dumps({
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "A",
-                        "location": "factory.py:760",
-                        "message": "Temp tsconfig created",
-                        "data": {
-                            "temp_tsconfig_path": temp_tsconfig_path,
-                            "temp_tsconfig_dir": os.path.dirname(temp_tsconfig_path),
-                            "temp_path": temp_path,
-                            "temp_file_dir": temp_file_dir,
-                            "temp_file_name": temp_file_name,
-                            "include_path": include_path,
-                            "tsconfig_has_baseUrl": "baseUrl" in temp_tsconfig_data.get("compilerOptions", {}),
-                            "tsconfig_include": temp_tsconfig_data.get("include"),
-                            "tsconfig_exclude": temp_tsconfig_data.get("exclude")
-                        },
-                        "timestamp": int(time.time() * 1000)
-                    }) + "\n")
-                # #endregion
-                
                 project_arg = str(temp_tsconfig_path)
             except Exception as e:
                 # Fallback to manual flags if tsconfig processing fails
@@ -829,24 +789,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 temp_path
             ])
         
-        # #region agent log
-        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-            log_file.write(json.dumps({
-                "sessionId": "debug-session",
-                "runId": "run1",
-                "hypothesisId": "A",
-                "location": "factory.py:776",
-                "message": "Running tsc command",
-                "data": {
-                    "cmd": cmd,
-                    "cwd": os.getcwd(),
-                    "temp_tsconfig_dir": os.path.dirname(temp_tsconfig_path) if temp_tsconfig_path else None,
-                    "repo_root": str(repo_root)
-                },
-                "timestamp": int(time.time() * 1000)
-            }) + "\n")
-        # #endregion
-        
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -854,24 +796,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             timeout=30,
             cwd=str(repo_root)  # Use repo_root instead of os.getcwd()
         )
-        
-        # #region agent log
-        with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-            log_file.write(json.dumps({
-                "sessionId": "debug-session",
-                "runId": "run1",
-                "hypothesisId": "A",
-                "location": "factory.py:790",
-                "message": "tsc command completed",
-                "data": {
-                    "returncode": result.returncode,
-                    "stdout_length": len(result.stdout or ""),
-                    "stderr_length": len(result.stderr or ""),
-                    "error_preview": (result.stderr or result.stdout or "")[:500]
-                },
-                "timestamp": int(time.time() * 1000)
-            }) + "\n")
-        # #endregion
         
         # Clean up temp tsconfig if created
         if temp_tsconfig_path and os.path.exists(temp_tsconfig_path):
@@ -894,24 +818,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             temp_file_name = os.path.basename(temp_path)
             in_relevant_error = False
             
-            # #region agent log
-            with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-                log_file.write(json.dumps({
-                    "sessionId": "debug-session",
-                    "runId": "run1",
-                    "hypothesisId": "B",
-                    "location": "factory.py:876",
-                    "message": "Error filtering start",
-                    "data": {
-                        "error_output_length": len(error_output),
-                        "error_lines_count": len(error_lines),
-                        "temp_file_name": temp_file_name,
-                        "first_5_lines": error_lines[:5]
-                    },
-                    "timestamp": int(time.time() * 1000)
-                }) + "\n")
-            # #endregion
-            
             for line in error_lines:
                 # Check if this line is an error from our generated file
                 # Errors are typically: "file.tsx(line,col): error TS####: message"
@@ -929,26 +835,6 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                         "components/", "app/", "tsconfig.json"
                     ]
                 ) and "page.tsx" not in line and temp_file_name not in line
-                
-                # #region agent log
-                if 'error TS' in line:
-                    with open(".cursor/debug.log", "a", encoding="utf-8") as log_file:
-                        log_file.write(json.dumps({
-                            "sessionId": "debug-session",
-                            "runId": "run1",
-                            "hypothesisId": "B",
-                            "location": "factory.py:900",
-                            "message": "Error line analysis",
-                            "data": {
-                                "line": line[:200],
-                                "is_our_error": is_our_error,
-                                "is_dependency_error": is_dependency_error,
-                                "has_lib": "lib/" in line,
-                                "has_page_tsx": "page.tsx" in line
-                            },
-                            "timestamp": int(time.time() * 1000)
-                        }) + "\n")
-                # #endregion
                 
                 if is_our_error:
                     filtered_errors.append(line)
@@ -1940,6 +1826,185 @@ Please fix the visual issues while maintaining correct syntax."""
     # Finalize the client (notifications, git, mark processed)
     finalize_client(client_path, final_qa_status, final_qa_report)
 
+def check_invisible_text_static(page_tsx_path: str, theme_path: Optional[str] = None) -> list:
+    """
+    Check for invisible text by parsing the TSX file and analyzing Tailwind classes.
+    This is a fallback/pre-check method that doesn't require a browser.
+    
+    Parameters:
+        page_tsx_path: Path to the generated page.tsx file
+        theme_path: Optional path to theme.json for color mapping
+        
+    Returns:
+        list: List of dicts with potential invisible text issues
+    """
+    issues = []
+    
+    if not os.path.exists(page_tsx_path):
+        return issues
+    
+    try:
+        # Load theme if available
+        theme_colors = {}
+        if theme_path and os.path.exists(theme_path):
+            try:
+                with open(theme_path, "r", encoding="utf-8") as f:
+                    theme = json.load(f)
+                    theme_colors = {
+                        "primary": theme.get("primary", ""),
+                        "secondary": theme.get("secondary", ""),
+                        "accent": theme.get("accent", ""),
+                        "background": theme.get("background", "white")
+                    }
+            except:
+                pass
+        
+        # Read the TSX file
+        with open(page_tsx_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        
+        # Simple regex to find text elements with className containing text- and bg- classes
+        # This is a basic check - Playwright method is more reliable
+        import re
+        
+        # Find elements with both text-{color} and bg-{color} classes in same element or parent
+        # Pattern: className="... text-{color} ... bg-{color} ..."
+        class_pattern = r'className=["\']([^"\']*)["\']'
+        matches = re.finditer(class_pattern, content)
+        
+        for match in matches:
+            classes = match.group(1)
+            # Extract text-{color} classes
+            text_classes = re.findall(r'text-([a-z]+(?:-\d+)?)', classes)
+            # Extract bg-{color} classes
+            bg_classes = re.findall(r'bg-([a-z]+(?:-\d+)?)', classes)
+            
+            # Check if text and bg colors might match
+            for text_class in text_classes:
+                for bg_class in bg_classes:
+                    # If they're the same base color (e.g., text-blue-500 and bg-blue-500)
+                    text_base = text_class.split('-')[0] if '-' in text_class else text_class
+                    bg_base = bg_class.split('-')[0] if '-' in bg_class else bg_class
+                    
+                    if text_base == bg_base:
+                        # Potential issue - same color family
+                        issues.append({
+                            "element": "static_analysis",
+                            "text_class": f"text-{text_class}",
+                            "background_class": f"bg-{bg_class}",
+                            "text_preview": "Code analysis",
+                            "note": "Same color family detected - may be invisible"
+                        })
+    except Exception as e:
+        _log_aligned("warning", "⚠️", "QA", f"Static invisible text check failed: {e}")
+    
+    return issues
+
+
+def check_invisible_text_playwright(page) -> list:
+    """
+    Check for invisible text using Playwright's computed styles.
+    
+    Parameters:
+        page: Playwright page object
+        
+    Returns:
+        list: List of dicts with invisible text issues, each containing:
+            - element: description of the element
+            - text_color: RGB color string
+            - background_color: RGB color string
+            - text_preview: first 50 chars of text content
+    """
+    issues = []
+    
+    try:
+        # Query all text-containing elements
+        text_selectors = [
+            'p', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'a', 'button', 'label', 'li', 'td', 'th', 'div'
+        ]
+        
+        for selector in text_selectors:
+            elements = page.query_selector_all(selector)
+            for element in elements:
+                try:
+                    # Get text content - skip if empty
+                    text_content = element.inner_text().strip()
+                    if not text_content or len(text_content) < 1:
+                        continue
+                    
+                    # Get computed styles
+                    text_color = element.evaluate("""
+                        (el) => {
+                            const style = window.getComputedStyle(el);
+                            return style.color;
+                        }
+                    """)
+                    
+                    # Get background color from element or parent
+                    bg_color = element.evaluate("""
+                        (el) => {
+                            let current = el;
+                            for (let i = 0; i < 5 && current; i++) {
+                                const style = window.getComputedStyle(current);
+                                const bg = style.backgroundColor;
+                                // Check if background is not transparent
+                                if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+                                    return bg;
+                                }
+                                current = current.parentElement;
+                            }
+                            // Fallback to body background
+                            return window.getComputedStyle(document.body).backgroundColor;
+                        }
+                    """)
+                    
+                    # Convert RGB strings to comparable values
+                    def parse_rgb(rgb_str):
+                        """Parse rgb/rgba string to (r, g, b, a) tuple."""
+                        if not rgb_str or rgb_str == 'transparent':
+                            return None
+                        # Match rgb(r, g, b) or rgba(r, g, b, a)
+                        match = re.match(r'rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)', rgb_str)
+                        if match:
+                            r, g, b = int(match.group(1)), int(match.group(2)), int(match.group(3))
+                            a = float(match.group(4)) if match.group(4) else 1.0
+                            return (r, g, b, a)
+                        return None
+                    
+                    text_rgb = parse_rgb(text_color)
+                    bg_rgb = parse_rgb(bg_color)
+                    
+                    if text_rgb and bg_rgb:
+                        # Calculate color difference (Euclidean distance in RGB space)
+                        r_diff = abs(text_rgb[0] - bg_rgb[0])
+                        g_diff = abs(text_rgb[1] - bg_rgb[1])
+                        b_diff = abs(text_rgb[2] - bg_rgb[2])
+                        total_diff = (r_diff + g_diff + b_diff) / 3.0
+                        
+                        # Flag if colors are very similar (within 5% of 255 range = ~13 units)
+                        if total_diff < 13:
+                            # Get element description
+                            tag_name = element.evaluate("el => el.tagName.toLowerCase()")
+                            class_name = element.get_attribute("class") or ""
+                            text_preview = text_content[:50].replace('\n', ' ')
+                            
+                            issues.append({
+                                "element": f"{tag_name}" + (f".{class_name.split()[0]}" if class_name else ""),
+                                "text_color": text_color,
+                                "background_color": bg_color,
+                                "text_preview": text_preview,
+                                "color_diff": round(total_diff, 1)
+                            })
+                except Exception as e:
+                    # Skip elements that can't be inspected
+                    continue
+    except Exception as e:
+        _log_aligned("warning", "⚠️", "QA", f"Invisible text check failed: {e}")
+    
+    return issues
+
+
 def run_qa(client_path) -> Tuple[str, str, str]:
     """
     Run visual QA on a generated page and return the results.
@@ -1963,26 +2028,19 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 
     # Server Check with Auto-Start
     server_ready = ensure_server_running()
-    # #region agent log
-    import json as json_module
-    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1440", "message": "run_qa server check", "data": {"client_id": client_id, "server_ready": server_ready}, "timestamp": int(time.time() * 1000)}) + "\n")
-    except: pass
-    # #endregion
 
     if not server_ready:
         _log_aligned("error", "❌", "QA", "Server unavailable. QA Skipped.")
         return ("SKIPPED", "Server unavailable - QA could not run", screenshot_path)
 
     with time_tracker.track_span("pipeline_qa", client_id, {"stage": "qa"}):
-        _log_aligned("info", "🕵️‍♂️", "QA Inspector", "starting...")
+        _log_aligned("info", "🧐", "QA Inspector", "starting...")
         url = f"http://localhost:3000/clients/{client_id}"
 
         browser = None
         try:
-            # Capture screenshot
+            # Capture screenshot and check for invisible text
+            invisible_text_issues = []
             with sync_playwright() as p:
                 browser = p.chromium.launch()
                 try:
@@ -1990,6 +2048,9 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                     page.goto(url)
                     page.wait_for_timeout(3000)  # Wait for hydration
                     page.screenshot(path=screenshot_path, full_page=True)
+                    
+                    # Check for invisible text before closing browser
+                    invisible_text_issues = check_invisible_text_playwright(page)
                 finally:
                     # Ensure browser is always closed, even on exception
                     if browser:
@@ -2005,26 +2066,6 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                     try:
                         with Image.open(screenshot_path) as img:
                             width, height = img.size
-                            # #region agent log
-                            try:
-                                with open(log_path, "a", encoding="utf-8") as f:
-                                    f.write(json_module.dumps({
-                                        "sessionId": "debug-session",
-                                        "runId": "run1",
-                                        "hypothesisId": "C",
-                                        "location": "factory.py:1996",
-                                        "message": "Screenshot dimensions check",
-                                        "data": {
-                                            "client_id": client_id,
-                                            "original_width": width,
-                                            "original_height": height,
-                                            "max_dimension": max_dimension,
-                                            "needs_resize": width > max_dimension or height > max_dimension
-                                        },
-                                        "timestamp": int(time.time() * 1000)
-                                    }) + "\n")
-                            except: pass
-                            # #endregion
                             
                             if width > max_dimension or height > max_dimension:
                                 # Calculate new dimensions maintaining aspect ratio
@@ -2038,27 +2079,6 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                                 # Resize image
                                 resized_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                                 resized_img.save(screenshot_path, "JPEG", quality=85)
-                                
-                                # #region agent log
-                                try:
-                                    with open(log_path, "a", encoding="utf-8") as f:
-                                        f.write(json_module.dumps({
-                                            "sessionId": "debug-session",
-                                            "runId": "run1",
-                                            "hypothesisId": "C",
-                                            "location": "factory.py:2020",
-                                            "message": "Screenshot resized",
-                                            "data": {
-                                                "client_id": client_id,
-                                                "new_width": new_width,
-                                                "new_height": new_height,
-                                                "original_width": width,
-                                                "original_height": height
-                                            },
-                                            "timestamp": int(time.time() * 1000)
-                                        }) + "\n")
-                                except: pass
-                                # #endregion
                                 
                                 _log_aligned("info", "📐", "QA", f"resized screenshot from {width}x{height} to {new_width}x{new_height}")
                     except Exception as e:
@@ -2090,6 +2110,11 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 2. Text readability (no overlapping, truncated text)
 3. Button/CTA visibility
 4. Overall professional appearance
+5. Invisible text detection
+   - Check for any text that appears to have the same color as its background
+   - Look for text elements that are present in the DOM but not visible
+   - Report any instances where text color matches background color
+   - Pay special attention to text on colored backgrounds (not just white)
 
 Return 'PASS' if the page looks good and functional.
 If there are issues, return 'FAIL: [list specific visual problems]'."""}
@@ -2099,6 +2124,21 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
             _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
 
             report = msg.content[0].text
+            
+            # Append invisible text issues if found
+            if invisible_text_issues:
+                report += "\n\n## Invisible Text Issues Detected (Automated Check)\n\n"
+                report += f"Found {len(invisible_text_issues)} element(s) with text color matching background:\n\n"
+                for i, issue in enumerate(invisible_text_issues[:10], 1):  # Limit to 10 for brevity
+                    report += f"{i}. **{issue['element']}**: Text color `{issue['text_color']}` matches background `{issue['background_color']}` (diff: {issue['color_diff']})\n"
+                    report += f"   Text preview: \"{issue['text_preview']}\"\n\n"
+                if len(invisible_text_issues) > 10:
+                    report += f"... and {len(invisible_text_issues) - 10} more issues.\n\n"
+                # If invisible text found, force FAIL status
+                if "PASS" in report and not report.strip().startswith("FAIL"):
+                    report = "FAIL: Invisible text detected\n\n" + report
+                    _log_aligned("warning", "⚠️", "QA", f"invisible text detected for {client_id}: {len(invisible_text_issues)} issues")
+            
             with open(os.path.join(client_path, "qa_report.md"), "w", encoding="utf-8") as f:
                 f.write(report)
 
@@ -2114,12 +2154,6 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
 
         except Exception as e:
             error_msg = f"Visual QA Error: {e!s}"
-            # #region agent log
-            try:
-                with open(log_path, "a", encoding="utf-8") as f:
-                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1463", "message": "run_qa exception", "data": {"client_id": client_id, "error_type": type(e).__name__, "error_msg": str(e)[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
-            except: pass
-            # #endregion
             _log_aligned("error", "❌", "QA", "Visual QA Error")
             return ("ERROR", error_msg, screenshot_path)
 

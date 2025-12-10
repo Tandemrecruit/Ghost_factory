@@ -408,5 +408,65 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T22:27:16.059382",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-saas",
+    "duration_seconds": 19.15,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:28:05.011268",
+    "activity": "pipeline_qa",
+    "client_id": "ember-roasters",
+    "duration_seconds": 11.22,
+    "time_saved_seconds": 3588.78,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:28:48.218174",
+    "activity": "pipeline_architect",
+    "client_id": "demo-saas",
+    "duration_seconds": 111.31,
+    "time_saved_seconds": 7088.69,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:29:42.703845",
+    "activity": "pipeline_qa",
+    "client_id": "ember-roasters",
+    "duration_seconds": 11.76,
+    "time_saved_seconds": 3588.24,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:29:51.084603",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-saas",
+    "duration_seconds": 62.86,
+    "time_saved_seconds": 10737.14,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:31:16.621514",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "duration_seconds": 361.58,
+    "time_saved_seconds": 14038.42,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

@@ -998,5 +998,45 @@
       "client_id": "demo-hvac",
       "attempt": 1
     }
+  },
+  {
+    "timestamp": "2025-12-10T22:26:31.582677",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(111,303): error TS1005: ',' expected.\npage.tsx(111,305): error TS1005: ',' expected.\npage.tsx(111,312): error TS1005: ',' expected.\npage.tsx(111,313): error TS1003: Identifier expected.\npage.tsx(111,315): error TS1002: Unterminated string literal.\npage.tsx(112,17): error TS1005: ':' expecte",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:28:05.022282",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple visual issues detected]\n\n**Specific Problems:**\n\n1. **Text Readability Issues:**\n   - Several sections have low contrast text that is difficult to read\n   - Text appears faint/washed out in multiple colored background sections\n   - Some body text lacks sufficient contrast against its",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:29:42.714179",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple visual issues detected]\n\n1. **Text Readability Issues:**\n   - Several sections show text that appears to have insufficient contrast or visibility\n   - Some body text appears faint or difficult to read against its background\n   - Multiple instances of small text that may be hard to pa",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:31:06.395261",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(19,26): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-saas",
+      "attempt": 1
+    }
   }
 ]

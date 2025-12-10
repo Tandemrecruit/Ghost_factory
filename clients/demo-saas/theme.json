@@ -1,0 +1,10 @@
+{
+  "primary": "#1E3A8A",
+  "secondary": "#10B981",
+  "accent": "#3B82F6",
+  "background": "white",
+  "font_heading": "Inter",
+  "font_body": "Inter",
+  "border_radius": "0.5rem",
+  "source": "intake"
+}

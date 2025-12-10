@@ -2041,5 +2041,199 @@
     "output_tokens": 400,
     "cost_usd": 0.0,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:26:30.323181",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:26:57.700245",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "router_classify",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:27:07.313449",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:27:16.049000",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_visual_designer_a11y",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:27:37.366410",
+    "provider": "anthropic",
+    "model": "claude-opus-4-5-20251101",
+    "activity": "pipeline_architect",
+    "client_id": "demo-saas",
+    "input_tokens": 4000,
+    "output_tokens": 1200,
+    "cost_usd": 0.05,
+    "metadata": {
+      "attempt": 1,
+      "niche": "saas.md"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:27:51.290969",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:27:52.441622",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_architect_critic",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:28:04.998255",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "ember-roasters",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:28:31.321072",
+    "provider": "anthropic",
+    "model": "claude-opus-4-5-20251101",
+    "activity": "pipeline_architect",
+    "client_id": "demo-saas",
+    "input_tokens": 4000,
+    "output_tokens": 1200,
+    "cost_usd": 0.05,
+    "metadata": {
+      "attempt": 2,
+      "niche": "saas.md"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:28:48.203737",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_architect_critic",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:29:28.968154",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:29:36.590482",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-saas",
+    "input_tokens": 5000,
+    "output_tokens": 3200,
+    "cost_usd": 0.063,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:29:42.689872",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "ember-roasters",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:29:51.069851",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_copywriter_critic",
+    "client_id": "demo-saas",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T22:31:04.681775",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-saas",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:31:14.915073",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
   }
 ]

@@ -3,6 +3,7 @@ import json
 import logging
 import threading
 import time
+import unicodedata
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -118,7 +119,17 @@ def log_time_entry(
     saved_str = _format_time_readable(time_saved_seconds) if time_saved_seconds > 0 else "0s"
     client_str = client_id or "n/a"
     message = f"{activity} for {client_str} | {duration_str} (saved {saved_str})"
-    logging.info(f"⏱️  {padded_label} {message}")
+    
+    # Dynamic emoji padding using unicodedata
+    emoji = "⏱️"
+    try:
+        width = 2 if unicodedata.east_asian_width(emoji[0]) in ('W', 'F') else 1
+    except IndexError:
+        width = 1
+    padding = 4 - width
+    emoji_column = f"{emoji}{' ' * padding}"
+    
+    logging.info(f"{emoji_column}{padded_label} {message}")
     return entry
 
 
