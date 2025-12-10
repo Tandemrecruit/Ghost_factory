@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   setMetricsEnabled,
   trackPageView,
@@ -110,8 +110,9 @@ export function MetricsProvider({
       const explicitLabel = element.getAttribute('data-gf-cta-label')
       if (explicitLabel) return explicitLabel
 
-      // Fall back to innerText (truncated for safety)
-      const text = (element as HTMLElement).innerText?.trim()
+      // Fall back to innerText or textContent (truncated for safety)
+      const htmlElement = element as HTMLElement
+      const text = (htmlElement.innerText || htmlElement.textContent)?.trim()
       if (text) {
         return text.slice(0, 100) // Limit label length
       }
