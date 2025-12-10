@@ -28,3 +28,27 @@ Rationale:
 - Tool emits paid client work; reliability and debuggability are mandatory.
 Impact:
 - `automation/**`, `tests/**`, CLAUDE.md, CodeRabbit rules, GOVENANCE.md.
+
+---
+
+D-0002
+Date: 2025-12-10
+Category: architecture
+Summary: Privacy-friendly metrics tracking system (v1) for client landing pages
+Details:
+- Event types: `page_view`, `cta_click`, `conversion` — minimal set for measuring page performance.
+- No PII, no cookies, no localStorage — aggregate-friendly anonymous data only.
+- Client-side: fire-and-forget via `navigator.sendBeacon` with `fetch` fallback; never blocks rendering.
+- Server-side: POST `/api/gf-track` validates with zod, adds server timestamp.
+- Persistence strategy: webhook-first (if `GF_METRICS_WEBHOOK_URL` set), else console log in dev / no-op in prod.
+- Components get `blockId` prop (e.g., `hero_simple_v1`) and `data-gf-block` attribute for block-level attribution.
+- `MetricsProvider` wrapper handles automatic page view tracking and event delegation for CTAs/conversions.
+Rationale:
+- Clients need conversion data to evaluate landing page ROI without invasive tracking.
+- Webhook-based persistence decouples metrics from specific storage backends (future: Python pipeline, data warehouse).
+- `blockId` convention enables future A/B testing without schema changes.
+Impact:
+- New files: `lib/metrics.ts`, `lib/metrics-schema.ts`, `app/api/gf-track/route.ts`, `components/MetricsProvider.tsx`.
+- Modified: `HeroSimple`, `HeroSplit`, `PricingSimple`, `CtaBanner` (blockId prop + data attributes).
+- Config: `GF_METRICS_ENABLED`, `GF_METRICS_WEBHOOK_URL`, `GF_METRICS_WEBHOOK_SECRET` in `.env.example`.
+- Docs: `docs/internal/metrics-tracking.md`, `design-system/manifest.md` updated.

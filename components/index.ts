@@ -25,3 +25,6 @@ export { VideoEmbed, type VideoEmbedProps } from './VideoEmbed'
 export { ComparisonTable, type ComparisonTableProps, type ComparisonFeature } from './ComparisonTable'
 export { NewsletterSignup, type NewsletterSignupProps } from './NewsletterSignup'
 export { BentoGrid, type BentoGridProps, type BentoItem } from './BentoGrid'
+
+// Metrics tracking
+export { MetricsProvider, type MetricsProviderProps } from './MetricsProvider'
