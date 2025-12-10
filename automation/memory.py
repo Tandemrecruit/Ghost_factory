@@ -26,6 +26,47 @@ os.makedirs(DATA_MEMORY_DIR, exist_ok=True)
 os.makedirs(GOLDEN_SAMPLES_DIR, exist_ok=True)
 
 
+def _log_memory(level: str, emoji: str, label: str, message: str):
+    """
+    Log a message with aligned header formatting (matches factory._log_aligned format).
+    
+    This is a local helper to avoid circular imports with factory.py.
+    
+    Args:
+        level: Log level ('info', 'warning', 'error', 'debug')
+        emoji: Emoji icon for the log message
+        label: Fixed-width label (padded to 20 chars)
+        message: The actual log message content
+    """
+    # Normalize emoji spacing (strip trailing spaces)
+    emoji_clean = emoji.strip()
+    
+    # Calculate emoji string length (some emojis are multi-character Unicode sequences)
+    emoji_len = len(emoji_clean)
+    
+    # Ensure emoji column (emoji + spaces) is always 4 characters wide for consistent alignment
+    # Most emojis render as 2 visual characters, so we add spaces to pad to 4 total
+    # This ensures labels always start at the same position regardless of emoji width
+    if emoji_len <= 2:
+        # Emoji is 1-2 chars, add spaces to make total column 4 chars (emoji + 2 spaces)
+        emoji_column = f"{emoji_clean}  "
+    elif emoji_len == 3:
+        # Emoji is 3 chars, add 1 space to make total column 4 chars
+        emoji_column = f"{emoji_clean} "
+    else:
+        # Emoji is 4+ chars, use as-is with 2 spaces (may be slightly wider but rare)
+        emoji_column = f"{emoji_clean}  "
+    
+    # Pad label to 20 characters for consistent alignment
+    padded_label = f"{label:<20}"
+    
+    # Format: emoji_column (4 chars) + label (20 chars) + space + message
+    formatted_message = f"{emoji_column}{padded_label} {message}"
+    
+    log_func = getattr(logging, level.lower(), logging.info)
+    log_func(formatted_message)
+
+
 def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[str, Any]] = None) -> bool:
     """
     Append an error record to the raw_errors.json log.
@@ -67,7 +108,7 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
 
         # Truncate issue for readability, but keep more context than before
         issue_preview = issue[:80] + "..." if len(issue) > 80 else issue
-        logging.info(f"🧠 Memory: Recorded {category} failure | {issue_preview}")
+        _log_memory("info", "🧠", "Memory", f"Recorded {category} failure | {issue_preview}")
         return True
 
     except Exception:
@@ -170,7 +211,7 @@ def compile_and_save_rules() -> bool:
         with open(DYNAMIC_RULES_PATH, "w", encoding="utf-8") as f:
             f.write(rules_md)
 
-        logging.info(f"🧠 Memory: Compiled rules from {len(logs)} errors | {DYNAMIC_RULES_PATH}")
+        _log_memory("info", "🧠", "Memory", f"Compiled rules from {len(logs)} errors | {DYNAMIC_RULES_PATH}")
         return True
 
     except Exception:
@@ -238,7 +279,7 @@ def get_golden_reference() -> Tuple[str, str]:
         with open(sample_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        logging.info(f"🧠 Memory: Loaded golden reference | {sample_file}")
+        _log_memory("info", "🧠", "Memory", f"Loaded golden reference | {sample_file}")
         return (sample_file, content)
 
     except Exception as e:
@@ -292,7 +333,7 @@ def add_golden_sample(filename: str, content: str) -> bool:
         with open(sample_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        logging.info(f"🧠 Memory: Added golden sample | {filename}")
+        _log_memory("info", "🧠", "Memory", f"Added golden sample | {filename}")
         return True
 
     except Exception:

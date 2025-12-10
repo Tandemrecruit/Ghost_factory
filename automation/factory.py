@@ -67,22 +67,34 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
     # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
     
-    # Pad emoji to fixed 3-character display width for consistent alignment
-    # This ensures labels start at the same position regardless of emoji width
-    emoji_padded = f"{emoji_clean:<3}"
+    # Calculate emoji string length (some emojis are multi-character Unicode sequences)
+    emoji_len = len(emoji_clean)
+    
+    # Ensure emoji column (emoji + spaces) is always 4 characters wide for consistent alignment
+    # Most emojis render as 2 visual characters, so we add spaces to pad to 4 total
+    # This ensures labels always start at the same position regardless of emoji width
+    if emoji_len <= 2:
+        # Emoji is 1-2 chars, add spaces to make total column 4 chars (emoji + 2 spaces)
+        emoji_column = f"{emoji_clean}  "
+    elif emoji_len == 3:
+        # Emoji is 3 chars, add 1 space to make total column 4 chars
+        emoji_column = f"{emoji_clean} "
+    else:
+        # Emoji is 4+ chars, use as-is with 2 spaces (may be slightly wider but rare)
+        emoji_column = f"{emoji_clean}  "
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
     
     # Prevent line wrapping: truncate message if too long
-    # Account for: emoji (3 chars) + space (2) + label (20) + space (1) = 26 chars overhead
-    # Target max width: 120 chars, so message max: ~94 chars
-    max_message_width = 94
+    # Account for: emoji column (4 chars) + label (20) + space (1) = 25 chars overhead
+    # Target max width: 120 chars, so message max: ~95 chars
+    max_message_width = 95
     if len(message) > max_message_width:
         message = message[:max_message_width - 3] + "..."
     
-    # Use two spaces after emoji to ensure visible separation
-    formatted_message = f"{emoji_padded}  {padded_label} {message}"
+    # Format: emoji_column (4 chars) + label (20 chars) + space + message
+    formatted_message = f"{emoji_column}{padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)
@@ -782,10 +794,63 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         else:
             # Combine stdout and stderr for full error output
             error_output = result.stderr or result.stdout or "Unknown compilation error"
+            
+            # Filter to only show errors from the generated page.tsx file, ignore errors from dependencies
+            # This prevents false failures due to errors in lib/ or other project files
+            error_lines = error_output.split('\n')
+            filtered_errors = []
+            temp_file_name = os.path.basename(temp_path)
+            in_relevant_error = False
+            
+            for line in error_lines:
+                # Check if this line is an error from our generated file
+                # Errors are typically: "file.tsx(line,col): error TS####: message"
+                # After sanitization, temp file paths become "page.tsx"
+                is_our_error = (
+                    "page.tsx" in line or  # Sanitized path
+                    temp_file_name in line or  # Original temp file name
+                    (line.strip().startswith("(") and "error TS" in line)  # Error continuation
+                )
+                
+                # Check if it's an error from a dependency file (lib/, node_modules/, etc.)
+                is_dependency_error = any(
+                    dep_path in line for dep_path in [
+                        "lib/", "node_modules/", ".next/", 
+                        "components/", "app/", "tsconfig.json"
+                    ]
+                ) and "page.tsx" not in line and temp_file_name not in line
+                
+                if is_our_error:
+                    filtered_errors.append(line)
+                    in_relevant_error = True
+                elif is_dependency_error:
+                    # Skip dependency errors
+                    in_relevant_error = False
+                    continue
+                elif in_relevant_error and (line.startswith(' ') or line.startswith('\t') or not line.strip()):
+                    # Include continuation lines if we're in a relevant error block
+                    filtered_errors.append(line)
+                elif not is_dependency_error and 'error TS' in line:
+                    # Include other errors that aren't from dependencies (safety net)
+                    filtered_errors.append(line)
+                    in_relevant_error = True
+            
+            # If we filtered out all errors, use original (shouldn't happen, but safety check)
+            if not filtered_errors:
+                filtered_output = error_output
+            else:
+                filtered_output = '\n'.join(filtered_errors)
+            
             # Sanitize Windows paths from error messages to prevent exposing local file paths
-            error_output = sanitize_windows_paths(error_output)
-            _log_aligned("warning", "⚠️", "Syntax check", f"failed for {client_id}: {error_output[:200]}...")
-            return (False, error_output)
+            filtered_output = sanitize_windows_paths(filtered_output)
+            
+            # If no errors remain after filtering, treat as success (dependencies have errors, not our code)
+            if not filtered_output.strip() or not any('error' in line.lower() for line in filtered_output.split('\n')):
+                _log_aligned("info", "✅", "Syntax check", f"passed for {client_id} (dependency errors ignored)")
+                return (True, "")
+            
+            _log_aligned("warning", "⚠️", "Syntax check", f"failed for {client_id}: {filtered_output[:200]}...")
+            return (False, filtered_output)
 
     except subprocess.TimeoutExpired:
         error_msg = "TypeScript compilation timed out (30s limit)"
