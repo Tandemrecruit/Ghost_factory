@@ -1,5 +1,6 @@
 import json
 import logging
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -92,9 +93,17 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
     
-    # Use 2 spaces for consistency with factory.py
-    # Assumes standard emoji visual width of 2 cells + 2 spaces = 4 visual cells
-    formatted_message = f"{emoji_clean}  {padded_label} {message}"
+    # Ensure consistent visual spacing by using unicodedata to check width.
+    # Target width is 4 cells (emoji + spaces).
+    try:
+        width = 2 if unicodedata.east_asian_width(emoji_clean[0]) in ('W', 'F') else 1
+    except IndexError:
+        width = 1
+    
+    padding = 4 - width
+    emoji_column = f"{emoji_clean}{' ' * padding}"
+    
+    formatted_message = f"{emoji_column}{padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)

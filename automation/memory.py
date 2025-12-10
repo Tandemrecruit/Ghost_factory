@@ -12,6 +12,7 @@ import json
 import os
 import random
 import logging
+import unicodedata
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Tuple
 
@@ -41,8 +42,15 @@ def _log_memory(level: str, emoji: str, label: str, message: str):
     # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
     
-    # Ensure consistent visual spacing by always adding 2 spaces.
-    emoji_column = f"{emoji_clean}  "
+    # Ensure consistent visual spacing by using unicodedata to check width.
+    # Target width is 4 cells (emoji + spaces).
+    try:
+        width = 2 if unicodedata.east_asian_width(emoji_clean[0]) in ('W', 'F') else 1
+    except IndexError:
+        width = 1
+    
+    padding = 4 - width
+    emoji_column = f"{emoji_clean}{' ' * padding}"
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"

@@ -10,6 +10,7 @@ import json
 import tempfile
 import shutil
 import threading
+import unicodedata
 from pathlib import Path
 from typing import Tuple, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
@@ -67,10 +68,16 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
     # Normalize emoji spacing (strip trailing spaces)
     emoji_clean = emoji.strip()
     
-    # Ensure consistent visual spacing by always adding 2 spaces.
-    # Standard emojis are 2 visual cells wide. Adding 2 spaces creates a consistent 4-cell column.
-    # This ignores internal string length (which varies) and relies on visual width (which is consistent).
-    emoji_column = f"{emoji_clean}  "
+    # Ensure consistent visual spacing by using unicodedata to check width.
+    # 'W' (Wide) and 'F' (Fullwidth) are 2 cells. Others (N, A, H, Na) are typically 1 cell.
+    # Target width is 4 cells (emoji + spaces).
+    try:
+        width = 2 if unicodedata.east_asian_width(emoji_clean[0]) in ('W', 'F') else 1
+    except IndexError:
+        width = 1  # Fallback for empty string
+    
+    padding = 4 - width
+    emoji_column = f"{emoji_clean}{' ' * padding}"
     
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
@@ -740,6 +747,14 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 # CRITICAL: Set baseUrl to repo root so TypeScript can resolve node_modules
                 # even though the tsconfig file is in a temp directory
                 # Also set isolatedModules to prevent TypeScript from checking imported files
+                temp_tsconfig_path = temp_path.replace(".tsx", ".tsconfig.json")
+                temp_file_dir = os.path.dirname(temp_path)
+                temp_file_name = os.path.basename(temp_path)
+                
+                # Use relative path from tsconfig location (same directory) or absolute path
+                # Since tsconfig and temp file are in same dir, use just the filename
+                include_path = temp_file_name
+                
                 temp_tsconfig_data = {
                     "extends": str(tsconfig_path),
                     "compilerOptions": {
@@ -748,11 +763,9 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                         "isolatedModules": True,  # Prevent checking imported files
                         "baseUrl": str(repo_root),  # Point to repo root for module resolution
                     },
-                    "include": [temp_path],
-                    "exclude": ["**/*"]  # Explicitly exclude everything except what's in include
+                    "include": [include_path],
+                    # Don't use exclude - it conflicts with include and excludes everything
                 }
-                
-                temp_tsconfig_path = temp_path.replace(".tsx", ".tsconfig.json")
                 with open(temp_tsconfig_path, "w", encoding="utf-8") as f:
                     json_module.dump(temp_tsconfig_data, f)
                 
@@ -762,13 +775,18 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                         "sessionId": "debug-session",
                         "runId": "run1",
                         "hypothesisId": "A",
-                        "location": "factory.py:740",
+                        "location": "factory.py:760",
                         "message": "Temp tsconfig created",
                         "data": {
                             "temp_tsconfig_path": temp_tsconfig_path,
                             "temp_tsconfig_dir": os.path.dirname(temp_tsconfig_path),
+                            "temp_path": temp_path,
+                            "temp_file_dir": temp_file_dir,
+                            "temp_file_name": temp_file_name,
+                            "include_path": include_path,
                             "tsconfig_has_baseUrl": "baseUrl" in temp_tsconfig_data.get("compilerOptions", {}),
-                            "tsconfig_content": temp_tsconfig_data
+                            "tsconfig_include": temp_tsconfig_data.get("include"),
+                            "tsconfig_exclude": temp_tsconfig_data.get("exclude")
                         },
                         "timestamp": int(time.time() * 1000)
                     }) + "\n")

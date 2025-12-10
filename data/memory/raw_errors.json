@@ -958,5 +958,35 @@
       "client_id": "demo-hvac",
       "attempt": 2
     }
+  },
+  {
+    "timestamp": "2025-12-10T21:21:56.269267",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(85,59): error TS2322: Type '{ children: Element; background: \"white\"; paddingY: \"large\"; id: string; }' is not assignable to type 'IntrinsicAttributes & SectionWrapperProps'.\n  Property 'id' does not exist on type 'IntrinsicAttributes & SectionWrapperProps'.\npage.tsx(132,58): error TS2322: ",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T21:23:25.738493",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple visual problems detected]\n\n1. **Text Readability Issues:**\n   - Text is extremely small and difficult to read on mobile\n   - Multiple sections appear compressed with poor line spacing\n   - Headers and body text have insufficient contrast/hierarchy\n\n2. **Layout Problems:**\n   - Conten",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T21:25:10.259661",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(16,26): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
   }
 ]

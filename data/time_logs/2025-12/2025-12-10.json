@@ -358,5 +358,35 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T21:23:25.728980",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "duration_seconds": 10.56,
+    "time_saved_seconds": 3589.44,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T21:27:04.486372",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "duration_seconds": 5.18,
+    "time_saved_seconds": 3594.82,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T21:27:04.498056",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 371.34,
+    "time_saved_seconds": 14028.66,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]
