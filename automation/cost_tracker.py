@@ -76,6 +76,24 @@ def _format_token_count(tokens: int) -> str:
     return str(tokens)
 
 
+def _log_aligned(level: str, emoji: str, label: str, message: str):
+    """
+    Log a message with aligned header formatting.
+    
+    Args:
+        level: Log level ('info', 'warning', 'error', 'debug')
+        emoji: Emoji icon for the log message
+        label: Fixed-width label (padded to 20 chars)
+        message: The actual log message content
+    """
+    # Pad label to 20 characters for consistent alignment
+    padded_label = f"{label:<20}"
+    formatted_message = f"{emoji} {padded_label} {message}"
+    
+    log_func = getattr(logging, level.lower(), logging.info)
+    log_func(formatted_message)
+
+
 def _calculate_cost_with_tiered_pricing(
     input_tokens: int,
     output_tokens: int,
@@ -157,8 +175,11 @@ def record_api_cost(
     out_tokens_str = _format_token_count(out_tokens)
     tokens_str = f"{in_tokens_str}+{out_tokens_str}"
     
-    logging.info(
-        f"💰 API cost: ${total_cost} | model: {model} | activity: {activity} | tokens: {tokens_str}"
+    _log_aligned(
+        "info",
+        "💰",
+        "API cost",
+        f"${total_cost} | model: {model} | activity: {activity} | tokens: {tokens_str}"
     )
     return entry
 

@@ -778,5 +778,65 @@
       "client_id": "demo-hvac",
       "attempt": 6
     }
+  },
+  {
+    "timestamp": "2025-12-10T20:13:16.350194",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(12,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:14:52.888180",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(426,53): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:16:38.595417",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(15,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:18:05.818082",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(18,8): error TS2307: Cannot find module '@/components/index' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:19:36.892139",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(16,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:21:03.161212",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(1,19): error TS2307: Cannot find module 'react' or its corresponding type declarations.\npage.tsx(16,8): error TS2307: Cannot find module '@/components/ui' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 6
+    }
   }
 ]

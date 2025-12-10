@@ -54,6 +54,23 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 
+def _log_aligned(level: str, emoji: str, label: str, message: str):
+    """
+    Log a message with aligned header formatting.
+    
+    Args:
+        level: Log level ('info', 'warning', 'error', 'debug')
+        emoji: Emoji icon for the log message
+        label: Fixed-width label (padded to 20 chars)
+        message: The actual log message content
+    """
+    # Pad label to 20 characters for consistent alignment
+    padded_label = f"{label:<20}"
+    formatted_message = f"{emoji} {padded_label} {message}"
+    
+    log_func = getattr(logging, level.lower(), logging.info)
+    log_func(formatted_message)
+
 client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
@@ -99,7 +116,7 @@ def _record_model_cost(provider, model, activity, client_id, response, metadata=
             metadata=metadata or {},
         )
     except Exception as e:
-        logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
+        _log_aligned("warning", "⚠️", "Cost tracking", f"failed for {provider}:{model} - {e}")
 
 def _llm_messages_create(model: str, client_id: str, activity: str, system: str, user_content: str, max_tokens: int):
     """
@@ -184,7 +201,7 @@ def _start_heartbeat(label: str, interval: float = 30.0):
 
     def _beat():
         while not stop_event.wait(interval):
-            logging.info(f"⏳ {label} still running...")
+            _log_aligned("info", "⏳", "Heartbeat", f"{label} still running...")
 
     thread = threading.Thread(target=_beat, daemon=True)
     thread.start()
@@ -201,9 +218,11 @@ def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwar
             return client_anthropic.messages.create(model=model, **kwargs)
         except RateLimitError as e:
             sleep = min(5 * attempt, 15)
-            logging.warning(
-                f"⚠️ Anthropic rate limit for {activity}/{client_id} "
-                f"(attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
+            _log_aligned(
+                "warning",
+                "⚠️",
+                "Rate limit",
+                f"{activity}/{client_id} (attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
             )
             time.sleep(sleep)
             if attempt == max_attempts:
@@ -212,9 +231,11 @@ def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwar
             status = getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
             if status == 429 or "429" in str(e):
                 sleep = min(5 * attempt, 15)
-                logging.warning(
-                    f"⚠️ Anthropic 429 for {activity}/{client_id} "
-                    f"(attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
+                _log_aligned(
+                    "warning",
+                    "⚠️",
+                    "Rate limit",
+                    f"{activity}/{client_id} (attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
                 )
                 time.sleep(sleep)
                 if attempt == max_attempts:
@@ -335,19 +356,19 @@ def validate_prompt_library():
     all_valid = True
 
     if not os.path.exists(PROMPTS_DIR):
-        logging.error(f"❌ Prompts directory not found: {PROMPTS_DIR}")
+        _log_aligned("error", "❌", "Prompts dir", f"not found: {PROMPTS_DIR}")
         return False
 
     for prompt_file in REQUIRED_PROMPTS:
         full_path = os.path.join(PROMPTS_DIR, prompt_file)
         if not os.path.exists(full_path):
-            logging.error(f"❌ Missing required prompt: {full_path}")
+            _log_aligned("error", "❌", "Missing prompt", full_path)
             all_valid = False
         else:
             logging.debug(f"✓ Found prompt: {prompt_file}")
 
     if all_valid:
-        logging.info(f"✅ All {len(REQUIRED_PROMPTS)} prompt files validated.")
+        _log_aligned("info", "✅", "Prompts validated", f"All {len(REQUIRED_PROMPTS)} prompt files validated.")
 
     return all_valid
 
@@ -363,7 +384,7 @@ def select_niche_persona(client_id, intake):
     Returns:
         str: Filename of the matched strategy prompt (for example "saas.md", "local_service.md", "ecommerce.md", "personal_brand.md", or "webinar.md").  
     """
-    logging.info(f"🔀 Router classifying {client_id}...")
+    _log_aligned("info", "🔀", "Router", f"classifying {client_id}...")
 
     # Load router prompt
     router_prompt = _load_prompt("router.md")
@@ -382,7 +403,7 @@ def select_niche_persona(client_id, intake):
     # Parse response - expect one of: saas, local_service, ecommerce
     response_text = _extract_response_text(msg)
     if not response_text:
-        logging.warning("⚠️ Router returned empty response, defaulting to local_service")
+        _log_aligned("warning", "⚠️", "Router", "returned empty response, defaulting to local_service")
         return "local_service.md"
 
     niche = response_text.strip().lower()
@@ -399,10 +420,10 @@ def select_niche_persona(client_id, intake):
     }
 
     if niche not in valid_niches:
-        logging.warning(f"⚠️ Router returned unknown niche '{niche}', defaulting to local_service")
+        _log_aligned("warning", "⚠️", "Router", f"returned unknown niche '{niche}', defaulting to local_service")
         niche = "local_service"
 
-    logging.info(f"📋 Client classified as: {niche}")
+    _log_aligned("info", "📋", "Client classified", f"as: {niche}")
     return valid_niches[niche]
 
 
@@ -410,22 +431,22 @@ def select_niche_persona(client_id, intake):
 
 def git_pull():
     """Checks for new intake forms from GitHub."""
-    logging.info("⬇️  Checking GitHub for new intakes...")
+    _log_aligned("info", "⬇️", "Git pull", "Checking GitHub for new intakes...")
     try:
         result = subprocess.run(["git", "pull"], capture_output=True, text=True)
         if "Already up to date" not in result.stdout:
-            logging.info("📦 New data downloaded from GitHub.")
+            _log_aligned("info", "📦", "Git pull", "New data downloaded from GitHub.")
             return True
         else:
-            logging.info("💤 No new data on GitHub.")
+            _log_aligned("info", "💤", "Git pull", "No new data on GitHub.")
             return False
     except Exception as e:
-        logging.error(f"Git Pull Failed: {e}")
+        _log_aligned("error", "❌", "Git pull", f"Failed: {e}")
         return False
 
 def git_commit_and_push(client_id):
     """Commits and pushes generated code to the repository."""
-    logging.info(f"💾 Committing changes for {client_id}...")
+    _log_aligned("info", "💾", "Git commit", f"Committing changes for {client_id}...")
     try:
         # Stage all changes (new pages, tracking files, processed intakes)
         subprocess.run(["git", "add", "."], check=True, capture_output=True)
@@ -436,11 +457,11 @@ def git_commit_and_push(client_id):
         
         # Push
         subprocess.run(["git", "push"], check=True, capture_output=True)
-        logging.info("✅ Git push successful.")
+        _log_aligned("info", "✅", "Git push", "successful.")
     except subprocess.CalledProcessError as e:
         # Don't crash the loop if git fails, just log it
         error_msg = e.stderr.decode() if e.stderr else str(e)
-        logging.error(f"❌ Git commit/push failed: {error_msg}")
+        _log_aligned("error", "❌", "Git commit/push", f"failed: {error_msg}")
 
 def run_intake_sanitizer():
     """Converts any raw intakes (intake-raw.md) to structured intakes (intake.md)."""
@@ -450,25 +471,25 @@ def run_intake_sanitizer():
     for client_id in os.listdir(WATCH_DIR):
         # Validate client ID to prevent path traversal attacks
         if not is_valid_client_id(client_id):
-            logging.warning(f"⚠️ Skipping invalid client ID in sanitizer: {client_id}")
+            _log_aligned("warning", "⚠️", "Sanitizer", f"Skipping invalid client ID: {client_id}")
             continue
         
         client_path = os.path.join(WATCH_DIR, client_id)
         raw_intake_path = os.path.join(client_path, "intake-raw.md")
 
         if os.path.isdir(client_path) and os.path.exists(raw_intake_path):
-            logging.info(f"📝 Sanitizing raw intake for {client_id}...")
+            _log_aligned("info", "📝", "Sanitizer", f"Sanitizing raw intake for {client_id}...")
             try:
                 result = subprocess.run(
                     ["python", "automation/intake_sanitizer.py", raw_intake_path],
                     capture_output=True, text=True
                 )
                 if result.returncode == 0:
-                    logging.info(f"✅ Sanitized intake for {client_id}")
+                    _log_aligned("info", "✅", "Sanitizer", f"Sanitized intake for {client_id}")
                 else:
-                    logging.error(f"❌ Sanitizer failed for {client_id}: {result.stderr}")
+                    _log_aligned("error", "❌", "Sanitizer", f"failed for {client_id}: {result.stderr}")
             except Exception as e:
-                logging.error(f"❌ Sanitizer error for {client_id}: {e}")
+                _log_aligned("error", "❌", "Sanitizer", f"error for {client_id}: {e}")
 
 def check_server_status():
     """Simple check if localhost:3000 is reachable."""
@@ -483,7 +504,7 @@ def ensure_server_running():
     if check_server_status():
         return True
         
-    logging.warning("⚠️ localhost:3000 is down. Attempting to start dev server...")
+    _log_aligned("warning", "⚠️", "Server", "localhost:3000 is down. Attempting to start dev server...")
     try:
         # Start npm run dev in the background
         # Note: This process will die if the script exits, which is usually fine for a worker
@@ -498,19 +519,19 @@ def ensure_server_running():
         for _ in range(15):
             time.sleep(1)
             if check_server_status():
-                logging.info("✅ Server started successfully.")
+                _log_aligned("info", "✅", "Server", "started successfully.")
                 return True
                 
-        logging.error("❌ Failed to start server within timeout.")
+        _log_aligned("error", "❌", "Server", "Failed to start server within timeout.")
         return False
     except Exception as e:
-        logging.error(f"❌ Error starting server: {e}")
+        _log_aligned("error", "❌", "Server", f"Error starting server: {e}")
         return False
 
 def send_discord_alert(client_name, status, report=None):
     """Send Discord notification for build status. Fails silently to keep pipeline resilient."""
     if not webhook_url:
-        logging.warning("⚠️ DISCORD_WEBHOOK_URL not set. Skipping Discord notification.")
+        _log_aligned("warning", "⚠️", "Discord", "DISCORD_WEBHOOK_URL not set. Skipping Discord notification.")
         return
     
     try:
@@ -555,20 +576,20 @@ def send_discord_alert(client_name, status, report=None):
         
         # Check if request was successful
         if response.status_code == 204:
-            logging.info(f"✅ Discord notification sent for {client_name}")
+            _log_aligned("info", "✅", "Discord", f"notification sent for {client_name}")
         elif response.status_code == 404:
-            logging.error(f"❌ Discord webhook not found (404). Check webhook URL.")
+            _log_aligned("error", "❌", "Discord", "webhook not found (404). Check webhook URL.")
         elif response.status_code == 401:
-            logging.error(f"❌ Discord webhook unauthorized (401). Check webhook URL.")
+            _log_aligned("error", "❌", "Discord", "webhook unauthorized (401). Check webhook URL.")
         else:
-            logging.warning(f"⚠️ Discord webhook returned status {response.status_code}: {response.text}")
+            _log_aligned("warning", "⚠️", "Discord", f"webhook returned status {response.status_code}: {response.text}")
             
     except requests.exceptions.Timeout:
-        logging.warning(f"⚠️ Discord webhook request timed out for {client_name}")
+        _log_aligned("warning", "⚠️", "Discord", f"webhook request timed out for {client_name}")
     except requests.exceptions.RequestException as e:
-        logging.warning(f"⚠️ Discord notification failed for {client_name}: {e}")
+        _log_aligned("warning", "⚠️", "Discord", f"notification failed for {client_name}: {e}")
     except Exception as e:
-        logging.warning(f"⚠️ Unexpected error sending Discord notification: {e}")
+        _log_aligned("warning", "⚠️", "Discord", f"Unexpected error sending Discord notification: {e}")
 
 
 def sanitize_windows_paths(error_text: str) -> str:
@@ -577,7 +598,7 @@ def sanitize_windows_paths(error_text: str) -> str:
     
     Replaces paths like:
     - C:/Users/.../AppData/Local/Temp/tmpw4sd64tkk.tsx
-    - C:\Users\...\AppData\Local\Temp\tmpw4sd64tkk.tsx
+    - C:\\Users\\...\\AppData\\Local\\Temp\\tmpw4sd64tkk.tsx
     
     With generic placeholder: page.tsx
     
@@ -683,29 +704,29 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         )
 
         if result.returncode == 0:
-            logging.info(f"✅ Syntax check passed for {client_id}")
+            _log_aligned("info", "✅", "Syntax check", f"passed for {client_id}")
             return (True, "")
         else:
             # Combine stdout and stderr for full error output
             error_output = result.stderr or result.stdout or "Unknown compilation error"
             # Sanitize Windows paths from error messages to prevent exposing local file paths
             error_output = sanitize_windows_paths(error_output)
-            logging.warning(f"⚠️ Syntax check failed for {client_id}: {error_output[:200]}...")
+            _log_aligned("warning", "⚠️", "Syntax check", f"failed for {client_id}: {error_output[:200]}...")
             return (False, error_output)
 
     except subprocess.TimeoutExpired:
         error_msg = "TypeScript compilation timed out (30s limit)"
-        logging.exception(f"❌ {error_msg} for {client_id}")
+        _log_aligned("error", "❌", "Syntax check", f"{error_msg} for {client_id}")
         return (False, error_msg)
 
     except FileNotFoundError:
         error_msg = "npx/tsc not found. Ensure Node.js and TypeScript are installed."
-        logging.exception(f"❌ {error_msg}")
+        _log_aligned("error", "❌", "Syntax check", error_msg)
         return (False, error_msg)
 
     except Exception as e:
         error_msg = f"Syntax check error: {e!s}"
-        logging.exception(f"❌ Syntax check error for {client_id}")
+        _log_aligned("error", "❌", "Syntax check", f"error for {client_id}")
         return (False, error_msg)
 
     finally:
@@ -715,7 +736,7 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 if os.path.exists(temp_path):
                     os.unlink(temp_path)
             except (OSError, PermissionError) as e:
-                logging.warning(f"⚠️ Failed to clean up temp file {temp_path}: {e}")
+                _log_aligned("warning", "⚠️", "Cleanup", f"Failed to clean up temp file {temp_path}: {e}")
                 # Try to register for cleanup on exit as fallback
                 import atexit
                 atexit.register(lambda: os.unlink(temp_path) if os.path.exists(temp_path) else None)
@@ -742,13 +763,13 @@ def run_visual_designer(client_path):
     client_id = os.path.basename(client_path)
     # Validate client ID to prevent path traversal
     validate_client_id_or_raise(client_id, "run_visual_designer")
-    logging.info(f"🎨 Visual Designer generating theme for {client_id}...")
+    _log_aligned("info", "🎨", "Visual Designer", f"generating theme for {client_id}...")
 
     with time_tracker.track_span("pipeline_visual_designer", client_id, {"stage": "visual_designer"}):
         # Load intake
         intake_path = os.path.join(client_path, "intake.md")
         if not os.path.exists(intake_path):
-            logging.warning(f"⚠️ No intake.md found for visual designer in {client_id}")
+            _log_aligned("warning", "⚠️", "Visual Designer", f"No intake.md found for visual designer in {client_id}")
             return None
 
         with open(intake_path, "r", encoding="utf-8") as f:
@@ -776,7 +797,7 @@ def run_visual_designer(client_path):
 
         while attempt < MAX_A11Y_RETRIES:
             attempt += 1
-            logging.info(f"🎨 Visual Designer attempt {attempt}/{MAX_A11Y_RETRIES}...")
+            _log_aligned("info", "🎨", "Visual Designer", f"attempt {attempt}/{MAX_A11Y_RETRIES}...")
 
             # Build user content with feedback if available
             if previous_feedback:
@@ -804,7 +825,7 @@ Generate an improved theme.json with better color contrast."""
 
             theme_content = _extract_response_text(msg)
             if not theme_content:
-                logging.error(f"❌ Visual Designer returned empty response on attempt {attempt}")
+                _log_aligned("error", "❌", "Visual Designer", f"returned empty response on attempt {attempt}")
                 if attempt >= MAX_A11Y_RETRIES:
                     theme_data = default_theme
                     break
@@ -825,17 +846,17 @@ Generate an improved theme.json with better color contrast."""
             try:
                 theme_data = json.loads(theme_json_str)
                 if not isinstance(theme_data, dict):
-                    logging.warning("⚠️ Visual Designer returned non-dict JSON (%s), using default", type(theme_data).__name__)
+                    _log_aligned("warning", "⚠️", "Visual Designer", f"returned non-dict JSON ({type(theme_data).__name__}), using default")
                     theme_data = default_theme
             except json.JSONDecodeError:
-                logging.exception("❌ Visual Designer returned invalid JSON on attempt %d", attempt)
+                _log_aligned("error", "❌", "Visual Designer", f"returned invalid JSON on attempt {attempt}")
                 if attempt >= MAX_A11Y_RETRIES:
                     theme_data = default_theme
                     break
                 continue
 
             # A11y Critic Review
-            logging.info(f"🔍 A11y Critic reviewing theme (attempt {attempt})...")
+            _log_aligned("info", "🔍", "A11y Critic", f"reviewing theme (attempt {attempt})...")
 
             a11y_input = f"""## Theme to Review
 ```json
@@ -856,14 +877,14 @@ Please evaluate the accessibility of this color palette."""
 
             a11y_response_text = _extract_response_text(a11y_msg)
             if not a11y_response_text:
-                logging.warning(f"⚠️ A11y Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                _log_aligned("warning", "⚠️", "A11y Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                 break
 
             a11y_response = a11y_response_text.strip()
 
             # Decision - PASS or FAIL
             if a11y_response.startswith("FAIL"):
-                logging.warning(f"⚠️ A11y Critic rejected theme on attempt {attempt}")
+                _log_aligned("warning", "⚠️", "A11y Critic", f"rejected theme on attempt {attempt}")
                 previous_feedback = a11y_response
 
                 # Record to memory for learning
@@ -875,13 +896,13 @@ Please evaluate the accessibility of this color palette."""
                 )
 
                 if attempt >= MAX_A11Y_RETRIES:
-                    logging.error(f"❌ Max a11y retries ({MAX_A11Y_RETRIES}) reached. Using last generated theme.")
+                    _log_aligned("error", "❌", "A11y Critic", f"Max a11y retries ({MAX_A11Y_RETRIES}) reached. Using last generated theme.")
                     break
             elif a11y_response.startswith("PASS"):
-                logging.info(f"✅ A11y Critic approved theme on attempt {attempt}")
+                _log_aligned("info", "✅", "A11y Critic", f"approved theme on attempt {attempt}")
                 break
             else:
-                logging.warning("⚠️ A11y Critic response unclear (no PASS/FAIL). Proceeding with theme.")
+                _log_aligned("warning", "⚠️", "A11y Critic", "response unclear (no PASS/FAIL). Proceeding with theme.")
                 break
 
         # Ensure we have a valid theme
@@ -893,7 +914,7 @@ Please evaluate the accessibility of this color palette."""
         with open(theme_path, "w", encoding="utf-8") as f:
             json.dump(theme_data, f, indent=2)
 
-        logging.info(f"✅ Visual Designer saved theme.json for {client_id}")
+        _log_aligned("info", "✅", "Visual Designer", f"saved theme.json for {client_id}")
         return theme_data
 
 
@@ -914,12 +935,12 @@ def run_architect(client_path):
     brief_path = os.path.join(client_path, "brief.md")
     brief_exists = os.path.exists(brief_path)
     if brief_exists:
-        logging.info(f"⏭️  Brief already exists for {client_id}, skipping architect generation")
+        _log_aligned("info", "⏭️", "Architect", f"Brief already exists for {client_id}, skipping architect generation")
         # Still need to continue pipeline to copywriter and builder stages
         run_copywriter(client_path)
         return
     
-    logging.info(f"🏗️  Architect analyzing {client_id}...")
+    _log_aligned("info", "🏗️", "Architect", f"analyzing {client_id}...")
 
     # Load intake ONCE (before time tracking to avoid including file I/O in span)
     with open(os.path.join(client_path, "intake.md"), "r", encoding="utf-8") as f:
@@ -948,7 +969,7 @@ def run_architect(client_path):
 
             while attempt < MAX_CRITIC_RETRIES:
                 attempt += 1
-                logging.info(f"📝 Strategist generating brief (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+                _log_aligned("info", "📝", "Strategist", f"generating brief (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
 
                 # Build messages for the strategist
                 if previous_feedback:
@@ -980,13 +1001,13 @@ Generate an improved Project Brief that addresses the feedback above."""
 
                 brief_content = _extract_response_text(msg)
                 if not brief_content:
-                    logging.error(f"❌ Strategist returned empty response on attempt {attempt}")
+                    _log_aligned("error", "❌", "Strategist", f"returned empty response on attempt {attempt}")
                     if attempt >= MAX_CRITIC_RETRIES:
                         raise RuntimeError(f"Strategist failed to generate brief after {MAX_CRITIC_RETRIES} attempts")
                     continue  # Retry without critic feedback
 
                 # Step 4: Critic reviews the brief
-                logging.info(f"🔍 Critic reviewing brief (attempt {attempt})...")
+                _log_aligned("info", "🔍", "Critic", f"reviewing brief (attempt {attempt})...")
 
                 critic_input = f"""## Original Client Intake
 {intake}
@@ -1011,7 +1032,7 @@ Please evaluate this brief against the original intake."""
 
                 critic_response_text = _extract_response_text(critic_msg)
                 if not critic_response_text:
-                    logging.warning(f"⚠️ Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                    _log_aligned("warning", "⚠️", "Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                     break
 
                 critic_response = critic_response_text.strip()
@@ -1019,17 +1040,17 @@ Please evaluate this brief against the original intake."""
                 # Step 5: Decision - PASS or FAIL
                 # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
                 if critic_response.startswith("FAIL"):
-                    logging.warning(f"⚠️ Critic rejected brief on attempt {attempt}")
+                    _log_aligned("warning", "⚠️", "Critic", f"rejected brief on attempt {attempt}")
                     previous_feedback = critic_response
                     if attempt >= MAX_CRITIC_RETRIES:
-                        logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
+                        _log_aligned("error", "❌", "Critic", f"Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
                         break  # Explicit break to exit loop after max retries
                 elif critic_response.startswith("PASS"):
-                    logging.info(f"✅ Critic approved brief on attempt {attempt}")
+                    _log_aligned("info", "✅", "Critic", f"approved brief on attempt {attempt}")
                     break
                 else:
                     # Ambiguous response - treat as pass but log warning
-                    logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with brief.")
+                    _log_aligned("warning", "⚠️", "Critic", "response unclear (no PASS/FAIL). Proceeding with brief.")
                     break
 
             # Step 6: Validate and save the brief
@@ -1039,16 +1060,16 @@ Please evaluate this brief against the original intake."""
             # Save immutable original for future optimization analysis
             brief_orig_path = os.path.join(client_path, "brief.orig.md")
             if atomic_write(brief_orig_path, brief_content):
-                logging.info("Saved original AI output to brief.orig.md")
+                _log_aligned("info", "💾", "Architect", "Saved original AI output to brief.orig.md")
             else:
-                logging.error(f"Failed to write {brief_orig_path}")
+                _log_aligned("error", "❌", "Architect", f"Failed to write {brief_orig_path}")
 
             # Save the working copy
             brief_path = os.path.join(client_path, "brief.md")
             if atomic_write(brief_path, brief_content):
-                logging.info("Saved brief.md")
+                _log_aligned("info", "💾", "Architect", "Saved brief.md")
             else:
-                logging.error(f"Failed to write {brief_path}")
+                _log_aligned("error", "❌", "Architect", f"Failed to write {brief_path}")
                 raise RuntimeError(f"Failed to write brief.md for {client_id}")
 
         # Wait for visual designer to complete
@@ -1058,7 +1079,7 @@ Please evaluate this brief against the original intake."""
         try:
             visual_designer_future.result(timeout=60)
         except (TimeoutError, FuturesTimeoutError, CancelledError) as e:
-            logging.warning("⚠️ Visual Designer timed out or was cancelled: %s", type(e).__name__)
+            _log_aligned("warning", "⚠️", "Visual Designer", f"timed out or was cancelled: {type(e).__name__}")
 
     # NOTE: We do NOT rename intake.md yet. We wait until the entire pipeline finishes.
     # This prevents the "Limbo" state if the script crashes later.
@@ -1084,12 +1105,12 @@ def run_copywriter(client_path):
     content_path = os.path.join(client_path, "content.md")
     content_exists = os.path.exists(content_path)
     if content_exists:
-        logging.info(f"⏭️  Content already exists for {client_id}, skipping copywriter generation")
+        _log_aligned("info", "⏭️", "Copywriter", f"Content already exists for {client_id}, skipping copywriter generation")
         # Still need to continue pipeline to builder stage
         run_builder(client_path)
         return
     
-    logging.info(f"✍️  Copywriter writing for {client_id}...")
+    _log_aligned("info", "✍️", "Copywriter", f"writing for {client_id}...")
 
     with time_tracker.track_span("pipeline_copywriter", client_id, {"stage": "copywriter"}):
         # Load brief and intake
@@ -1112,7 +1133,7 @@ def run_copywriter(client_path):
         # Determine if critic review is possible
         skip_critic = intake is None
         if skip_critic:
-            logging.warning("⚠️ No intake file found - skipping Copy Critic review")
+            _log_aligned("warning", "⚠️", "Copywriter", "No intake file found - skipping Copy Critic review")
             critic_prompt = None
         else:
             critic_prompt = _load_prompt("critique/copy_critic.md")
@@ -1126,7 +1147,7 @@ def run_copywriter(client_path):
 
         while attempt < MAX_CRITIC_RETRIES:
             attempt += 1
-            logging.info(f"📝 Copywriter generating content (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
+            _log_aligned("info", "📝", "Copywriter", f"generating content (attempt {attempt}/{MAX_CRITIC_RETRIES})...")
 
             # Build messages for the copywriter
             if previous_feedback:
@@ -1157,18 +1178,18 @@ Generate improved website content that addresses the feedback above."""
 
             content = _extract_response_text(msg)
             if not content:
-                logging.error(f"❌ Copywriter returned empty response on attempt {attempt}")
+                _log_aligned("error", "❌", "Copywriter", f"returned empty response on attempt {attempt}")
                 if attempt >= MAX_CRITIC_RETRIES:
                     raise RuntimeError(f"Copywriter failed to generate content after {MAX_CRITIC_RETRIES} attempts")
                 continue
 
             # Skip critic review if intake is not available
             if skip_critic:
-                logging.info("Skipping Copy Critic review - no intake available")
+                _log_aligned("info", "⏭️", "Copy Critic", "Skipping Copy Critic review - no intake available")
                 break
 
             # Copy Critic reviews the content
-            logging.info(f"🔍 Copy Critic reviewing content (attempt {attempt})...")
+            _log_aligned("info", "🔍", "Copy Critic", f"reviewing content (attempt {attempt})...")
 
             critic_input = f"""## Original Client Intake
 {intake}
@@ -1196,7 +1217,7 @@ Please evaluate this content against the intake and brief."""
 
             critic_response_text = _extract_response_text(critic_msg)
             if not critic_response_text:
-                logging.warning(f"⚠️ Copy Critic returned empty response on attempt {attempt}. Treating as PASS.")
+                _log_aligned("warning", "⚠️", "Copy Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                 break
 
             critic_response = critic_response_text.strip()
@@ -1204,16 +1225,16 @@ Please evaluate this content against the intake and brief."""
             # Decision - PASS or FAIL
             # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
             if critic_response.startswith("FAIL"):
-                logging.warning(f"⚠️ Copy Critic rejected content on attempt {attempt}")
+                _log_aligned("warning", "⚠️", "Copy Critic", f"rejected content on attempt {attempt}")
                 previous_feedback = critic_response
                 if attempt >= MAX_CRITIC_RETRIES:
-                    logging.error(f"❌ Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated content.")
+                    _log_aligned("error", "❌", "Copy Critic", f"Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated content.")
                     break
             elif critic_response.startswith("PASS"):
-                logging.info(f"✅ Copy Critic approved content on attempt {attempt}")
+                _log_aligned("info", "✅", "Copy Critic", f"approved content on attempt {attempt}")
                 break
             else:
-                logging.warning("⚠️ Critic response unclear (no PASS/FAIL). Proceeding with content.")
+                _log_aligned("warning", "⚠️", "Copy Critic", "response unclear (no PASS/FAIL). Proceeding with content.")
                 break
 
         # Validate content before saving
@@ -1223,16 +1244,16 @@ Please evaluate this content against the intake and brief."""
         # Save immutable original for future analysis
         content_orig_path = os.path.join(client_path, "content.orig.md")
         if atomic_write(content_orig_path, content):
-            logging.info("Saved original AI output to content.orig.md")
+            _log_aligned("info", "💾", "Copywriter", "Saved original AI output to content.orig.md")
         else:
-            logging.error(f"Failed to write {content_orig_path}")
+            _log_aligned("error", "❌", "Copywriter", f"Failed to write {content_orig_path}")
 
         # Save the working copy
         content_path = os.path.join(client_path, "content.md")
         if atomic_write(content_path, content):
-            logging.info("Saved content.md")
+            _log_aligned("info", "💾", "Copywriter", "Saved content.md")
         else:
-            logging.error(f"Failed to write {content_path}")
+            _log_aligned("error", "❌", "Copywriter", f"Failed to write {content_path}")
             raise RuntimeError(f"Failed to write content.md for {client_id}")
 
     run_builder(client_path)
@@ -1267,10 +1288,10 @@ def run_builder(client_path):
     # Check for existing page.tsx - skip if already generated
     target_file = f"./app/clients/{client_id}/page.tsx"
     if os.path.exists(target_file):
-        logging.info(f"⏭️  Page already exists for {client_id}, skipping builder stage")
+        _log_aligned("info", "⏭️", "Builder", f"Page already exists for {client_id}, skipping builder stage")
         return
     
-    logging.info(f"🧱 Builder assembling {client_id} (Self-Correcting Mode)...")
+    _log_aligned("info", "🧱", "Builder", f"assembling {client_id} (Self-Correcting Mode)...")
 
     with time_tracker.track_span("pipeline_builder", client_id, {"stage": "builder"}):
         # Load inputs
@@ -1284,7 +1305,7 @@ def run_builder(client_path):
             with open(LIBRARY_PATH, "r", encoding="utf-8") as f:
                 manifest = f.read()
         else:
-            logging.warning("⚠️ Library Manifest not found. AI will generate raw code.")
+            _log_aligned("warning", "⚠️", "Builder", "Library Manifest not found. AI will generate raw code.")
 
         # Load theme.json if it exists
         theme_section = ""
@@ -1306,9 +1327,9 @@ Apply these colors, fonts, and styles using Tailwind CSS classes:
 - Use "font_body" for paragraph text
 - Apply "border_radius" to buttons and cards
 """
-                logging.info(f"✅ Loaded theme.json for {client_id}")
+                _log_aligned("info", "✅", "Builder", f"Loaded theme.json for {client_id}")
             except (json.JSONDecodeError, IOError) as e:
-                logging.warning(f"⚠️ Failed to load theme.json: {e}")
+                _log_aligned("warning", "⚠️", "Builder", f"Failed to load theme.json: {e}")
 
         # Load memory (evolutionary learning) and golden references
         memory_prompt = memory.get_memory_prompt()
@@ -1331,6 +1352,8 @@ RULES:
 6. Ensure ALL imports are correct and components exist.
 7. Output ONLY the code for `page.tsx` inside a ```tsx code block.
 8. Do NOT use placeholder text like [Your text here] - use actual content from the brief.
+9. CRITICAL: Generate COMPLETE, syntactically valid TypeScript/TSX code. All template literals, strings, JSX tags, and code blocks must be properly closed. The code must compile without errors.
+10. Ensure all opening braces {{, brackets [, parentheses (, backticks (backtick character), and JSX tags have matching closing characters.
 
 MANIFEST:
 {manifest}
@@ -1363,7 +1386,7 @@ MANIFEST:
                         f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1232", "message": "loop iteration start", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "syntax_feedback": syntax_feedback[:100] if syntax_feedback else None, "visual_feedback": visual_feedback[:100] if visual_feedback else None}, "timestamp": int(time.time() * 1000)}) + "\n")
                 except: pass
                 # #endregion
-                logging.info(f"🔄 Builder cycle {total_attempts}/{max_total_attempts}...")
+                _log_aligned("info", "🔄", "Builder cycle", f"{total_attempts}/{max_total_attempts}...")
 
                 # Build user message with any feedback
                 user_content = f"Brief: {brief}\n\nContent: {content}"
@@ -1376,6 +1399,13 @@ The previous code had TypeScript compilation errors. Please fix these issues:
 ```
 {syntax_feedback}
 ```
+
+CRITICAL REQUIREMENTS:
+- Generate COMPLETE, syntactically valid TypeScript/TSX code
+- Ensure all template literals (backticks) are properly closed
+- Ensure all opening braces `{{`, brackets `[`, parentheses `(`, and JSX tags have matching closing characters
+- The code must compile without ANY syntax errors
+- Pay special attention to the specific error mentioned above and ensure it is completely resolved
 Generate corrected code that compiles without errors."""
 
                 if visual_feedback and screenshot_path:
@@ -1394,7 +1424,7 @@ Please fix the visual issues while maintaining correct syntax."""
                     activity="pipeline_builder",
                     system=base_prompt,
                     user_content=user_content,
-                    max_tokens=4000,
+                    max_tokens=8000,  # Increased to prevent truncation of large page files
                 )
 
                 raw_response = _extract_response_text(msg, default="")
@@ -1405,7 +1435,7 @@ Please fix the visual issues while maintaining correct syntax."""
                 except: pass
                 # #endregion
                 if not raw_response:
-                    logging.error(f"❌ Builder returned empty response on attempt {total_attempts} for {client_id}")
+                    _log_aligned("error", "❌", "Builder", f"returned empty response on attempt {total_attempts} for {client_id}")
                     memory.record_failure(
                         category="builder",
                         issue="Builder returned empty or malformed response",
@@ -1415,15 +1445,35 @@ Please fix the visual issues while maintaining correct syntax."""
                     continue
 
                 # Extract code from response
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1418", "message": "code extraction start", "data": {"total_attempts": total_attempts, "raw_response_len": len(raw_response), "has_code_block": "```" in raw_response}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
                 match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
                 if match:
                     code = match.group(1).strip()
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            code_preview = code[:200] if code else ""
+                            unclosed_templates = code.count("${") - code.count("}") if code else 0
+                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1420", "message": "code extracted from block", "data": {"total_attempts": total_attempts, "code_len": len(code), "code_preview": code_preview, "unclosed_template_count": unclosed_templates, "backtick_count": code.count("`") if code else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
                 else:
-                    logging.warning("⚠️ No code blocks found in Builder response. Using raw output.")
+                    _log_aligned("warning", "⚠️", "Builder", "No code blocks found in Builder response. Using raw output.")
                     code = raw_response
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1423", "message": "no code block found, using raw", "data": {"total_attempts": total_attempts, "code_len": len(code)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
 
                 # Phase 1: Syntax Check
-                logging.info(f"🔍 Phase 1: Syntax validation (attempt {total_attempts})...")
+                _log_aligned("info", "🔍", "Phase 1", f"Syntax validation (attempt {total_attempts})...")
                 syntax_ok, syntax_error = check_syntax(code, client_id)
                 # #region agent log
                 try:
@@ -1433,7 +1483,7 @@ Please fix the visual issues while maintaining correct syntax."""
                 # #endregion
 
                 if not syntax_ok:
-                    logging.warning(f"⚠️ Syntax check failed on attempt {total_attempts}")
+                    _log_aligned("warning", "⚠️", "Syntax check", f"failed on attempt {total_attempts}")
                     syntax_feedback = syntax_error
 
                     # Record to memory
@@ -1450,10 +1500,10 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Syntax passed - clear syntax feedback
                 syntax_feedback = None
-                logging.info(f"✅ Syntax check passed on attempt {total_attempts}")
+                _log_aligned("info", "✅", "Syntax check", f"passed on attempt {total_attempts}")
 
                 # Phase 2: Save and run Visual QA
-                logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
+                _log_aligned("info", "🔍", "Phase 2", f"Visual QA (attempt {total_attempts})...")
 
                 # Save the code atomically
                 write_success = atomic_write(target_file, code)
@@ -1464,7 +1514,7 @@ Please fix the visual issues while maintaining correct syntax."""
                 except: pass
                 # #endregion
                 if not write_success:
-                    logging.error(f"Failed to write {target_file}")
+                    _log_aligned("error", "❌", "Builder", f"Failed to write {target_file}")
                     memory.record_failure(
                         category="builder",
                         issue=f"Failed to write page.tsx file: {target_file}",
@@ -1484,13 +1534,13 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Phase 3: Check QA results
                 if qa_status == "PASS":
-                    logging.info(f"✅ Visual QA passed on attempt {total_attempts}")
+                    _log_aligned("info", "✅", "Visual QA", f"passed on attempt {total_attempts}")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break  # Success! Exit the loop
 
                 elif qa_status == "FAIL":
-                    logging.warning(f"⚠️ Visual QA failed on attempt {total_attempts}")
+                    _log_aligned("warning", "⚠️", "Visual QA", f"failed on attempt {total_attempts}")
                     visual_feedback = qa_report
 
                     # Record to memory
@@ -1509,7 +1559,7 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 else:
                     # ERROR or SKIPPED - can't repair, use what we have
-                    logging.warning(f"⚠️ QA returned {qa_status} - cannot repair, using current code")
+                    _log_aligned("warning", "⚠️", "QA", f"returned {qa_status} - cannot repair, using current code")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break
@@ -1525,7 +1575,7 @@ Please fix the visual issues while maintaining correct syntax."""
                 f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1364", "message": "loop exit", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "final_qa_status": final_qa_status, "exhausted_attempts": total_attempts >= max_total_attempts}, "timestamp": int(time.time() * 1000)}) + "\n")
         except: pass
         # #endregion
-        logging.info(f"🏁 Builder completed after {total_attempts} attempts. Final status: {final_qa_status}")
+        _log_aligned("info", "🏁", "Builder", f"completed after {total_attempts} attempts. Final status: {final_qa_status}")
 
         # Compile rules periodically (after learning from this session)
         if total_attempts > 1:
@@ -1567,11 +1617,11 @@ def run_qa(client_path) -> Tuple[str, str, str]:
     # #endregion
 
     if not server_ready:
-        logging.error("❌ Server unavailable. QA Skipped.")
+        _log_aligned("error", "❌", "QA", "Server unavailable. QA Skipped.")
         return ("SKIPPED", "Server unavailable - QA could not run", screenshot_path)
 
     with time_tracker.track_span("pipeline_qa", client_id, {"stage": "qa"}):
-        logging.info("🕵️‍♂️ QA Inspector starting...")
+        _log_aligned("info", "🕵️‍♂️", "QA Inspector", "starting...")
         url = f"http://localhost:3000/clients/{client_id}"
 
         browser = None
@@ -1590,7 +1640,7 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                         try:
                             browser.close()
                         except Exception as e:
-                            logging.warning(f"⚠️ Error closing browser: {e}")
+                            _log_aligned("warning", "⚠️", "QA", f"Error closing browser: {e}")
 
             # Analyze with Vision Model
             with open(screenshot_path, "rb") as f:
@@ -1625,10 +1675,10 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
             # Determine status from report
             if "PASS" in report and not report.strip().startswith("FAIL"):
                 status = "PASS"
-                logging.info(f"✅ QA passed for {client_id}")
+                _log_aligned("info", "✅", "QA", f"passed for {client_id}")
             else:
                 status = "FAIL"
-                logging.warning(f"⚠️ QA failed for {client_id}")
+                _log_aligned("warning", "⚠️", "QA", f"failed for {client_id}")
 
             return (status, report, screenshot_path)
 
@@ -1640,7 +1690,7 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
                     f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1463", "message": "run_qa exception", "data": {"client_id": client_id, "error_type": type(e).__name__, "error_msg": str(e)[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
             except: pass
             # #endregion
-            logging.exception("❌ Visual QA Error")
+            _log_aligned("error", "❌", "QA", "Visual QA Error")
             return ("ERROR", error_msg, screenshot_path)
 
 
@@ -1671,14 +1721,14 @@ def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
     git_commit_and_push(client_id)
 
     # Mark as processed
-    logging.info(f"🏁 Finalizing job for {client_id}...")
+    _log_aligned("info", "🏁", "Finalizing", f"job for {client_id}...")
     try:
         intake_path = os.path.join(client_path, "intake.md")
         processed_path = os.path.join(client_path, "intake-processed.md")
         if os.path.exists(intake_path):
             os.rename(intake_path, processed_path)
     except OSError:
-        logging.exception("⚠️ Failed to rename intake.md")
+        _log_aligned("warning", "⚠️", "Finalizing", "Failed to rename intake.md")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
@@ -1686,20 +1736,20 @@ if __name__ == "__main__":
     print("    Features: Memory System | Syntax Guard | Visual Repair | A11y Critic")
 
     # Validate prompt library before starting
-    logging.info("📚 Validating prompt library...")
+    _log_aligned("info", "📚", "Startup", "Validating prompt library...")
     if not validate_prompt_library():
-        logging.error("❌ FATAL: Required prompt files are missing. Cannot start factory.")
-        logging.error("Please ensure all files exist in the prompts/ directory.")
+        _log_aligned("error", "❌", "Startup", "FATAL: Required prompt files are missing. Cannot start factory.")
+        _log_aligned("error", "❌", "Startup", "Please ensure all files exist in the prompts/ directory.")
         exit(1)
 
     # Ensure environment is ready (Fix #5)
-    logging.info("🎭 Checking Playwright browsers...")
+    _log_aligned("info", "🎭", "Startup", "Checking Playwright browsers...")
     try:
         subprocess.run(["playwright", "install", "chromium"], check=True, capture_output=True)
-        logging.info("✅ Browsers ready.")
+        _log_aligned("info", "✅", "Startup", "Browsers ready.")
     except Exception as e:
-        logging.error(f"❌ Playwright install failed: {e}")
-        logging.warning("Visual QA may fail.")
+        _log_aligned("error", "❌", "Startup", f"Playwright install failed: {e}")
+        _log_aligned("warning", "⚠️", "Startup", "Visual QA may fail.")
 
     # Check for command-line argument (client ID)
     if len(sys.argv) > 1:
@@ -1710,23 +1760,23 @@ if __name__ == "__main__":
             client_path = os.path.join(base_dir, client_id_arg)
             intake_path = os.path.join(client_path, "intake.md")
             if os.path.isdir(client_path) and os.path.exists(intake_path):
-                logging.info(f"🚀 Processing client from command line: {client_id_arg}")
+                _log_aligned("info", "🚀", "CLI", f"Processing client from command line: {client_id_arg}")
                 try:
                     with client_lock(client_id_arg):
                         run_architect(client_path)
-                    logging.info(f"✅ Completed processing for {client_id_arg}")
+                    _log_aligned("info", "✅", "CLI", f"Completed processing for {client_id_arg}")
                     exit(0)
                 except RuntimeError as e:
-                    logging.error(f"❌ Could not acquire lock for {client_id_arg}: {e}")
+                    _log_aligned("error", "❌", "CLI", f"Could not acquire lock for {client_id_arg}: {e}")
                     exit(1)
                 except Exception as e:
-                    logging.error(f"❌ Pipeline crashed for {client_id_arg}: {e}")
+                    _log_aligned("error", "❌", "CLI", f"Pipeline crashed for {client_id_arg}: {e}")
                     exit(1)
             else:
-                logging.error(f"❌ Client directory not found or missing intake.md: {client_path}")
+                _log_aligned("error", "❌", "CLI", f"Client directory not found or missing intake.md: {client_path}")
                 exit(1)
         else:
-            logging.error(f"❌ Invalid client ID: {client_id_arg}")
+            _log_aligned("error", "❌", "CLI", f"Invalid client ID: {client_id_arg}")
             exit(1)
 
     while True:
@@ -1741,28 +1791,28 @@ if __name__ == "__main__":
 
                 # Validate client ID to prevent path traversal attacks
                 if not is_valid_client_id(client_id):
-                    logging.warning(f"⚠️ Skipping invalid client ID: {client_id}")
+                    _log_aligned("warning", "⚠️", "Batch loop", f"Skipping invalid client ID: {client_id}")
                     continue
                 
                 # Check if client is already being processed
                 if is_locked(client_id):
-                    logging.info(f"⏸️  Client {client_id} is already being processed, skipping")
+                    _log_aligned("info", "⏸️", "Batch loop", f"Client {client_id} is already being processed, skipping")
                     continue
                 
                 path = os.path.join(WATCH_DIR, client_id)
                 # Look for unprocessed intake files
                 if os.path.isdir(path) and os.path.exists(f"{path}/intake.md"):
-                    logging.info(f"🚀 Found pending job: {client_id}")
+                    _log_aligned("info", "🚀", "Batch loop", f"Found pending job: {client_id}")
                     try:
                         # Acquire lock before processing
                         with client_lock(client_id):
                             run_architect(path)
                     except RuntimeError as e:
                         # Lock acquisition failed - another instance is processing
-                        logging.info(f"⏸️  Could not acquire lock for {client_id}, skipping")
+                        _log_aligned("info", "⏸️", "Batch loop", f"Could not acquire lock for {client_id}, skipping")
                     except Exception as e:
-                        logging.error(f"❌ Pipeline crashed for {client_id}: {e}")
+                        _log_aligned("error", "❌", "Batch loop", f"Pipeline crashed for {client_id}: {e}")
                         # Since we didn't rename intake.md, it will be retried next loop
 
-        logging.info(f"💤 Batch complete. Sleeping for {BATCH_INTERVAL/60} minutes...")
+        _log_aligned("info", "💤", "Batch loop", f"Batch complete. Sleeping for {BATCH_INTERVAL/60} minutes...")
         time.sleep(BATCH_INTERVAL)
