@@ -13,7 +13,7 @@ from typing import Tuple, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
 from openai import OpenAI
-from anthropic import Anthropic
+from anthropic import Anthropic, RateLimitError
 from playwright.sync_api import sync_playwright
 from automation import time_tracker, cost_tracker
 from automation import memory
@@ -56,7 +56,7 @@ MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review
 WATCH_DIR = "./clients"
 LIBRARY_PATH = "./design-system/manifest.md"
 PROMPTS_DIR = "./prompts"
-BATCH_INTERVAL = 3600  # Check every 1 hour
+BATCH_INTERVAL = 60  # Seconds, Check every 1 hour for testing
 MAX_CRITIC_RETRIES = 3  # Hard stop for critic loop to prevent infinite API costs
 
 def _extract_usage_tokens(response):
@@ -84,6 +84,38 @@ def _record_model_cost(provider, model, activity, client_id, response, metadata=
         )
     except Exception as e:
         logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
+
+
+def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwargs):
+    """
+    Call Anthropic with a small exponential backoff on 429 (rate limit) errors.
+    """
+    max_attempts = 3
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return client_anthropic.messages.create(model=model, **kwargs)
+        except RateLimitError as e:
+            sleep = min(5 * attempt, 15)
+            logging.warning(
+                f"⚠️ Anthropic rate limit for {activity}/{client_id} "
+                f"(attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
+            )
+            time.sleep(sleep)
+            if attempt == max_attempts:
+                raise
+        except Exception as e:
+            status = getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
+            if status == 429 or "429" in str(e):
+                sleep = min(5 * attempt, 15)
+                logging.warning(
+                    f"⚠️ Anthropic 429 for {activity}/{client_id} "
+                    f"(attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
+                )
+                time.sleep(sleep)
+                if attempt == max_attempts:
+                    raise
+                continue
+            raise
 
 
 def _extract_response_text(response, default=None):
@@ -179,11 +211,13 @@ def select_niche_persona(client_id, intake):
     router_prompt = _load_prompt("router.md")
 
     # Ask LLM to classify
-    msg = client_anthropic.messages.create(
+    msg = _anthropic_messages_create(
         model=MODEL_ROUTER,
+        client_id=client_id,
+        activity="router_classify",
         max_tokens=50,
         system=router_prompt,
-        messages=[{"role": "user", "content": intake}]
+        messages=[{"role": "user", "content": intake}],
     )
     _record_model_cost("anthropic", MODEL_ROUTER, "router_classify", client_id, msg)
 
@@ -570,11 +604,13 @@ Generate an improved theme.json with better color contrast."""
                 user_content = intake
 
             # Generate theme
-            msg = client_anthropic.messages.create(
+            msg = _anthropic_messages_create(
                 model=MODEL_COPY,
+                client_id=client_id,
+                activity="pipeline_visual_designer",
                 max_tokens=500,
                 system=designer_prompt,
-                messages=[{"role": "user", "content": user_content}]
+                messages=[{"role": "user", "content": user_content}],
             )
             _record_model_cost("anthropic", MODEL_COPY, "pipeline_visual_designer", client_id, msg, {"attempt": attempt})
 
@@ -620,11 +656,13 @@ Generate an improved theme.json with better color contrast."""
 
 Please evaluate the accessibility of this color palette."""
 
-            a11y_msg = client_anthropic.messages.create(
+            a11y_msg = _anthropic_messages_create(
                 model=MODEL_CRITIC,
+                client_id=client_id,
+                activity="pipeline_visual_designer_a11y",
                 max_tokens=500,
                 system=a11y_critic_prompt,
-                messages=[{"role": "user", "content": a11y_input}]
+                messages=[{"role": "user", "content": a11y_input}],
             )
             _record_model_cost("anthropic", MODEL_CRITIC, "pipeline_visual_designer_a11y", client_id, a11y_msg, {"attempt": attempt})
 
@@ -739,11 +777,13 @@ Generate an improved Project Brief that addresses the feedback above."""
                     user_content = intake
 
                 # Generate brief
-                msg = client_anthropic.messages.create(
+                msg = _anthropic_messages_create(
                     model=MODEL_STRATEGY,
+                    client_id=client_id,
+                    activity="pipeline_architect",
                     max_tokens=2000,
                     system=strategy_prompt,
-                    messages=[{"role": "user", "content": user_content}]
+                    messages=[{"role": "user", "content": user_content}],
                 )
                 _record_model_cost(
                     "anthropic", MODEL_STRATEGY, "pipeline_architect",
@@ -768,11 +808,13 @@ Generate an improved Project Brief that addresses the feedback above."""
 
 Please evaluate this brief against the original intake."""
 
-                critic_msg = client_anthropic.messages.create(
+                critic_msg = _anthropic_messages_create(
                     model=MODEL_CRITIC,
+                    client_id=client_id,
+                    activity="pipeline_architect_critic",
                     max_tokens=500,
                     system=critic_prompt,
-                    messages=[{"role": "user", "content": critic_input}]
+                    messages=[{"role": "user", "content": critic_input}],
                 )
                 _record_model_cost(
                     "anthropic", MODEL_CRITIC, "pipeline_architect_critic",
@@ -912,11 +954,13 @@ Generate improved website content that addresses the feedback above."""
                 user_content = brief
 
             # Generate content
-            msg = client_anthropic.messages.create(
+            msg = _anthropic_messages_create(
                 model=MODEL_COPY,
+                client_id=client_id,
+                activity="pipeline_copywriter",
                 max_tokens=4000,
                 system=copywriter_prompt,
-                messages=[{"role": "user", "content": user_content}]
+                messages=[{"role": "user", "content": user_content}],
             )
             _record_model_cost(
                 "anthropic", MODEL_COPY, "pipeline_copywriter",
@@ -949,11 +993,13 @@ Generate improved website content that addresses the feedback above."""
 
 Please evaluate this content against the intake and brief."""
 
-            critic_msg = client_anthropic.messages.create(
+            critic_msg = _anthropic_messages_create(
                 model=MODEL_CRITIC,
+                client_id=client_id,
+                activity="pipeline_copywriter_critic",
                 max_tokens=500,
                 system=critic_prompt,
-                messages=[{"role": "user", "content": critic_input}]
+                messages=[{"role": "user", "content": critic_input}],
             )
             _record_model_cost(
                 "anthropic", MODEL_CRITIC, "pipeline_copywriter_critic",
@@ -1136,11 +1182,13 @@ The previous code rendered but had visual issues detected by our QA system:
 Please fix the visual issues while maintaining correct syntax."""
 
             # Generate code
-            msg = client_anthropic.messages.create(
+            msg = _anthropic_messages_create(
                 model=MODEL_CODER,
+                client_id=client_id,
+                activity="pipeline_builder",
                 max_tokens=4000,
                 system=base_prompt,
-                messages=[{"role": "user", "content": user_content}]
+                messages=[{"role": "user", "content": user_content}],
             )
             _record_model_cost(
                 "anthropic", MODEL_CODER, "pipeline_builder",
@@ -1303,8 +1351,11 @@ def run_qa(client_path) -> Tuple[str, str, str]:
             with open(screenshot_path, "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode("utf-8")
 
-            msg = client_anthropic.messages.create(
-                model=MODEL_QA, max_tokens=1000,
+            msg = _anthropic_messages_create(
+                model=MODEL_QA,
+                client_id=client_id,
+                activity="pipeline_qa",
+                max_tokens=1000,
                 messages=[{
                     "role": "user",
                     "content": [
@@ -1318,7 +1369,7 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 Return 'PASS' if the page looks good and functional.
 If there are issues, return 'FAIL: [list specific visual problems]'."""}
                     ]
-                }]
+                }],
             )
             _record_model_cost("anthropic", MODEL_QA, "pipeline_qa", client_id, msg)
 

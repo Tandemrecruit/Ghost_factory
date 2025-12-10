@@ -108,5 +108,25 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:22:54.133901",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 368.81,
+    "time_saved_seconds": 14031.19,
+    "metadata": {
+      "stage": "builder"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:25:09.520972",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 406.77,
+    "time_saved_seconds": 13993.23,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]
