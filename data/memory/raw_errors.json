@@ -58,5 +58,65 @@
       "client_id": "demo-hvac",
       "attempt": 6
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:08:01.511827",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp2c_q7fqb.tsx(300,137): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:08:57.497989",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpwnhsjtw8.tsx(309,278): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:09:54.136514",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpjqjc4c7d.tsx(312,85): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:10:54.586553",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpv4p3hjqi.tsx(306,33): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:11:49.178966",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmplsr9cnah.tsx(268,79): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:12:48.786944",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp0gbow43n.tsx(309,22): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 6
+    }
   }
 ]

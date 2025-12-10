@@ -684,10 +684,13 @@ def run_architect(client_path):
     # Validate client ID to prevent path traversal
     validate_client_id_or_raise(client_id, "run_architect")
     
-    # Check for existing brief.md - skip if already generated
+    # Check for existing brief.md - skip generation if already exists, but continue pipeline
     brief_path = os.path.join(client_path, "brief.md")
-    if os.path.exists(brief_path):
-        logging.info(f"⏭️  Brief already exists for {client_id}, skipping architect stage")
+    brief_exists = os.path.exists(brief_path)
+    if brief_exists:
+        logging.info(f"⏭️  Brief already exists for {client_id}, skipping architect generation")
+        # Still need to continue pipeline to copywriter and builder stages
+        run_copywriter(client_path)
         return
     
     logging.info(f"🏗️  Architect analyzing {client_id}...")
@@ -1392,6 +1395,34 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(f"❌ Playwright install failed: {e}")
         logging.warning("Visual QA may fail.")
+
+    # Check for command-line argument (client ID)
+    if len(sys.argv) > 1:
+        client_id_arg = sys.argv[1]
+        if is_valid_client_id(client_id_arg):
+            # Use absolute path to avoid Windows path issues
+            base_dir = os.path.abspath(WATCH_DIR)
+            client_path = os.path.join(base_dir, client_id_arg)
+            intake_path = os.path.join(client_path, "intake.md")
+            if os.path.isdir(client_path) and os.path.exists(intake_path):
+                logging.info(f"🚀 Processing client from command line: {client_id_arg}")
+                try:
+                    with client_lock(client_id_arg):
+                        run_architect(client_path)
+                    logging.info(f"✅ Completed processing for {client_id_arg}")
+                    exit(0)
+                except RuntimeError as e:
+                    logging.error(f"❌ Could not acquire lock for {client_id_arg}: {e}")
+                    exit(1)
+                except Exception as e:
+                    logging.error(f"❌ Pipeline crashed for {client_id_arg}: {e}")
+                    exit(1)
+            else:
+                logging.error(f"❌ Client directory not found or missing intake.md: {client_path}")
+                exit(1)
+        else:
+            logging.error(f"❌ Invalid client ID: {client_id_arg}")
+            exit(1)
 
     while True:
         has_new_data = git_pull()
