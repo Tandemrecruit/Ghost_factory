@@ -1,0 +1,62 @@
+[
+  {
+    "timestamp": "2025-12-10T11:01:21.846854",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:02:10.429121",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:02:58.998379",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:03:47.605981",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:04:34.512845",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:05:23.376257",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: npx/tsc not found. Ensure Node.js and TypeScript are installed.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 6
+    }
+  }
+]

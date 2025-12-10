@@ -19,7 +19,7 @@ client = OpenAI()
 
 # Model: GPT-5 Nano - $0.05/$0.40 per 1M tokens (20x cheaper than Haiku)
 # Perfect for structured extraction tasks like intake sanitization
-MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano-latest")
+MODEL_SANITIZER = os.getenv("MODEL_SANITIZER", "gpt-5-nano")
 
 SYSTEM_PROMPT = """
 You are an Intake Sanitizer for a landing-page studio.

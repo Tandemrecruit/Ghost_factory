@@ -1,0 +1,62 @@
+[
+  {
+    "timestamp": "2025-12-10T10:56:21.036661",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 0.27,
+    "time_saved_seconds": 7199.73,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T10:56:45.730154",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 24.96,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T10:58:30.855254",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 32.25,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T10:59:06.779608",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 68.17,
+    "time_saved_seconds": 7131.83,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:00:24.898024",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 78.11,
+    "time_saved_seconds": 10721.89,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:05:23.383466",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 298.48,
+    "time_saved_seconds": 14101.52,
+    "metadata": {
+      "stage": "builder"
+    }
+  }
+]

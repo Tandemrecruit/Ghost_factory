@@ -1,5 +1,6 @@
 import time
 import os
+import sys
 import logging
 import requests
 import subprocess
@@ -7,6 +8,7 @@ import base64
 import re
 import json
 import tempfile
+import shutil
 from typing import Tuple, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
@@ -20,6 +22,15 @@ from automation.lock_utils import client_lock, is_locked
 from automation.file_utils import atomic_write
 
 # 1. SETUP
+# Fix Windows console encoding for emoji support
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        # Python < 3.7 fallback
+        pass
+
 load_dotenv()
 logging.basicConfig(
     level=logging.INFO, 
@@ -37,8 +48,8 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
 MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation - quality/cost balance
 MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
-MODEL_QA = "claude-haiku-4-5-20251015"         # Visual inspection - fast & cost-effective
-MODEL_ROUTER = "claude-haiku-4-5-20251015"     # Fast classification
+MODEL_QA = "claude-sonnet-4-5-20250929"       # Visual inspection - using Sonnet until Haiku model is available
+MODEL_ROUTER = "claude-sonnet-4-5-20250929"   # Fast classification - using Sonnet until Haiku model is available
 MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review         
 
 # Config
@@ -400,10 +411,40 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             temp_file.write(code_string)
             temp_path = temp_file.name
 
+        # Try to find npx - check common locations
+        npx_cmd = shutil.which("npx")
+        if not npx_cmd:
+            # Try to find npx in the same directory as node
+            node_path = shutil.which("node")
+            if node_path:
+                node_dir = os.path.dirname(node_path)
+                # On Windows, try both npx and npx.cmd
+                for npx_name in ["npx.cmd", "npx"]:
+                    npx_path = os.path.join(node_dir, npx_name)
+                    if os.path.exists(npx_path):
+                        npx_cmd = npx_path
+                        break
+                # Also try shutil.which for npx.cmd specifically
+                if not npx_cmd:
+                    npx_cmd = shutil.which("npx.cmd")
+        
+        if not npx_cmd:
+            # Last resort: try direct path if we know node location
+            node_path = shutil.which("node")
+            if node_path:
+                node_dir = os.path.dirname(node_path)
+                potential_npx = os.path.join(node_dir, "npx")
+                if os.path.exists(potential_npx):
+                    npx_cmd = potential_npx
+        
+        if not npx_cmd:
+            raise FileNotFoundError("npx/tsc not found. Ensure Node.js and TypeScript are installed. Run: npm install -g typescript")
+        
         # Run TypeScript compiler in check-only mode
         result = subprocess.run(
             [
-                "npx", "tsc",
+                npx_cmd,
+                "tsc",
                 "--noEmit",           # Don't emit output files
                 "--skipLibCheck",     # Skip type checking of declaration files
                 "--jsx", "preserve",  # Preserve JSX for Next.js

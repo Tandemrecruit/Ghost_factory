@@ -23,7 +23,7 @@ def is_valid_client_id(client_id: str) -> bool:
     Rules:
     - Only alphanumeric characters, hyphens, and underscores
     - Cannot start or end with hyphen/underscore (except single char)
-    - Cannot contain path separators (/, \)
+    - Cannot contain path separators (/, \\)
     - Cannot contain Windows invalid chars (< > : " | ? *)
     - Must be non-empty
     
