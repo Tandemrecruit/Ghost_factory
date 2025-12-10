@@ -1,6 +1,6 @@
 # Dynamic Rules - Top Avoidable Mistakes
 
-*Auto-generated from 104 recorded errors. Last updated: 2025-12-10 22:31 UTC*
+*Auto-generated from 106 recorded errors. Last updated: 2025-12-10 22:34 UTC*
 
 ## Rule 1: Avoid Syntax Errors (80 occurrences)
 
@@ -18,7 +18,7 @@
 
 ---
 
-## Rule 3: Avoid Visual Errors (3 occurrences)
+## Rule 3: Avoid Visual Errors (5 occurrences)
 
 **Common Problem:** Visual QA failed: FAIL: [Multiple visual problems detected]
 

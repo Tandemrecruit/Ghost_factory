@@ -2235,5 +2235,60 @@
     "output_tokens": 4000,
     "cost_usd": 0.078,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:32:16.025652",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-saas",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:32:31.922156",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-saas",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:33:29.015829",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-saas",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:33:42.175951",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-saas",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T22:34:49.654557",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-saas",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
   }
 ]
