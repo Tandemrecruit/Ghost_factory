@@ -46,7 +46,7 @@ if sys.platform == 'win32':
 load_dotenv()
 logging.basicConfig(
     level=logging.INFO, 
-    format='%(asctime)s - [FACTORY] - %(message)s', 
+    format='%(asctime)s  -  [FACTORY]  -  %(message)s', 
     datefmt='%H:%M:%S'
 )
 
@@ -71,13 +71,14 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
     padded_label = f"{label:<20}"
     
     # Prevent line wrapping: truncate message if too long
-    # Account for: emoji (2-3 chars) + space (1) + label (20) + space (1) = ~25 chars overhead
-    # Target max width: 120 chars, so message max: ~95 chars
-    max_message_width = 95
+    # Account for: emoji (2-3 chars) + space (2) + label (20) + space (1) = ~26 chars overhead
+    # Target max width: 120 chars, so message max: ~94 chars
+    max_message_width = 94
     if len(message) > max_message_width:
         message = message[:max_message_width - 3] + "..."
     
-    formatted_message = f"{emoji_clean} {padded_label} {message}"
+    # Use two spaces after emoji to ensure visible separation (some emojis are wide)
+    formatted_message = f"{emoji_clean}  {padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)
@@ -353,8 +354,9 @@ REQUIRED_PROMPTS = [
 ]
 
 # Max retries for self-correcting loops
-MAX_SYNTAX_RETRIES = 3
-MAX_VISUAL_REPAIR_RETRIES = 3
+# Reduced to save API credits - early exit logic will catch repeated failures
+MAX_SYNTAX_RETRIES = 2  # Reduced from 3
+MAX_VISUAL_REPAIR_RETRIES = 2  # Reduced from 3
 MAX_A11Y_RETRIES = 3
 
 
@@ -1440,6 +1442,11 @@ MANIFEST:
         screenshot_path = None
         total_attempts = 0
         max_total_attempts = MAX_SYNTAX_RETRIES + MAX_VISUAL_REPAIR_RETRIES
+        
+        # Progress tracking to detect when we're not making progress (save API costs)
+        error_history = []  # Track last 3 errors to detect repetition
+        consecutive_same_errors = 0
+        last_error_type = None
 
         # Start heartbeat so we can see progress during long builder cycles
         heartbeat_stop, heartbeat_thread = _start_heartbeat(f"Builder for {client_id}", interval=10.0)
@@ -1567,6 +1574,55 @@ Please fix the visual issues while maintaining correct syntax."""
                     _log_aligned("warning", "⚠️", "Syntax check", f"failed on attempt {total_attempts}")
                     syntax_feedback = syntax_error
 
+                    # Track error patterns to detect when we're not making progress (save API costs)
+                    # Extract error type (first line of error, normalized)
+                    error_first_line = syntax_error.split('\n')[0] if syntax_error else ""
+                    
+                    # Detect module resolution errors (normalize all module errors to same category)
+                    is_module_error = "Cannot find module" in error_first_line or "TS2307" in syntax_error
+                    
+                    # Normalize error type for comparison:
+                    # - All module errors become "MODULE_ERROR"
+                    # - Other errors use first 80 chars (to catch similar but not identical errors)
+                    if is_module_error:
+                        error_type = "MODULE_ERROR"
+                    else:
+                        error_type = error_first_line[:80]  # Normalize to first 80 chars
+                    
+                    # Check if this is the same error category as before
+                    if error_type == last_error_type:
+                        consecutive_same_errors += 1
+                    else:
+                        consecutive_same_errors = 1
+                        last_error_type = error_type
+                    
+                    # Keep error history (last 3)
+                    error_history.append(error_type)
+                    if len(error_history) > 3:
+                        error_history.pop(0)
+                    
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1597", "message": "error pattern tracking", "data": {"total_attempts": total_attempts, "error_type": error_type, "is_module_error": is_module_error, "consecutive_same_errors": consecutive_same_errors, "last_error_type": last_error_type}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
+                    
+                    # Early exit conditions to save API credits:
+                    # 1. Module resolution errors = config issue, exit after 2 attempts (saves 4 API calls)
+                    # 2. Same error category 3 times in a row = no progress, exit early
+                    if is_module_error and total_attempts >= 2:
+                        _log_aligned("error", "❌", "Builder", f"Module resolution error detected (attempt {total_attempts}). Likely tsconfig issue. Exiting early to save API credits.")
+                        final_qa_status = "SKIPPED"
+                        final_qa_report = f"Build failed: Module resolution error (likely tsconfig issue). Error: {error_first_line[:200]}"
+                        break
+                    
+                    if consecutive_same_errors >= 3:
+                        _log_aligned("error", "❌", "Builder", f"Same error category repeated {consecutive_same_errors} times. Exiting early to save API credits.")
+                        final_qa_status = "SKIPPED"
+                        final_qa_report = f"Build failed: Same error repeated {consecutive_same_errors} times. Last error: {error_first_line[:200]}"
+                        break
+
                     # Record to memory
                     memory.record_failure(
                         category="syntax",
@@ -1615,13 +1671,13 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Phase 3: Check QA results
                 if qa_status == "PASS":
-                    _log_aligned("info", "✅ ", "Visual QA", f"passed on attempt {total_attempts}")
+                    _log_aligned("info", "✅", "Visual QA", f"passed on attempt {total_attempts}")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break  # Success! Exit the loop
 
                 elif qa_status == "FAIL":
-                    _log_aligned("warning", "⚠️ ", "Visual QA", f"failed on attempt {total_attempts}")
+                    _log_aligned("warning", "⚠️", "Visual QA", f"failed on attempt {total_attempts}")
                     visual_feedback = qa_report
 
                     # Record to memory
@@ -1640,7 +1696,7 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 else:
                     # ERROR or SKIPPED - can't repair, use what we have
-                    _log_aligned("warning", "⚠️ ", "QA", f"returned {qa_status} - cannot repair, using current code")
+                    _log_aligned("warning", "⚠️", "QA", f"returned {qa_status} - cannot repair, using current code")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break
@@ -1721,7 +1777,7 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                         try:
                             browser.close()
                         except Exception as e:
-                            _log_aligned("warning", "⚠️ ", "QA", f"Error closing browser: {e}")
+                            _log_aligned("warning", "⚠️", "QA", f"Error closing browser: {e}")
 
             # Analyze with Vision Model
             with open(screenshot_path, "rb") as f:
@@ -1756,10 +1812,10 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
             # Determine status from report
             if "PASS" in report and not report.strip().startswith("FAIL"):
                 status = "PASS"
-                _log_aligned("info", "✅ ", "QA", f"passed for {client_id}")
+                _log_aligned("info", "✅", "QA", f"passed for {client_id}")
             else:
                 status = "FAIL"
-                _log_aligned("warning", "⚠️ ", "QA", f"failed for {client_id}")
+                _log_aligned("warning", "⚠️", "QA", f"failed for {client_id}")
 
             return (status, report, screenshot_path)
 
@@ -1809,7 +1865,7 @@ def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
         if os.path.exists(intake_path):
             os.rename(intake_path, processed_path)
     except OSError:
-        _log_aligned("warning", "⚠️ ", "Finalizing", "Failed to rename intake.md")
+        _log_aligned("warning", "⚠️", "Finalizing", "Failed to rename intake.md")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
@@ -1827,10 +1883,10 @@ if __name__ == "__main__":
     _log_aligned("info", "🎭", "Startup", "Checking Playwright browsers...")
     try:
         subprocess.run(["playwright", "install", "chromium"], check=True, capture_output=True)
-        _log_aligned("info", "✅ ", "Startup", "Browsers ready.")
+        _log_aligned("info", "✅", "Startup", "Browsers ready.")
     except Exception as e:
         _log_aligned("error", "❌", "Startup", f"Playwright install failed: {e}")
-        _log_aligned("warning", "⚠️ ", "Startup", "Visual QA may fail.")
+        _log_aligned("warning", "⚠️", "Startup", "Visual QA may fail.")
 
     # Check for command-line argument (client ID)
     if len(sys.argv) > 1:
@@ -1845,7 +1901,7 @@ if __name__ == "__main__":
                 try:
                     with client_lock(client_id_arg):
                         run_architect(client_path)
-                    _log_aligned("info", "✅ ", "CLI", f"Completed processing for {client_id_arg}")
+                    _log_aligned("info", "✅", "CLI", f"Completed processing for {client_id_arg}")
                     exit(0)
                 except RuntimeError as e:
                     _log_aligned("error", "❌", "CLI", f"Could not acquire lock for {client_id_arg}: {e}")
@@ -1872,7 +1928,7 @@ if __name__ == "__main__":
 
                 # Validate client ID to prevent path traversal attacks
                 if not is_valid_client_id(client_id):
-                    _log_aligned("warning", "⚠️ ", "Batch loop", f"Skipping invalid client ID: {client_id}")
+                    _log_aligned("warning", "⚠️", "Batch loop", f"Skipping invalid client ID: {client_id}")
                     continue
                 
                 # Check if client is already being processed

@@ -62,6 +62,23 @@ def _persist_day_entries(path: Path, entries: List[Dict[str, Any]]) -> None:
         json.dump(entries, f, indent=2)
 
 
+def _format_time_readable(seconds: float) -> str:
+    """
+    Format seconds into human-readable format.
+    - Above 90 seconds: show as minutes (e.g., "2.5m")
+    - Above 90 minutes (5400s): show as hours (e.g., "2.0h")
+    - Otherwise: show as seconds (e.g., "45.3s")
+    """
+    if seconds >= 5400:  # 90 minutes
+        hours = seconds / 3600
+        return f"{hours:.1f}h"
+    elif seconds >= 90:  # 90 seconds
+        minutes = seconds / 60
+        return f"{minutes:.1f}m"
+    else:
+        return f"{seconds:.1f}s"
+
+
 def _compute_time_saved(activity: str, duration_seconds: float, cfg: Dict[str, Any]) -> float:
     baseline_minutes = cfg.get("baseline_minutes", {})
     baseline = baseline_minutes.get(activity)
@@ -93,10 +110,15 @@ def log_time_entry(
     entries = _load_day_entries(path)
     entries.append(entry)
     _persist_day_entries(path, entries)
-    logging.info(
-        f"[time] activity={activity} client={client_id or 'n/a'} "
-        f"duration={duration_seconds:.1f}s saved={time_saved_seconds:.1f}s"
-    )
+    # Format to match _log_aligned style: emoji + padded label + message
+    label = "Time tracking"
+    padded_label = f"{label:<20}"
+    # Format duration and saved time in human-readable format
+    duration_str = _format_time_readable(duration_seconds)
+    saved_str = _format_time_readable(time_saved_seconds) if time_saved_seconds > 0 else "0s"
+    client_str = client_id or "n/a"
+    message = f"{activity} for {client_str} | {duration_str} (saved {saved_str})"
+    logging.info(f"⏱️  {padded_label} {message}")
     return entry
 
 

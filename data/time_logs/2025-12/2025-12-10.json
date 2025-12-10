@@ -278,5 +278,45 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T20:45:34.607599",
+    "activity": "pipeline_visual_designer",
+    "client_id": "ember-roasters",
+    "duration_seconds": 21.48,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:46:21.876465",
+    "activity": "pipeline_architect",
+    "client_id": "ember-roasters",
+    "duration_seconds": 68.75,
+    "time_saved_seconds": 7131.25,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:47:45.380961",
+    "activity": "pipeline_copywriter",
+    "client_id": "ember-roasters",
+    "duration_seconds": 83.49,
+    "time_saved_seconds": 10716.51,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:56:22.799251",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 155.21,
+    "time_saved_seconds": 14244.79,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

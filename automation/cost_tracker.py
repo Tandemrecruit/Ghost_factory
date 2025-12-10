@@ -170,6 +170,10 @@ def record_api_cost(
     month_str = now.strftime("%Y-%m")
     _append_entry(API_COST_DIR, month_str, entry)
     
+    # Skip logging if cost is $0.0 to reduce console noise
+    if total_cost == 0.0:
+        return entry
+    
     # Format tokens compactly for readability
     in_tokens_str = _format_token_count(in_tokens)
     out_tokens_str = _format_token_count(out_tokens)
