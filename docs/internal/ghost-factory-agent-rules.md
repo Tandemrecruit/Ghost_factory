@@ -4,6 +4,9 @@
 **Last Updated:** 2025-12-10
 **Purpose:** Practical checklist and rules for external coding agents (Claude, GPT, Codex, Gemini) working in this repository.
 
+> **Always read [`AGENT_ALIGNMENT.md`](./AGENT_ALIGNMENT.md) first.**
+> This file is the practical "how to behave" companion to that constitution.
+
 ---
 
 ## 1. Scope Reminder – v1.0
