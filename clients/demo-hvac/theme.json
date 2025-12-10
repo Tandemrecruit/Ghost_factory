@@ -1,9 +1,9 @@
 {
   "primary": "#1E40AF",
-  "secondary": "#F97316",
-  "accent": "#0EA5E9",
+  "secondary": "#EA580C",
+  "accent": "#0284C7",
   "background": "white",
-  "font_heading": "Space Grotesk",
+  "font_heading": "Inter",
   "font_body": "Inter",
   "border_radius": "0.5rem",
   "source": "intake"

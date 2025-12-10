@@ -138,5 +138,85 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:28:23.521734",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 25.72,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:28:47.463085",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 49.66,
+    "time_saved_seconds": 7150.34,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:29:47.877951",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 60.41,
+    "time_saved_seconds": 10739.59,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:30:37.189917",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 70.72,
+    "time_saved_seconds": 10729.28,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:33:45.495557",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 0.21,
+    "time_saved_seconds": 14399.79,
+    "metadata": {
+      "stage": "builder"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:33:53.932582",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 196.73,
+    "time_saved_seconds": 14203.27,
+    "metadata": {
+      "stage": "builder"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:43:51.366437",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 1.55,
+    "time_saved_seconds": 14398.45,
+    "metadata": {
+      "stage": "builder"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:57:46.914674",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 367.87,
+    "time_saved_seconds": 14032.13,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

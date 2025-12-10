@@ -9,17 +9,29 @@ import re
 import json
 import tempfile
 import shutil
+import threading
+from pathlib import Path
 from typing import Tuple, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError, CancelledError
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic, RateLimitError
 from playwright.sync_api import sync_playwright
-from automation import time_tracker, cost_tracker
-from automation import memory
-from automation.client_utils import validate_client_id_or_raise, is_valid_client_id
-from automation.lock_utils import client_lock, is_locked
-from automation.file_utils import atomic_write
+
+# Ensure local package imports work even if editable install isn't active
+try:
+    from automation import time_tracker, cost_tracker, memory
+    from automation.client_utils import validate_client_id_or_raise, is_valid_client_id
+    from automation.lock_utils import client_lock, is_locked
+    from automation.file_utils import atomic_write
+except ModuleNotFoundError:
+    repo_root = Path(__file__).resolve().parent.parent
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    from automation import time_tracker, cost_tracker, memory
+    from automation.client_utils import validate_client_id_or_raise, is_valid_client_id
+    from automation.lock_utils import client_lock, is_locked
+    from automation.file_utils import atomic_write
 
 # 1. SETUP
 # Fix Windows console encoding for emoji support
@@ -46,7 +58,7 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 # Tier order: Opus > Sonnet > Haiku (cost and capability)
 # For current pricing, see docs/internal/pricing_model.md
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
-MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation - quality/cost balance
+MODEL_CODER = "gpt-5-mini"                     # Code generation - cost saver
 MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
 MODEL_QA = "claude-haiku-4-5-20251001"       # Visual inspection - using Sonnet until Haiku model is available
 MODEL_ROUTER = "claude-haiku-4-5-20251001"   # Fast classification - using Sonnet until Haiku model is available
@@ -84,6 +96,50 @@ def _record_model_cost(provider, model, activity, client_id, response, metadata=
         )
     except Exception as e:
         logging.warning(f"Cost tracking failed for {provider}:{model} - {e}")
+
+def _llm_messages_create(model: str, client_id: str, activity: str, system: str, user_content: str, max_tokens: int):
+    """
+    Unified LLM caller that routes to Anthropic (with backoff) or OpenAI.
+    """
+    if model.startswith("gpt-"):
+        resp = client_openai.chat.completions.create(
+            model=model,
+            # OpenAI models in this family expect max_completion_tokens
+            max_completion_tokens=max_tokens,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_content},
+            ],
+        )
+        _record_model_cost("openai", model, activity, client_id, resp)
+        return resp
+
+    resp = _anthropic_messages_create(
+        model=model,
+        client_id=client_id,
+        activity=activity,
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user_content}],
+    )
+    _record_model_cost("anthropic", model, activity, client_id, resp)
+    return resp
+
+
+def _start_heartbeat(label: str, interval: float = 10.0):
+    """
+    Start a background heartbeat logger to show long-running progress.
+    Returns the (event, thread) so callers can stop it.
+    """
+    stop_event = threading.Event()
+
+    def _beat():
+        while not stop_event.wait(interval):
+            logging.info(f"⏳ {label} still running...")
+
+    thread = threading.Thread(target=_beat, daemon=True)
+    thread.start()
+    return stop_event, thread
 
 
 def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwargs):
@@ -134,6 +190,19 @@ def _extract_response_text(response, default=None):
             first_block = response.content[0]
             if hasattr(first_block, 'text') and first_block.text:
                 return first_block.text
+        if response and hasattr(response, "choices"):
+            choice = response.choices[0]
+            content = getattr(choice.message, "content", None)
+            if isinstance(content, list) and content:
+                texts = []
+                for part in content:
+                    if isinstance(part, dict) and part.get("type") == "text":
+                        texts.append(part.get("text", ""))
+                    elif isinstance(part, str):
+                        texts.append(part)
+                return "\n".join(t for t in texts if t) or default
+            if isinstance(content, str):
+                return content
         return default
     except (IndexError, AttributeError, TypeError):
         return default
@@ -1155,15 +1224,19 @@ MANIFEST:
         total_attempts = 0
         max_total_attempts = MAX_SYNTAX_RETRIES + MAX_VISUAL_REPAIR_RETRIES
 
-        while total_attempts < max_total_attempts:
-            total_attempts += 1
-            logging.info(f"🔄 Builder cycle {total_attempts}/{max_total_attempts}...")
+        # Start heartbeat so we can see progress during long builder cycles
+        heartbeat_stop, heartbeat_thread = _start_heartbeat(f"Builder for {client_id}", interval=10.0)
 
-            # Build user message with any feedback
-            user_content = f"Brief: {brief}\n\nContent: {content}"
+        try:
+            while total_attempts < max_total_attempts:
+                total_attempts += 1
+                logging.info(f"🔄 Builder cycle {total_attempts}/{max_total_attempts}...")
 
-            if syntax_feedback:
-                user_content += f"""
+                # Build user message with any feedback
+                user_content = f"Brief: {brief}\n\nContent: {content}"
+
+                if syntax_feedback:
+                    user_content += f"""
 
 ## SYNTAX ERROR FROM PREVIOUS ATTEMPT
 The previous code had TypeScript compilation errors. Please fix these issues:
@@ -1172,8 +1245,8 @@ The previous code had TypeScript compilation errors. Please fix these issues:
 ```
 Generate corrected code that compiles without errors."""
 
-            if visual_feedback and screenshot_path:
-                user_content += f"""
+                if visual_feedback and screenshot_path:
+                    user_content += f"""
 
 ## VISUAL QA FEEDBACK FROM PREVIOUS ATTEMPT
 The previous code rendered but had visual issues detected by our QA system:
@@ -1181,111 +1254,111 @@ The previous code rendered but had visual issues detected by our QA system:
 
 Please fix the visual issues while maintaining correct syntax."""
 
-            # Generate code
-            msg = _anthropic_messages_create(
-                model=MODEL_CODER,
-                client_id=client_id,
-                activity="pipeline_builder",
-                max_tokens=4000,
-                system=base_prompt,
-                messages=[{"role": "user", "content": user_content}],
-            )
-            _record_model_cost(
-                "anthropic", MODEL_CODER, "pipeline_builder",
-                client_id, msg, {"attempt": total_attempts, "has_syntax_feedback": bool(syntax_feedback), "has_visual_feedback": bool(visual_feedback)}
-            )
-
-            raw_response = _extract_response_text(msg, default="")
-            if not raw_response:
-                logging.error(f"❌ Builder returned empty response on attempt {total_attempts} for {client_id}")
-                memory.record_failure(
-                    category="builder",
-                    issue="Builder returned empty or malformed response",
-                    fix="Will retry with same inputs",
-                    metadata={"client_id": client_id, "attempt": total_attempts},
-                )
-                continue
-
-            # Extract code from response
-            match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
-            if match:
-                code = match.group(1).strip()
-            else:
-                logging.warning("⚠️ No code blocks found in Builder response. Using raw output.")
-                code = raw_response
-
-            # Phase 1: Syntax Check
-            logging.info(f"🔍 Phase 1: Syntax validation (attempt {total_attempts})...")
-            syntax_ok, syntax_error = check_syntax(code, client_id)
-
-            if not syntax_ok:
-                logging.warning(f"⚠️ Syntax check failed on attempt {total_attempts}")
-                syntax_feedback = syntax_error
-
-                # Record to memory
-                memory.record_failure(
-                    category="syntax",
-                    issue=f"TypeScript compilation failed: {syntax_error[:300]}",
-                    fix="Will retry with error feedback",
-                    metadata={"client_id": client_id, "attempt": total_attempts}
+                # Generate code
+                msg = _llm_messages_create(
+                    model=MODEL_CODER,
+                    client_id=client_id,
+                    activity="pipeline_builder",
+                    system=base_prompt,
+                    user_content=user_content,
+                    max_tokens=4000,
                 )
 
-                # Clear visual feedback since we haven't gotten there yet
-                visual_feedback = None
-                continue  # Retry with syntax feedback
+                raw_response = _extract_response_text(msg, default="")
+                if not raw_response:
+                    logging.error(f"❌ Builder returned empty response on attempt {total_attempts} for {client_id}")
+                    memory.record_failure(
+                        category="builder",
+                        issue="Builder returned empty or malformed response",
+                        fix="Will retry with same inputs",
+                        metadata={"client_id": client_id, "attempt": total_attempts},
+                    )
+                    continue
 
-            # Syntax passed - clear syntax feedback
-            syntax_feedback = None
-            logging.info(f"✅ Syntax check passed on attempt {total_attempts}")
+                # Extract code from response
+                match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
+                if match:
+                    code = match.group(1).strip()
+                else:
+                    logging.warning("⚠️ No code blocks found in Builder response. Using raw output.")
+                    code = raw_response
 
-            # Phase 2: Save and run Visual QA
-            logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
+                # Phase 1: Syntax Check
+                logging.info(f"🔍 Phase 1: Syntax validation (attempt {total_attempts})...")
+                syntax_ok, syntax_error = check_syntax(code, client_id)
 
-            # Save the code atomically
-            if not atomic_write(target_file, code):
-                logging.error(f"Failed to write {target_file}")
-                memory.record_failure(
-                    category="builder",
-                    issue=f"Failed to write page.tsx file: {target_file}",
-                    fix="Check file permissions and disk space",
-                    metadata={"client_id": client_id, "attempt": total_attempts}
-                )
-                continue  # Retry
+                if not syntax_ok:
+                    logging.warning(f"⚠️ Syntax check failed on attempt {total_attempts}")
+                    syntax_feedback = syntax_error
 
-            # Run QA
-            qa_status, qa_report, screenshot_path = run_qa(client_path)
+                    # Record to memory
+                    memory.record_failure(
+                        category="syntax",
+                        issue=f"TypeScript compilation failed: {syntax_error[:300]}",
+                        fix="Will retry with error feedback",
+                        metadata={"client_id": client_id, "attempt": total_attempts}
+                    )
 
-            # Phase 3: Check QA results
-            if qa_status == "PASS":
-                logging.info(f"✅ Visual QA passed on attempt {total_attempts}")
-                final_qa_status = qa_status
-                final_qa_report = qa_report
-                break  # Success! Exit the loop
+                    # Clear visual feedback since we haven't gotten there yet
+                    visual_feedback = None
+                    continue  # Retry with syntax feedback
 
-            elif qa_status == "FAIL":
-                logging.warning(f"⚠️ Visual QA failed on attempt {total_attempts}")
-                visual_feedback = qa_report
+                # Syntax passed - clear syntax feedback
+                syntax_feedback = None
+                logging.info(f"✅ Syntax check passed on attempt {total_attempts}")
 
-                # Record to memory
-                memory.record_failure(
-                    category="visual",
-                    issue=f"Visual QA failed: {qa_report[:300]}",
-                    fix="Will retry with visual feedback",
-                    metadata={"client_id": client_id, "attempt": total_attempts}
-                )
+                # Phase 2: Save and run Visual QA
+                logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
 
-                # If we have screenshot, we could inject it (for future vision-based repair)
-                # For now, we just use the text report
-                final_qa_status = qa_status
-                final_qa_report = qa_report
-                continue  # Retry with visual feedback
+                # Save the code atomically
+                if not atomic_write(target_file, code):
+                    logging.error(f"Failed to write {target_file}")
+                    memory.record_failure(
+                        category="builder",
+                        issue=f"Failed to write page.tsx file: {target_file}",
+                        fix="Check file permissions and disk space",
+                        metadata={"client_id": client_id, "attempt": total_attempts}
+                    )
+                    continue  # Retry
 
-            else:
-                # ERROR or SKIPPED - can't repair, use what we have
-                logging.warning(f"⚠️ QA returned {qa_status} - cannot repair, using current code")
-                final_qa_status = qa_status
-                final_qa_report = qa_report
-                break
+                # Run QA
+                qa_status, qa_report, screenshot_path = run_qa(client_path)
+
+                # Phase 3: Check QA results
+                if qa_status == "PASS":
+                    logging.info(f"✅ Visual QA passed on attempt {total_attempts}")
+                    final_qa_status = qa_status
+                    final_qa_report = qa_report
+                    break  # Success! Exit the loop
+
+                elif qa_status == "FAIL":
+                    logging.warning(f"⚠️ Visual QA failed on attempt {total_attempts}")
+                    visual_feedback = qa_report
+
+                    # Record to memory
+                    memory.record_failure(
+                        category="visual",
+                        issue=f"Visual QA failed: {qa_report[:300]}",
+                        fix="Will retry with visual feedback",
+                        metadata={"client_id": client_id, "attempt": total_attempts}
+                    )
+
+                    # If we have screenshot, we could inject it (for future vision-based repair)
+                    # For now, we just use the text report
+                    final_qa_status = qa_status
+                    final_qa_report = qa_report
+                    continue  # Retry with visual feedback
+
+                else:
+                    # ERROR or SKIPPED - can't repair, use what we have
+                    logging.warning(f"⚠️ QA returned {qa_status} - cannot repair, using current code")
+                    final_qa_status = qa_status
+                    final_qa_report = qa_report
+                    break
+
+        finally:
+            heartbeat_stop.set()
+            heartbeat_thread.join(timeout=2)
 
         # Phase 4: Finalization
         logging.info(f"🏁 Builder completed after {total_attempts} attempts. Final status: {final_qa_status}")
@@ -1484,6 +1557,10 @@ if __name__ == "__main__":
 
         if os.path.exists(WATCH_DIR):
             for client_id in os.listdir(WATCH_DIR):
+                # Skip dotfiles
+                if client_id.startswith("."):
+                    continue
+
                 # Validate client ID to prevent path traversal attacks
                 if not is_valid_client_id(client_id):
                     logging.warning(f"⚠️ Skipping invalid client ID: {client_id}")

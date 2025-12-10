@@ -398,5 +398,245 @@
       "client_id": "demo-hvac",
       "attempt": 6
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:27:07.231925",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmptjz759ab.tsx(201,24): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:28:12.128119",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpj0wgowhj.tsx(278,94): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:28:59.715457",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpxgiundil.tsx(253,60): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:29:42.379018",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpp4rdawhv.tsx(284,57): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:30:37.568862",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpbcnn_nha.tsx(309,58): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:31:20.328932",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp2engsars.tsx(297,20): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:31:22.113009",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpvege4a71.tsx(13,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:32:04.575782",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpgavi7256.tsx(373,71): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:32:05.439650",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpw4u4o9m7.tsx(272,17): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:33:05.242180",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp3wdht2kg.tsx(306,42): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:33:53.834974",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp2imv3xz0.tsx(304,92): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:45:37.478345",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:46:39.244070",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:47:37.936938",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:48:11.936043",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:48:37.063179",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:49:32.181708",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:49:33.436124",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:52:46.317591",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:53:54.937212",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:54:52.796789",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:56:06.170857",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:56:56.103127",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:57:46.905670",
+    "category": "builder",
+    "issue": "Builder returned empty or malformed response",
+    "fix": "Will retry with same inputs",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 6
+    }
   }
 ]
