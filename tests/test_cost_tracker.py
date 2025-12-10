@@ -20,13 +20,9 @@ import pytest
 import json
 import tempfile
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import Mock, patch, mock_open, call
-import sys
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from automation import cost_tracker
 
@@ -76,7 +72,7 @@ class TestLoadConfig:
         """Test load_config when file can't be read"""
         with patch('automation.cost_tracker.CONFIG_PATH') as mock_path:
             mock_path.exists.return_value = True
-            with patch('builtins.open', side_effect=IOError("Permission denied")):
+            with patch('builtins.open', side_effect=OSError("Permission denied")):
                 result = cost_tracker.load_config()
                 
                 assert result == {}
@@ -139,15 +135,17 @@ class TestPricingFor:
             mock_path.exists.return_value = True
             # Load the actual config file
             actual_config_path = Path("automation/tracker_config.json")
-            if actual_config_path.exists():
-                with open(actual_config_path) as f:
-                    cfg = json.load(f)
-                
-                for model_key, pricing in cfg.get("api_pricing", {}).items():
-                    # Each model should have flat pricing structure
-                    assert "input_per_million" in pricing
-                    assert "output_per_million" in pricing
-                    assert "tiered_pricing" not in pricing
+            if not actual_config_path.exists():
+                pytest.fail(f"Config file not found: {actual_config_path}. Cannot verify flat pricing structure.")
+            
+            with open(actual_config_path) as f:
+                cfg = json.load(f)
+            
+            for pricing in cfg.get("api_pricing", {}).values():
+                # Each model should have flat pricing structure
+                assert "input_per_million" in pricing
+                assert "output_per_million" in pricing
+                assert "tiered_pricing" not in pricing
 
 
 class TestEstimateTokens:
@@ -191,7 +189,7 @@ class TestRecordApiCost:
     @pytest.fixture
     def mock_time(self):
         """Mock datetime for consistent timestamps"""
-        fixed_time = datetime(2025, 1, 15, 10, 30, 0)
+        fixed_time = datetime(2025, 1, 15, 10, 30, 0, tzinfo=timezone.utc)
         with patch('automation.cost_tracker.datetime') as mock_dt:
             mock_dt.utcnow.return_value = fixed_time
             yield mock_dt
@@ -512,7 +510,7 @@ class TestRecordHostingCosts:
              patch('automation.cost_tracker._append_entry') as mock_append, \
              patch('automation.cost_tracker.datetime') as mock_dt:
             
-            mock_dt.utcnow.return_value = datetime(2025, 3, 15)
+            mock_dt.utcnow.return_value = datetime(2025, 3, 15, tzinfo=timezone.utc)
             
             result = cost_tracker.record_hosting_costs(["client-1"])
             

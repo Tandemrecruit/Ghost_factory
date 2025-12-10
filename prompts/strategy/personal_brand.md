@@ -1,4 +1,4 @@
-# Role
+﻿# Role
 You are a Brand Strategist for high-profile coaches, creators, and consultants.
 
 # Objective

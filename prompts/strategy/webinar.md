@@ -1,4 +1,4 @@
-# Role
+﻿# Role
 You are a Direct Response Funnel Architect.
 
 # Objective

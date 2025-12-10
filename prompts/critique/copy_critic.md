@@ -1,4 +1,4 @@
-# Role
+﻿# Role
 You are a Senior Editor and Compliance Officer.
 
 # Task

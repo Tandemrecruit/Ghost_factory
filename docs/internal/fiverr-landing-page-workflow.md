@@ -1,4 +1,4 @@
-# Fiverr Landing Page Workflow (Internal)
+﻿# Fiverr Landing Page Workflow (Internal)
 
 > Internal use only. This doc connects Fiverr orders to the Ghost Factory pipeline. Never paste this file into Fiverr. Use it as a checklist.
 
@@ -9,25 +9,25 @@
 Public offer: I design clean, modern, conversion-focused landing pages for solo founders, small businesses, and early-stage products.
 
 - Platforms: Primarily modern web (Next.js / React) hosted on my stack (e.g., Vercel) with shareable links and visual deliverables.
-- Client experience: Simple process, clear communication, and 1–3 rounds of structured revisions depending on package.
-- Public language: “custom workflow,” “proven layout patterns,” “template library” – no references to AI or automation.
+- Client experience: Simple process, clear communication, and 1â€“3 rounds of structured revisions depending on package.
+- Public language: â€œcustom workflow,â€ â€œproven layout patterns,â€ â€œtemplate libraryâ€ â€“ no references to AI or automation.
 
 ---
 
-## 2. Package Mapping (Fiverr → Internal Deliverables)
+## 2. Package Mapping (Fiverr â†’ Internal Deliverables)
 
 ### Basic Package (Starter)
 
-- Working name: “Launch-Ready Starter Section”
+- Working name: â€œLaunch-Ready Starter Sectionâ€
 - Public promise:
   - One-page layout with up to **3 sections**:
     - Hero
-    - Short “How it helps” feature section
+    - Short â€œHow it helpsâ€ feature section
     - Simple CTA or contact section
 - Internal deliverables:
   - `intake.md` (light, but still structured)
   - `brief.md` (short; focused on one core promise)
-  - `content.md` (hero + 1–2 sections)
+  - `content.md` (hero + 1â€“2 sections)
   - Page built using a small subset of components (e.g., `HeroSimple`, `FeatureGrid` or `FeatureSteps`, `CtaBanner`).
 - Client-facing deliverables:
   - One live preview link (my hosting)
@@ -39,7 +39,7 @@ Public offer: I design clean, modern, conversion-focused landing pages for solo 
 
 ### Standard Package (Full Landing Page)
 
-- Working name: “Conversion-Focused Landing Page”
+- Working name: â€œConversion-Focused Landing Pageâ€
 - Public promise:
   - Full landing page with up to **6 sections**:
     - Hero
@@ -61,7 +61,7 @@ Public offer: I design clean, modern, conversion-focused landing pages for solo 
 
 ### Premium Package (Landing Page + Simple Form)
 
-- Working name: “Landing Page + Lead Capture”
+- Working name: â€œLanding Page + Lead Captureâ€
 - Public promise:
   - Everything in Standard, plus:
     - Simple, working contact or opt-in form:
@@ -81,7 +81,7 @@ Public offer: I design clean, modern, conversion-focused landing pages for solo 
 
 ## 3. Order-to-Delivery Checklist
 
-### Step 1 – Pre-Order Communication (Optional but Ideal)
+### Step 1 â€“ Pre-Order Communication (Optional but Ideal)
 
 - Ask the potential client:
   - What is your offer?
@@ -92,7 +92,7 @@ Public offer: I design clean, modern, conversion-focused landing pages for solo 
   - Which package fits them best.
   - That you build clean, modern landing pages and you are not doing complex apps or full websites.
 
-### Step 2 – When an Order Comes In
+### Step 2 â€“ When an Order Comes In
 
 1. Create a new `client-id`
    - Simple format: `client-YYYYMMDD-shortname`
@@ -110,7 +110,7 @@ Public offer: I design clean, modern, conversion-focused landing pages for solo 
    - Client messages
    - Any attachments they upload
 
-### Step 3 – Intake Structure (intake.md)
+### Step 3 â€“ Intake Structure (intake.md)
 
 Keep `intake.md` simple and predictable:
 
@@ -126,12 +126,12 @@ Keep `intake.md` simple and predictable:
 
 This file is the single source of truth for the rest of the pipeline.
 
-### Step 4 – Brief and Content
+### Step 4 â€“ Brief and Content
 
 1. **Brief (`brief.md`)**
    - Turn `intake.md` into:
      - One clear main promise
-     - 3–5 key benefits
+     - 3â€“5 key benefits
      - Suggested section order
      - Notes on tone and angle
 
@@ -145,7 +145,7 @@ This file is the single source of truth for the rest of the pipeline.
 
 Use whatever AI tools and prompts you want internally, then edit for clarity and fit.
 
-### Step 5 – Build the Page
+### Step 5 â€“ Build the Page
 
 1. Run dev server:
    - From repo root, standard flow:
@@ -161,7 +161,7 @@ Use whatever AI tools and prompts you want internally, then edit for clarity and
 
 3. Save the page under the appropriate route using the current project structure (for example, under `app/clients/[clientId]/`).
 
-### Step 6 – QA Checklist
+### Step 6 â€“ QA Checklist
 
 Before you send anything to the client, check:
 
@@ -173,19 +173,19 @@ Before you send anything to the client, check:
   - No obvious typos.
   - The main promise is clear above the fold.
 - Flow:
-  - The sections follow a logical story from problem → solution → proof → action.
+  - The sections follow a logical story from problem â†’ solution â†’ proof â†’ action.
 - Links:
-  - All CTAs go to the right place (or placeholder link if client hasn’t decided yet, with a note explaining it).
+  - All CTAs go to the right place (or placeholder link if client hasnâ€™t decided yet, with a note explaining it).
 
 If something feels off, fix it here rather than waiting for the client to point it out.
 
-### Step 7 – Packaging & Delivery
+### Step 7 â€“ Packaging & Delivery
 
 Baseline approach (adjust package by package):
 
 - Provide:
   - A live preview link (hosted on my stack).
-  - 1–3 screenshots (including full-page or sectional scrollshots).
+  - 1â€“3 screenshots (including full-page or sectional scrollshots).
   - A short message describing:
     - The main goal of the page.
     - The sections included.
@@ -224,13 +224,13 @@ Because I work two jobs and have limited hours:
 
 - I set **generous public delivery times** (5 / 7 / 10 days).
 - Internally, I aim to:
-  - Draft the page within 1–2 focused sessions.
-  - Leave at least 1–2 days of buffer before the Fiverr deadline.
+  - Draft the page within 1â€“2 focused sessions.
+  - Leave at least 1â€“2 days of buffer before the Fiverr deadline.
 - I track:
   - Actual hours spent per project to understand my real hourly rate.
   - Where the time goes (intake, copy, build, QA, revisions).
 
 If a client is slow to respond or unclear:
 
-- Ask 1–2 clear follow-up questions.
+- Ask 1â€“2 clear follow-up questions.
 - If needed, propose a direction and move forward rather than waiting forever.

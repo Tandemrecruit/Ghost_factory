@@ -1,15 +1,15 @@
-# Project Brief: Ember Roasters
+﻿# Project Brief: Ember Roasters
 
 ## Overview
 
 **Client:** Ember Roasters
 **Tagline:** "Coffee Worth Waking Up For"
 **Location:** Portland, Oregon
-**Industry:** Coffee Roastery — Direct-to-Consumer
+**Industry:** Coffee Roastery â€” Direct-to-Consumer
 
 Ember Roasters is a Portland-based specialty coffee roaster focused on small-batch, ultra-fresh coffee delivered directly to consumers. Their primary business model centers on monthly subscription boxes, with secondary revenue from one-time bag purchases.
 
-**Target Audience:** Quality-conscious coffee enthusiasts aged 28–45 who have invested in home brewing equipment (pour-over, espresso) and prioritize freshness and sourcing over price. These are not casual coffee drinkers—they understand and appreciate the difference that roast dates and origin make.
+**Target Audience:** Quality-conscious coffee enthusiasts aged 28â€“45 who have invested in home brewing equipment (pour-over, espresso) and prioritize freshness and sourcing over price. These are not casual coffee drinkersâ€”they understand and appreciate the difference that roast dates and origin make.
 
 **Brand Voice:** Warm, artisan, unpretentious, quality-obsessed
 
@@ -26,9 +26,9 @@ Ember Roasters is a Portland-based specialty coffee roaster focused on small-bat
 
 | Role | Color | Hex |
 |------|-------|-----|
-| Primary | Deep Burgundy/Maroon | TBD — suggest #722F37 |
-| Secondary | Cream/Off-White | TBD — suggest #F5F1EB |
-| Accent | Burnt Orange | TBD — suggest #CC5500 |
+| Primary | Deep Burgundy/Maroon | TBD â€” suggest #722F37 |
+| Secondary | Cream/Off-White | TBD â€” suggest #F5F1EB |
+| Accent | Burnt Orange | TBD â€” suggest #CC5500 |
 
 *Note: Exact hex values to be confirmed once logo/brand assets are received.*
 
@@ -38,15 +38,15 @@ Ember Roasters is a Portland-based specialty coffee roaster focused on small-bat
 
 ```
 Homepage (Single Landing Page)
-├── Hero Section
-├── Features / Benefits
-├── How It Works (Subscription Process)
-├── Sourcing Story (About the Farmers)
-├── Pricing Section (3 Tiers)
-├── Press / Media Mentions
-├── Testimonials
-├── FAQ
-└── Footer (with Secondary CTA)
+â”œâ”€â”€ Hero Section
+â”œâ”€â”€ Features / Benefits
+â”œâ”€â”€ How It Works (Subscription Process)
+â”œâ”€â”€ Sourcing Story (About the Farmers)
+â”œâ”€â”€ Pricing Section (3 Tiers)
+â”œâ”€â”€ Press / Media Mentions
+â”œâ”€â”€ Testimonials
+â”œâ”€â”€ FAQ
+â””â”€â”€ Footer (with Secondary CTA)
 ```
 
 *This is a single-page layout optimized for conversion, guiding visitors from awareness through to subscription sign-up.*
@@ -71,20 +71,20 @@ Homepage (Single Landing Page)
 
 ### How It Works
 - **Purpose:** Reduce friction by showing simplicity
-- **Content:** 3-step process (Choose → Receive → Enjoy)
+- **Content:** 3-step process (Choose â†’ Receive â†’ Enjoy)
 - **Format:** Numbered steps with simple illustrations
 
 ### Sourcing Story
 - **Purpose:** Build trust and emotional connection; justify premium pricing
 - **Content:** Brief narrative about direct farmer relationships; origin highlights
-- **Tone:** Authentic and unpretentious—avoid "third wave" jargon
+- **Tone:** Authentic and unpretentiousâ€”avoid "third wave" jargon
 
 ### Pricing Section
 - **Purpose:** Present clear options, highlight value, drive conversion
 - **Tiers:**
-  - **Explorer** — $24/mo (entry point)
-  - **Enthusiast** — $42/mo (most popular—consider visual emphasis)
-  - **Obsessed** — $72/mo (power users)
+  - **Explorer** â€” $24/mo (entry point)
+  - **Enthusiast** â€” $42/mo (most popularâ€”consider visual emphasis)
+  - **Obsessed** â€” $72/mo (power users)
 - **Reassurances to integrate:**
   - "About $0.50 per cup"
   - "Pause or cancel anytime"
@@ -133,12 +133,12 @@ Homepage (Single Landing Page)
 
 ## Strategic Notes
 
-1. **Avoid elitism:** The brand voice is "unpretentious"—copy should feel welcoming, not exclusive. Think neighborhood roaster, not coffee snob.
+1. **Avoid elitism:** The brand voice is "unpretentious"â€”copy should feel welcoming, not exclusive. Think neighborhood roaster, not coffee snob.
 
 2. **Lead with freshness:** The roast-date guarantee is a key differentiator. Make it visible and concrete.
 
 3. **Price anchoring:** Position the per-cup cost ($0.50) early to reframe the subscription price against daily coffee shop spending.
 
-4. **Low-risk entry:** The satisfaction guarantee and flexible cancellation are powerful objection-busters—feature them prominently near CTAs.
+4. **Low-risk entry:** The satisfaction guarantee and flexible cancellation are powerful objection-bustersâ€”feature them prominently near CTAs.
 
 5. **No false urgency:** Per client instructions, avoid countdown timers or artificial scarcity. The value proposition should stand on its own.

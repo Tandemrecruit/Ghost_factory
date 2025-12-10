@@ -1,4 +1,4 @@
-# Ghost Factory
+﻿# Ghost Factory
 
 Automated landing page generation service using Next.js 15, React 18, and Tailwind CSS.
 
@@ -16,54 +16,54 @@ Ghost Factory automates the creation of high-converting landing pages. The syste
 
 ## Project Structure
 
-```
+```text
 ghost-factory/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Home page
-│   ├── globals.css         # Global styles & Tailwind
-│   ├── dashboard/          # Internal dashboard
-│   └── clients/
-│       └── [clientId]/     # Dynamic client pages
-├── automation/             # Python automation pipeline
-│   ├── factory.py          # Main orchestrator
-│   ├── cost_tracker.py     # API cost tracking
-│   ├── time_tracker.py     # Time logging
-│   ├── revenue_tracker.py  # Revenue tracking
-│   ├── intake_sanitizer.py # Input sanitization
-│   ├── schema_validator.py # Data validation
-│   └── ...                 # Additional utilities
-├── clients/                # Client data (watched by factory)
-│   └── [client-id]/
-│       ├── intake.md       # Input brief
-│       ├── brief.md        # Generated strategy
-│       ├── content.md      # Generated copy
-│       └── assets/         # Client images
-├── components/             # Reusable UI components (23 total)
-├── data/                   # Runtime data storage
-│   ├── costs/              # API cost logs
-│   ├── time_logs/          # Time tracking data
-│   └── memory/             # Agent memory storage
-├── design-system/
-│   └── manifest.md         # Component API reference
-├── docs/                   # Documentation
-│   ├── business/           # Business policies & offers
-│   ├── internal/           # Technical guides
-│   └── operations/         # SOPs & checklists
-├── lib/                    # TypeScript utilities
-│   ├── utils.ts            # cn() helper
-│   ├── icons.tsx           # Icon mapping
-│   ├── metrics.ts          # Analytics tracking
-│   ├── schema-validator.ts # Runtime validation
-│   └── ...                 # Additional utilities
-├── prompts/                # AI agent prompts
-│   ├── strategy/           # Industry-specific strategies
-│   ├── critique/           # Review agent prompts
-│   └── design/             # Design generation prompts
-├── tests/                  # Test suites
-│   ├── *.py                # Python tests (pytest)
-│   └── ts/                 # TypeScript tests (vitest)
-└── templates/              # Page templates
+â”œâ”€â”€ app/                    # Next.js App Router
+â”‚   â”œâ”€â”€ layout.tsx          # Root layout
+â”‚   â”œâ”€â”€ page.tsx            # Home page
+â”‚   â”œâ”€â”€ globals.css         # Global styles & Tailwind
+â”‚   â”œâ”€â”€ dashboard/          # Internal dashboard
+â”‚   â””â”€â”€ clients/
+â”‚       â””â”€â”€ [clientId]/     # Dynamic client pages
+â”œâ”€â”€ automation/             # Python automation pipeline
+â”‚   â”œâ”€â”€ factory.py          # Main orchestrator
+â”‚   â”œâ”€â”€ cost_tracker.py     # API cost tracking
+â”‚   â”œâ”€â”€ time_tracker.py     # Time logging
+â”‚   â”œâ”€â”€ revenue_tracker.py  # Revenue tracking
+â”‚   â”œâ”€â”€ intake_sanitizer.py # Input sanitization
+â”‚   â”œâ”€â”€ schema_validator.py # Data validation
+â”‚   â””â”€â”€ ...                 # Additional utilities
+â”œâ”€â”€ clients/                # Client data (watched by factory)
+â”‚   â””â”€â”€ [client-id]/
+â”‚       â”œâ”€â”€ intake.md       # Input brief
+â”‚       â”œâ”€â”€ brief.md        # Generated strategy
+â”‚       â”œâ”€â”€ content.md      # Generated copy
+â”‚       â””â”€â”€ assets/         # Client images
+â”œâ”€â”€ components/             # Reusable UI components (23 total)
+â”œâ”€â”€ data/                   # Runtime data storage
+â”‚   â”œâ”€â”€ costs/              # API cost logs
+â”‚   â”œâ”€â”€ time_logs/          # Time tracking data
+â”‚   â””â”€â”€ memory/             # Agent memory storage
+â”œâ”€â”€ design-system/
+â”‚   â””â”€â”€ manifest.md         # Component API reference
+â”œâ”€â”€ docs/                   # Documentation
+â”‚   â”œâ”€â”€ business/           # Business policies & offers
+â”‚   â”œâ”€â”€ internal/           # Technical guides
+â”‚   â””â”€â”€ operations/         # SOPs & checklists
+â”œâ”€â”€ lib/                    # TypeScript utilities
+â”‚   â”œâ”€â”€ utils.ts            # cn() helper
+â”‚   â”œâ”€â”€ icons.tsx           # Icon mapping
+â”‚   â”œâ”€â”€ metrics.ts          # Analytics tracking
+â”‚   â”œâ”€â”€ schema-validator.ts # Runtime validation
+â”‚   â””â”€â”€ ...                 # Additional utilities
+â”œâ”€â”€ prompts/                # AI agent prompts
+â”‚   â”œâ”€â”€ strategy/           # Industry-specific strategies
+â”‚   â”œâ”€â”€ critique/           # Review agent prompts
+â”‚   â””â”€â”€ design/             # Design generation prompts
+â”œâ”€â”€ tests/                  # Test suites
+â”‚   â”œâ”€â”€ *.py                # Python tests (pytest)
+â”‚   â””â”€â”€ ts/                 # TypeScript tests (vitest)
+â””â”€â”€ templates/              # Page templates
 ```
 
 ## Getting Started
@@ -79,6 +79,9 @@ ghost-factory/
 ```bash
 # Install Node.js dependencies
 npm install
+
+# Install Python package in editable mode (required for tests)
+pip install -e .
 
 # Install Python dependencies
 pip install -r requirements.txt

@@ -1,4 +1,4 @@
-# Client Overview
+﻿# Client Overview
 - Business Name: Ember Roasters
 - Tagline: "Coffee Worth Waking Up For"
 - Location: Portland, Oregon
@@ -6,12 +6,12 @@
 - Current Website (if any): Not provided (Instagram: @emberroasterspdx)
 - Primary Offer: Monthly coffee subscription boxes
 - Secondary Offer(s): One-time bag purchases
-- Ideal Customer: 28–45-year-olds who value quality coffee, have a nice home brewing setup (pour-over or espresso), and are willing to pay more for quality; not the Folgers crowd
-- Brand Voice (3–5 words): warm, artisan, unpretentious, quality-obsessed
+- Ideal Customer: 28â€“45-year-olds who value quality coffee, have a nice home brewing setup (pour-over or espresso), and are willing to pay more for quality; not the Folgers crowd
+- Brand Voice (3â€“5 words): warm, artisan, unpretentious, quality-obsessed
 - Main Goal of This Page: Sell subscriptions (primary); drive one-time purchases (secondary)
 
 # Core Messaging
-- Core Promise (1–2 sentences):
+- Core Promise (1â€“2 sentences):
   Ultra-fresh, small-batch coffee delivered to your door each month, roasted weekly and sourced directly from farmers. Every bag shows a roast date, and subscriptions include free shipping.
 - Top 3 Benefits:
   - Fresh weekly roasts
@@ -51,7 +51,7 @@
 - Social Proof / Testimonials: Not provided
 - Competitors / Inspiration URLs: Not provided
 - Service Area / Locations: United States
-- Pricing Strategy (starting price / range / “contact us”): Starting price $24/mo; tiers: Explorer $24/mo; Enthusiast $42/mo; Obsessed $72/mo; Free shipping on subscriptions
+- Pricing Strategy (starting price / range / â€œcontact usâ€): Starting price $24/mo; tiers: Explorer $24/mo; Enthusiast $42/mo; Obsessed $72/mo; Free shipping on subscriptions
 - Legal / Compliance Notes: Mention the satisfaction guarantee
 
 # Project Logistics

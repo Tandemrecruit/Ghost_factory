@@ -1,4 +1,4 @@
-# Ghost Factory – Agent Rules for Coding Assistants
+﻿# Ghost Factory â€“ Agent Rules for Coding Assistants
 
 **Version:** 1.0
 **Last Updated:** 2025-12-10
@@ -9,14 +9,14 @@
 
 ---
 
-## 1. Scope Reminder – v1.0
+## 1. Scope Reminder â€“ v1.0
 
 **You are working on Ghost Factory v1.0.**
 
 Your job is to help make the **single demo client pipeline** work end-to-end:
 
-```
-intake-raw.md → intake.md → brief.md → content.md → page.tsx → rendered page
+```text
+intake-raw.md â†’ intake.md â†’ brief.md â†’ content.md â†’ page.tsx â†’ rendered page
 ```
 
 ### You ARE Here To
@@ -59,38 +59,38 @@ If asked about these features, say: **"This is out of scope for v1.0."**
 
 ### v1.0 Pipeline Summary
 
-```
+```text
 1. intake-raw.md       (manual: human copies from Google Sheets)
-        ↓
+        â†“
 2. intake_sanitizer.py (GPT-5 Nano normalizes to fixed schema)
-        ↓
+        â†“
 3. intake.md           (canonical input for all stages)
-        ↓
-4. run_architect()     (Router → Strategist → Strategy Critic → brief.md)
-   └── Visual Designer (parallel: theme.json)
-        ↓
-5. run_copywriter()    (Copywriter → Copy Critic → content.md)
-        ↓
-6. run_builder()       (Builder → Syntax Check → page.tsx)
-        ↓
-7. run_qa()            (Server check → page renders)
-        ↓
-8. finalize_client()   (rename intake.md → intake-processed.md)
+        â†“
+4. run_architect()     (Router â†’ Strategist â†’ Strategy Critic â†’ brief.md)
+   â””â”€â”€ Visual Designer (parallel: theme.json)
+        â†“
+5. run_copywriter()    (Copywriter â†’ Copy Critic â†’ content.md)
+        â†“
+6. run_builder()       (Builder â†’ Syntax Check â†’ page.tsx)
+        â†“
+7. run_qa()            (Server check â†’ page renders)
+        â†“
+8. finalize_client()   (rename intake.md â†’ intake-processed.md)
 ```
 
 ### Client Directory Structure
 
-```
+```text
 clients/demo-hvac/
-├── intake-raw.md       # Raw form answers (input)
-├── intake.md           # Sanitized intake (generated)
-├── intake-source.md    # Archived original (generated)
-├── brief.md            # Strategy brief (generated)
-├── brief.orig.md       # Original AI output (generated)
-├── content.md          # Website copy (generated)
-├── content.orig.md     # Original AI output (generated)
-├── theme.json          # Color/font theme (generated)
-└── assets/             # Client images (optional)
+â”œâ”€â”€ intake-raw.md       # Raw form answers (input)
+â”œâ”€â”€ intake.md           # Sanitized intake (generated)
+â”œâ”€â”€ intake-source.md    # Archived original (generated)
+â”œâ”€â”€ brief.md            # Strategy brief (generated)
+â”œâ”€â”€ brief.orig.md       # Original AI output (generated)
+â”œâ”€â”€ content.md          # Website copy (generated)
+â”œâ”€â”€ content.orig.md     # Original AI output (generated)
+â”œâ”€â”€ theme.json          # Color/font theme (generated)
+â””â”€â”€ assets/             # Client images (optional)
 ```
 
 ---
@@ -230,7 +230,7 @@ If you find that:
 
 ### Example Response
 
-```
+```text
 I noticed that the README mentions "intake.md is renamed to intake-processed.md
 at the end of the pipeline," but factory.py:finalize_client() currently does this.
 I'll proceed with the code's behavior. Should I update the README to clarify this?
@@ -252,21 +252,27 @@ When requirements are unclear:
 After any change, verify:
 
 1. **Intake sanitization works:**
+
    ```bash
    python automation/intake_sanitizer.py clients/demo-hvac/intake-raw.md
    ```
+
    - Should produce `intake.md` and `intake-source.md`
 
 2. **Pipeline completes:**
+
    ```bash
    python automation/factory.py
    ```
+
    - Should process `demo-hvac` without unhandled exceptions
 
 3. **Dev server starts:**
+
    ```bash
    npm run dev
    ```
+
    - Should start without errors
 
 4. **Page renders:**
@@ -280,7 +286,7 @@ After any change, verify:
 
 Copy this snippet when prompting any AI coding assistant:
 
-```
+```text
 You are working on Ghost Factory v1.0.
 
 GOAL: Make the single demo client pipeline work from intake-raw.md to a rendered page.
@@ -306,10 +312,10 @@ If you encounter conflicts between docs and code, assume code is correct.
 
 ## Quick Reference Card
 
-```
+```text
 v1.0 SCOPE
 ----------
-YES: Single client (demo-hvac), intake→brief→content→page, basic QA
+YES: Single client (demo-hvac), intakeâ†’briefâ†’contentâ†’page, basic QA
 NO:  Multi-client, analytics, A/B tests, dashboards, notifications
 
 KEY FILES
@@ -324,7 +330,7 @@ Sanitizer:         automation/intake_sanitizer.py
 CONFLICT RESOLUTION
 -------------------
 Priority: Repo Files > Memory > External Context
-If docs ≠ code: Trust the code, suggest doc update
+If docs â‰  code: Trust the code, suggest doc update
 
 TESTING
 -------
