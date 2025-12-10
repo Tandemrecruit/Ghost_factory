@@ -6,6 +6,8 @@ export interface HeroSimpleProps {
   subhead: string
   primaryCtaLabel: string
   primaryCtaHref: string
+  /** Block ID for metrics tracking - defaults to 'hero_simple_v1' */
+  blockId?: string
   className?: string
 }
 
@@ -14,10 +16,12 @@ export function HeroSimple({
   subhead,
   primaryCtaLabel,
   primaryCtaHref,
+  blockId = 'hero_simple_v1',
   className,
 }: HeroSimpleProps) {
   return (
     <section
+      data-gf-block={blockId}
       className={cn(
         'flex min-h-[70vh] flex-col items-center justify-center px-4 py-20 text-center',
         className
@@ -33,6 +37,7 @@ export function HeroSimple({
         <Link
           href={primaryCtaHref}
           className="btn-primary inline-flex items-center gap-2 text-lg"
+          data-gf-cta="primary"
         >
           {primaryCtaLabel}
         </Link>

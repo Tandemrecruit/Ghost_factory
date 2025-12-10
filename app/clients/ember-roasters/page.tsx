@@ -363,3 +363,6 @@ export default function Home() {
         ]}
         copyrightText="© 2024 Ember Roasters. Portland, Oregon."
       />
+    </>
+  );
+}

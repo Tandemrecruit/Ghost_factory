@@ -10,6 +10,8 @@ export interface CtaBannerProps {
   secondaryCtaLabel?: string
   secondaryCtaHref?: string
   background?: 'primary' | 'dark' | 'gradient'
+  /** Block ID for metrics tracking - defaults to 'cta_banner_v1' */
+  blockId?: string
   className?: string
 }
 
@@ -22,6 +24,7 @@ export function CtaBanner({
   secondaryCtaLabel,
   secondaryCtaHref,
   background = 'primary',
+  blockId = 'cta_banner_v1',
   className,
 }: CtaBannerProps) {
   const backgroundClasses = {
@@ -32,6 +35,7 @@ export function CtaBanner({
 
   return (
     <section
+      data-gf-block={blockId}
       className={cn(
         'py-16 md:py-20',
         backgroundClasses[background],
@@ -57,6 +61,7 @@ export function CtaBanner({
             <Link
               href={primaryCtaHref}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-8 py-4 font-semibold text-primary shadow-lg transition-all duration-200 hover:bg-white/90"
+              data-gf-cta="primary"
             >
               {primaryCtaLabel}
             </Link>

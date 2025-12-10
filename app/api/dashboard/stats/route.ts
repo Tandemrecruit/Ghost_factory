@@ -59,25 +59,28 @@ async function computeFallback(month: string) {
   const processingRate = cfg.payment_processing_rate ?? 0.03;
   const timeEntries = await loadTimeEntries(month);
   
-  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`));
+  type RevenueRecord = { amount_usd?: number };
+  type CostRecord = { provider?: string; cost_usd?: number; type?: string };
+
+  const revenueEntries = await readJson(path.join(revenueDir, `${month}.json`)) as RevenueRecord[];
   const revenueValidation = validateRevenueEntries(revenueEntries);
   if (!revenueValidation.valid) {
     console.warn(`[Schema Validation] Invalid revenue entries for ${month}:`, revenueValidation.errors);
   }
-  
-  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`));
+
+  const apiCosts = await readJson(path.join(costApiDir, `${month}.json`)) as CostRecord[];
   const apiValidation = validateCostEntries(apiCosts, "api");
   if (!apiValidation.valid) {
     console.warn(`[Schema Validation] Invalid API cost entries for ${month}:`, apiValidation.errors);
   }
-  
-  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`));
+
+  const hostingCosts = await readJson(path.join(costHostingDir, `${month}.json`)) as CostRecord[];
   const hostingValidation = validateCostEntries(hostingCosts, "hosting");
   if (!hostingValidation.valid) {
     console.warn(`[Schema Validation] Invalid hosting cost entries for ${month}:`, hostingValidation.errors);
   }
-  
-  const costEntries = [...apiCosts, ...hostingCosts];
+
+  const costEntries: CostRecord[] = [...apiCosts, ...hostingCosts];
 
   // Type coercion with null checks
   const totalSeconds = timeEntries.reduce((sum, e) => {
@@ -90,19 +93,19 @@ async function computeFallback(month: string) {
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
-  const revenueTotal = revenueEntries.reduce((sum, e) => {
+  const revenueTotal = revenueEntries.reduce((sum: number, e) => {
     const val = Number(e?.amount_usd) || 0;
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
   const apiCostTotal = costEntries
     .filter((e) => e?.provider)
-    .reduce((sum, e) => {
+    .reduce((sum: number, e) => {
       const val = Number(e?.cost_usd) || 0;
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
   const hostingCostTotal = costEntries
     .filter((e) => e?.type === "hosting")
-    .reduce((sum, e) => {
+    .reduce((sum: number, e) => {
       const val = Number(e?.cost_usd) || 0;
       return sum + (isNaN(val) ? 0 : val);
     }, 0);

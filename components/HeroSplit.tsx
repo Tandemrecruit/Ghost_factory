@@ -13,6 +13,8 @@ export interface HeroSplitProps {
   primaryCtaLabel: string
   primaryCtaHref: string
   imagePosition?: 'left' | 'right'
+  /** Block ID for metrics tracking - defaults to 'hero_split_v1' */
+  blockId?: string
   className?: string
 }
 
@@ -24,12 +26,13 @@ export function HeroSplit({
   primaryCtaLabel,
   primaryCtaHref,
   imagePosition = 'right',
+  blockId = 'hero_split_v1',
   className,
 }: HeroSplitProps) {
   const [imageError, setImageError] = useState(false)
 
   return (
-    <section className={cn('py-16 md:py-20 lg:py-24', className)}>
+    <section data-gf-block={blockId} className={cn('py-16 md:py-20 lg:py-24', className)}>
       <div className="container-wide">
         <div
           className={cn(
@@ -48,6 +51,7 @@ export function HeroSplit({
             <Link
               href={primaryCtaHref}
               className="btn-primary inline-flex items-center gap-2 text-lg"
+              data-gf-cta="primary"
             >
               {primaryCtaLabel}
             </Link>

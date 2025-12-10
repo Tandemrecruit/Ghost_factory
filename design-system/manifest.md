@@ -90,3 +90,71 @@
 6. **Responsive**: All components are mobile-responsive by default. No additional props needed for responsive behavior.
 
 7. **Total Components Available**: 22 components across 10 categories. Do NOT invent new components - use only what is listed in this manifest.
+
+---
+
+## Metrics Tracking (blockId & data attributes)
+
+### Block ID Convention
+
+Key performance-sensitive components support an optional `blockId` prop for metrics tracking:
+
+| Component | Default blockId | Description |
+|-----------|-----------------|-------------|
+| `HeroSimple` | `hero_simple_v1` | Centered hero section |
+| `HeroSplit` | `hero_split_v1` | Two-column hero with image |
+| `PricingSimple` | `pricing_simple_v1` | Single pricing plan |
+| `CtaBanner` | `cta_banner_v1` | Call-to-action banner |
+
+**Usage:**
+```tsx
+<HeroSimple blockId="hero_main" ... />  // Custom ID
+<HeroSimple ... />                       // Uses default 'hero_simple_v1'
+```
+
+**Override Examples (for A/B tests):**
+```tsx
+<HeroSimple blockId="hero_simple_v1_variant_b" ... />
+<PricingSimple blockId="pricing_urgency_test" ... />
+```
+
+### Data Attributes (Automatic)
+
+These components automatically render with:
+
+- `data-gf-block="{blockId}"` on the root section element
+- `data-gf-cta="primary"` on primary CTA buttons/links
+
+### Manual Tracking Attributes
+
+For custom components or overrides, use these data attributes:
+
+| Attribute | Purpose | Example |
+|-----------|---------|---------|
+| `data-gf-block="block_id"` | Identifies which block fired an event | `<section data-gf-block="custom_hero">` |
+| `data-gf-cta="primary"` | Track CTA clicks | `<button data-gf-cta="primary">` |
+| `data-gf-cta-label="text"` | Override CTA label in metrics | `<button data-gf-cta-label="Book Now">` |
+| `data-gf-conversion="primary"` | Track conversions (forms, final CTAs) | `<form data-gf-conversion="primary">` |
+
+### MetricsProvider Wrapper
+
+For client pages, wrap content with `MetricsProvider` to enable tracking:
+
+```tsx
+import { MetricsProvider } from '@/components'
+
+export default async function Page({ params }) {
+  const { clientId } = await params
+  const metricsEnabled = process.env.GF_METRICS_ENABLED === 'true'
+
+  return (
+    <MetricsProvider clientId={clientId} enabled={metricsEnabled}>
+      <HeroSimple ... />
+      <FeatureGrid ... />
+      <CtaBanner ... />
+    </MetricsProvider>
+  )
+}
+```
+
+**Note:** The automation pipeline should use default `blockId` values unless running A/B tests or needing custom tracking.

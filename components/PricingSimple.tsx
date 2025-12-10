@@ -12,6 +12,8 @@ export interface PricingSimpleProps {
   ctaLabel: string
   ctaHref: string
   guaranteeText?: string
+  /** Block ID for metrics tracking - defaults to 'pricing_simple_v1' */
+  blockId?: string
   className?: string
 }
 
@@ -25,6 +27,7 @@ export function PricingSimple({
   ctaLabel,
   ctaHref,
   guaranteeText,
+  blockId = 'pricing_simple_v1',
   className,
 }: PricingSimpleProps) {
   const periodLabel = {
@@ -34,7 +37,7 @@ export function PricingSimple({
   }
 
   return (
-    <section className={cn('section-padding', className)}>
+    <section data-gf-block={blockId} className={cn('section-padding', className)}>
       <div className="container-narrow">
         <div className="mx-auto max-w-lg rounded-2xl border border-border bg-background p-8 shadow-xl md:p-10">
           {/* Header */}
@@ -76,6 +79,7 @@ export function PricingSimple({
           <Link
             href={ctaHref}
             className="btn-primary block w-full text-center text-lg"
+            data-gf-cta="primary"
           >
             {ctaLabel}
           </Link>
