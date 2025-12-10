@@ -64,9 +64,20 @@ def _log_aligned(level: str, emoji: str, label: str, message: str):
         label: Fixed-width label (padded to 20 chars)
         message: The actual log message content
     """
+    # Normalize emoji spacing (strip trailing spaces, function will add space)
+    emoji_clean = emoji.strip()
+    
     # Pad label to 20 characters for consistent alignment
     padded_label = f"{label:<20}"
-    formatted_message = f"{emoji} {padded_label} {message}"
+    
+    # Prevent line wrapping: truncate message if too long
+    # Account for: emoji (2-3 chars) + space (1) + label (20) + space (1) = ~25 chars overhead
+    # Target max width: 120 chars, so message max: ~95 chars
+    max_message_width = 95
+    if len(message) > max_message_width:
+        message = message[:max_message_width - 3] + "..."
+    
+    formatted_message = f"{emoji_clean} {padded_label} {message}"
     
     log_func = getattr(logging, level.lower(), logging.info)
     log_func(formatted_message)
@@ -220,7 +231,7 @@ def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwar
             sleep = min(5 * attempt, 15)
             _log_aligned(
                 "warning",
-                "⚠️",
+                "⚠️ ",
                 "Rate limit",
                 f"{activity}/{client_id} (attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
             )
@@ -233,7 +244,7 @@ def _anthropic_messages_create(model: str, client_id: str, activity: str, **kwar
                 sleep = min(5 * attempt, 15)
                 _log_aligned(
                     "warning",
-                    "⚠️",
+                    "⚠️ ",
                     "Rate limit",
                     f"{activity}/{client_id} (attempt {attempt}/{max_attempts}). Retrying in {sleep}s"
                 )
@@ -684,24 +695,80 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             raise FileNotFoundError("npx/tsc not found. Ensure Node.js and TypeScript are installed. Run: npm install -g typescript")
         
         # Run TypeScript compiler in check-only mode
-        result = subprocess.run(
-            [
-                npx_cmd,
-                "tsc",
-                "--noEmit",           # Don't emit output files
-                "--skipLibCheck",     # Skip type checking of declaration files
-                "--jsx", "preserve",  # Preserve JSX for Next.js
-                "--esModuleInterop",  # Enable ES module interop
-                "--moduleResolution", "node",
-                "--target", "ES2020",
-                "--module", "ESNext",
+        # Use tsconfig.json to ensure path mappings (@/*) are resolved correctly
+        repo_root = Path(__file__).resolve().parent.parent
+        tsconfig_path = repo_root / "tsconfig.json"
+        
+        # Create a temporary tsconfig that extends the main one but only includes our temp file
+        temp_tsconfig = None
+        temp_tsconfig_path = None
+        if tsconfig_path.exists():
+            try:
+                import json as json_module
+                with open(tsconfig_path, "r", encoding="utf-8") as f:
+                    main_tsconfig = json_module.load(f)
+                
+                # Create a temp tsconfig that extends main and includes only our file
+                temp_tsconfig_data = {
+                    "extends": str(tsconfig_path),
+                    "compilerOptions": {
+                        "noEmit": True,
+                        "skipLibCheck": True,
+                    },
+                    "include": [temp_path],
+                    "exclude": []
+                }
+                
+                temp_tsconfig_path = temp_path.replace(".tsx", ".tsconfig.json")
+                with open(temp_tsconfig_path, "w", encoding="utf-8") as f:
+                    json_module.dump(temp_tsconfig_data, f)
+                
+                project_arg = str(temp_tsconfig_path)
+            except Exception as e:
+                # Fallback to manual flags if tsconfig processing fails
+                logging.warning(f"Failed to create temp tsconfig: {e}, using manual flags")
+                temp_tsconfig_path = None
+                project_arg = None
+        else:
+            project_arg = None
+        
+        # Build command
+        cmd = [
+            npx_cmd,
+            "tsc",
+            "--noEmit",
+            "--skipLibCheck",
+        ]
+        
+        if project_arg:
+            cmd.extend(["--project", project_arg])
+        else:
+            # Fallback: use manual flags matching tsconfig.json
+            cmd.extend([
+                "--jsx", "preserve",
+                "--esModuleInterop",
+                "--moduleResolution", "bundler",
+                "--target", "ES2017",
+                "--module", "esnext",
+                "--baseUrl", ".",
+                "--paths", '{"@/*": ["./*"]}',
                 temp_path
-            ],
+            ])
+        
+        result = subprocess.run(
+            cmd,
             capture_output=True,
             text=True,
             timeout=30,
             cwd=os.getcwd()
         )
+        
+        # Clean up temp tsconfig if created
+        if temp_tsconfig_path and os.path.exists(temp_tsconfig_path):
+            try:
+                os.unlink(temp_tsconfig_path)
+            except:
+                pass
 
         if result.returncode == 0:
             _log_aligned("info", "✅", "Syntax check", f"passed for {client_id}")
@@ -1451,24 +1518,38 @@ Please fix the visual issues while maintaining correct syntax."""
                         f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1418", "message": "code extraction start", "data": {"total_attempts": total_attempts, "raw_response_len": len(raw_response), "has_code_block": "```" in raw_response}, "timestamp": int(time.time() * 1000)}) + "\n")
                 except: pass
                 # #endregion
-                match = re.search(r'```(?:tsx|typescript)?(.*?)```', raw_response, re.DOTALL)
-                if match:
-                    code = match.group(1).strip()
-                    # #region agent log
-                    try:
-                        with open(log_path, "a", encoding="utf-8") as f:
-                            code_preview = code[:200] if code else ""
-                            unclosed_templates = code.count("${") - code.count("}") if code else 0
-                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1420", "message": "code extracted from block", "data": {"total_attempts": total_attempts, "code_len": len(code), "code_preview": code_preview, "unclosed_template_count": unclosed_templates, "backtick_count": code.count("`") if code else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
-                    except: pass
-                    # #endregion
-                else:
+                # Try multiple regex patterns in order of specificity
+                patterns = [
+                    r'```tsx\s*(.*?)```',  # Explicit tsx block
+                    r'```typescript\s*(.*?)```',  # Explicit typescript block
+                    r'```ts\s*(.*?)```',  # Explicit ts block
+                    r'```(?:tsx|typescript|ts)?\s*(.*?)```',  # Any code block with optional language
+                    r'```\s*(.*?)```',  # Generic code block (fallback)
+                ]
+                
+                code = None
+                for pattern in patterns:
+                    match = re.search(pattern, raw_response, re.DOTALL)
+                    if match:
+                        code = match.group(1).strip()
+                        # #region agent log
+                        try:
+                            with open(log_path, "a", encoding="utf-8") as f:
+                                code_preview = code[:200] if code else ""
+                                backtick_count = code.count("`") if code else 0
+                                template_expr_count = code.count("${") if code else 0
+                                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1512", "message": "code extracted from block", "data": {"total_attempts": total_attempts, "code_len": len(code), "code_preview": code_preview, "backtick_count": backtick_count, "template_expr_count": template_expr_count, "pattern_used": pattern[:40]}, "timestamp": int(time.time() * 1000)}) + "\n")
+                        except: pass
+                        # #endregion
+                        break
+                
+                if not code:
                     _log_aligned("warning", "⚠️", "Builder", "No code blocks found in Builder response. Using raw output.")
-                    code = raw_response
+                    code = raw_response.strip()
                     # #region agent log
                     try:
                         with open(log_path, "a", encoding="utf-8") as f:
-                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1423", "message": "no code block found, using raw", "data": {"total_attempts": total_attempts, "code_len": len(code)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1523", "message": "no code block found, using raw", "data": {"total_attempts": total_attempts, "code_len": len(code)}, "timestamp": int(time.time() * 1000)}) + "\n")
                     except: pass
                     # #endregion
 
@@ -1534,13 +1615,13 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Phase 3: Check QA results
                 if qa_status == "PASS":
-                    _log_aligned("info", "✅", "Visual QA", f"passed on attempt {total_attempts}")
+                    _log_aligned("info", "✅ ", "Visual QA", f"passed on attempt {total_attempts}")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break  # Success! Exit the loop
 
                 elif qa_status == "FAIL":
-                    _log_aligned("warning", "⚠️", "Visual QA", f"failed on attempt {total_attempts}")
+                    _log_aligned("warning", "⚠️ ", "Visual QA", f"failed on attempt {total_attempts}")
                     visual_feedback = qa_report
 
                     # Record to memory
@@ -1559,7 +1640,7 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 else:
                     # ERROR or SKIPPED - can't repair, use what we have
-                    _log_aligned("warning", "⚠️", "QA", f"returned {qa_status} - cannot repair, using current code")
+                    _log_aligned("warning", "⚠️ ", "QA", f"returned {qa_status} - cannot repair, using current code")
                     final_qa_status = qa_status
                     final_qa_report = qa_report
                     break
@@ -1640,7 +1721,7 @@ def run_qa(client_path) -> Tuple[str, str, str]:
                         try:
                             browser.close()
                         except Exception as e:
-                            _log_aligned("warning", "⚠️", "QA", f"Error closing browser: {e}")
+                            _log_aligned("warning", "⚠️ ", "QA", f"Error closing browser: {e}")
 
             # Analyze with Vision Model
             with open(screenshot_path, "rb") as f:
@@ -1675,10 +1756,10 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
             # Determine status from report
             if "PASS" in report and not report.strip().startswith("FAIL"):
                 status = "PASS"
-                _log_aligned("info", "✅", "QA", f"passed for {client_id}")
+                _log_aligned("info", "✅ ", "QA", f"passed for {client_id}")
             else:
                 status = "FAIL"
-                _log_aligned("warning", "⚠️", "QA", f"failed for {client_id}")
+                _log_aligned("warning", "⚠️ ", "QA", f"failed for {client_id}")
 
             return (status, report, screenshot_path)
 
@@ -1728,7 +1809,7 @@ def finalize_client(client_path: str, qa_status: str, qa_report: str) -> None:
         if os.path.exists(intake_path):
             os.rename(intake_path, processed_path)
     except OSError:
-        _log_aligned("warning", "⚠️", "Finalizing", "Failed to rename intake.md")
+        _log_aligned("warning", "⚠️ ", "Finalizing", "Failed to rename intake.md")
 
 # 4. MAIN BATCH LOOP
 if __name__ == "__main__":
@@ -1746,10 +1827,10 @@ if __name__ == "__main__":
     _log_aligned("info", "🎭", "Startup", "Checking Playwright browsers...")
     try:
         subprocess.run(["playwright", "install", "chromium"], check=True, capture_output=True)
-        _log_aligned("info", "✅", "Startup", "Browsers ready.")
+        _log_aligned("info", "✅ ", "Startup", "Browsers ready.")
     except Exception as e:
         _log_aligned("error", "❌", "Startup", f"Playwright install failed: {e}")
-        _log_aligned("warning", "⚠️", "Startup", "Visual QA may fail.")
+        _log_aligned("warning", "⚠️ ", "Startup", "Visual QA may fail.")
 
     # Check for command-line argument (client ID)
     if len(sys.argv) > 1:
@@ -1764,7 +1845,7 @@ if __name__ == "__main__":
                 try:
                     with client_lock(client_id_arg):
                         run_architect(client_path)
-                    _log_aligned("info", "✅", "CLI", f"Completed processing for {client_id_arg}")
+                    _log_aligned("info", "✅ ", "CLI", f"Completed processing for {client_id_arg}")
                     exit(0)
                 except RuntimeError as e:
                     _log_aligned("error", "❌", "CLI", f"Could not acquire lock for {client_id_arg}: {e}")
@@ -1791,7 +1872,7 @@ if __name__ == "__main__":
 
                 # Validate client ID to prevent path traversal attacks
                 if not is_valid_client_id(client_id):
-                    _log_aligned("warning", "⚠️", "Batch loop", f"Skipping invalid client ID: {client_id}")
+                    _log_aligned("warning", "⚠️ ", "Batch loop", f"Skipping invalid client ID: {client_id}")
                     continue
                 
                 # Check if client is already being processed
