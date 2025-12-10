@@ -48,8 +48,8 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
 MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation - quality/cost balance
 MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
-MODEL_QA = "claude-sonnet-4-5-20250929"       # Visual inspection - using Sonnet until Haiku model is available
-MODEL_ROUTER = "claude-sonnet-4-5-20250929"   # Fast classification - using Sonnet until Haiku model is available
+MODEL_QA = "claude-haiku-4-5-20251001"       # Visual inspection - using Sonnet until Haiku model is available
+MODEL_ROUTER = "claude-haiku-4-5-20251001"   # Fast classification - using Sonnet until Haiku model is available
 MODEL_CRITIC = "claude-sonnet-4-5-20250929"    # Quality review         
 
 # Config
@@ -850,10 +850,13 @@ def run_copywriter(client_path):
     """
     client_id = os.path.basename(client_path)
     
-    # Check for existing content.md - skip if already generated
+    # Check for existing content.md - skip generation if already exists, but continue pipeline
     content_path = os.path.join(client_path, "content.md")
-    if os.path.exists(content_path):
-        logging.info(f"⏭️  Content already exists for {client_id}, skipping copywriter stage")
+    content_exists = os.path.exists(content_path)
+    if content_exists:
+        logging.info(f"⏭️  Content already exists for {client_id}, skipping copywriter generation")
+        # Still need to continue pipeline to builder stage
+        run_builder(client_path)
         return
     
     logging.info(f"✍️  Copywriter writing for {client_id}...")

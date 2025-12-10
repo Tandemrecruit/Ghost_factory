@@ -118,5 +118,95 @@
       "client_id": "demo-hvac",
       "attempt": 6
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:13:21.222434",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp5jx35iaz.tsx(291,44): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:14:05.025326",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpo2b9jio4.tsx(318,32): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:14:54.044368",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp77r63mja.tsx(218,38): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:15:23.976051",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpo1qvrt0o.tsx(211,83): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:15:40.300999",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp0sokinm5.tsx(308,26): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:16:10.433359",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpif_m8eqw.tsx(264,184): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:16:23.409356",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmplknddulv.tsx(304,56): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:16:59.979506",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpebo0k2ja.tsx(304,7): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:17:10.491268",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpedh5nigp.tsx(279,45): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 6
+    }
   }
 ]
