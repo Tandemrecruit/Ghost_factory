@@ -29,7 +29,10 @@ const WEBHOOK_SECRET = process.env.GF_METRICS_WEBHOOK_SECRET
 const IS_DEV = process.env.NODE_ENV !== 'production'
 
 /**
- * Add server-side timestamp to an event
+ * Attach a server-side ISO 8601 timestamp to the provided metrics event.
+ *
+ * @param event - The client-originated metrics event to augment
+ * @returns A `MetricsProcessedEvent` containing all original event fields plus a `timestamp` set to the current time in ISO 8601 format
  */
 function processEvent(event: MetricsClientEvent): MetricsProcessedEvent {
   return {
@@ -39,14 +42,23 @@ function processEvent(event: MetricsClientEvent): MetricsProcessedEvent {
 }
 
 /**
- * Log event in development mode
+ * Log a processed metrics event to the console with a [GF_METRICS_EVENT] prefix.
+ *
+ * @param event - The processed metrics event to log
  */
 function logEvent(event: MetricsProcessedEvent): void {
   console.log('[GF_METRICS_EVENT]', JSON.stringify(event))
 }
 
 /**
- * Send events to configured webhook
+ * Send processed metrics events to the configured webhook endpoint.
+ *
+ * If no webhook URL is configured this function is a no-op. Includes an
+ * Authorization Bearer header when a webhook secret is configured. Errors
+ * and non-OK responses are logged but not propagated.
+ *
+ * @param events - Array of processed metrics events to include in the request body as `{ events }`
+ * @returns `void`
  */
 async function sendToWebhook(events: MetricsProcessedEvent[]): Promise<void> {
   if (!WEBHOOK_URL) return
@@ -79,7 +91,11 @@ async function sendToWebhook(events: MetricsProcessedEvent[]): Promise<void> {
 }
 
 /**
- * Process events according to persistence strategy
+ * Persist processed metric events according to the configured strategy.
+ *
+ * If a webhook URL is configured, POSTs the events to that webhook; otherwise, in development each event is logged locally; in production without a webhook this is a no-op.
+ *
+ * @param events - Array of processed metric events (each includes a server-side timestamp) to be persisted
  */
 async function persistEvents(events: MetricsProcessedEvent[]): Promise<void> {
   if (WEBHOOK_URL) {
@@ -92,6 +108,14 @@ async function persistEvents(events: MetricsProcessedEvent[]): Promise<void> {
   // Strategy 1b: No-op in production without webhook
 }
 
+/**
+ * HTTP POST handler that accepts metrics events, validates and processes them, and persists or forwards them according to configuration.
+ *
+ * Validates the incoming JSON against the metrics API schema, normalizes single or batched events, attaches a server timestamp to each event, and persists them via the configured strategy (webhook, development logging, or no-op in production). If metrics are disabled, it accepts the request without processing.
+ *
+ * @param request - Incoming NextRequest whose JSON body must match the metrics API request schema (single event or batch).
+ * @returns A Response: 204 No Content when accepted (including when metrics are disabled), 400 with a JSON error for invalid JSON or schema validation failures, or 500 with a JSON error for unexpected server errors.
+ */
 export async function POST(request: NextRequest) {
   // Check if metrics are enabled
   if (!METRICS_ENABLED) {
@@ -159,7 +183,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Also support OPTIONS for CORS preflight if needed
+/**
+ * Handles CORS preflight requests by returning an empty 204 response with appropriate CORS headers.
+ *
+ * @returns A `Response` with HTTP status 204 (No Content) and headers `Access-Control-Allow-Methods: POST, OPTIONS` and `Access-Control-Allow-Headers: Content-Type`.
+ */
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,

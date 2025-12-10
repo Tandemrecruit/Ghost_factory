@@ -11,6 +11,12 @@ export interface HeroSimpleProps {
   className?: string
 }
 
+/**
+ * Render a centered hero section with a heading, subhead, and a primary call-to-action.
+ *
+ * @param blockId - Optional identifier injected as `data-gf-block` on the root section for metrics/tracking (defaults to `"hero_simple_v1"`).
+ * @returns A JSX element containing the hero section markup.
+ */
 export function HeroSimple({
   heading,
   subhead,

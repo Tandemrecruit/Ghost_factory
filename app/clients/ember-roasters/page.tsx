@@ -12,6 +12,15 @@ import {
   TrustBadges,
 } from "@/components";
 
+/**
+ * Render the Ember Roasters marketing homepage.
+ *
+ * The component composes the landing page from modular sections — navigation, hero, trust badges,
+ * feature grid and steps, story/origins, pricing tiers, guarantees, testimonials, FAQ, CTA banner,
+ * and footer — each provided via presentational subcomponents and static content.
+ *
+ * @returns The React element tree for the Ember Roasters landing page.
+ */
 export default function Home() {
   return (
     <>

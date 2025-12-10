@@ -55,7 +55,12 @@ export const MetricsApiRequestSchema = z.union([
 ])
 export type MetricsApiRequest = z.infer<typeof MetricsApiRequestSchema>
 
-// Helper to check if request is a batch
+/**
+ * Determine whether an API request represents a batch of client events.
+ *
+ * @param request - API request payload to inspect
+ * @returns `true` if the request contains an `events` array of client events, `false` otherwise.
+ */
 export function isBatchRequest(
   request: MetricsApiRequest
 ): request is { events: MetricsClientEvent[] } {

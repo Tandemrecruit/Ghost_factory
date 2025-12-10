@@ -84,7 +84,13 @@ export function MetricsProvider({
     if (!enabled) return
 
     /**
-     * Find the nearest ancestor with data-gf-block attribute
+     * Locate the nearest ancestor element that defines a block identifier.
+     *
+     * Searches upward from the given element for the closest ancestor with a `data-gf-block`
+     * attribute and returns that attribute's value.
+     *
+     * @param element - The element to start the search from.
+     * @returns The `data-gf-block` attribute value of the nearest ancestor, or `undefined` if none exists.
      */
     function findBlockId(element: Element): string | undefined {
       const blockElement = element.closest('[data-gf-block]')
@@ -92,7 +98,12 @@ export function MetricsProvider({
     }
 
     /**
-     * Get CTA label from element
+     * Extracts a human-readable CTA label from a DOM element.
+     *
+     * Prefers the element's `data-gf-cta-label` attribute; if absent, uses the element's visible text trimmed and truncated to 100 characters. Returns `undefined` when no label can be determined.
+     *
+     * @param element - DOM element to derive the CTA label from
+     * @returns The extracted label, or `undefined` if none is available
      */
     function getCtaLabel(element: Element): string | undefined {
       // First check for explicit label override
@@ -109,7 +120,14 @@ export function MetricsProvider({
     }
 
     /**
-     * Handle CTA clicks
+     * Handle document click events for primary CTAs and send CTA click metrics.
+     *
+     * Finds the nearest ancestor of the click target with `data-gf-cta="primary"`, resolves its
+     * block identifier and a human-readable CTA label (if available), and calls `trackCtaClick`
+     * with the collected context and optional `cta_label` metadata.
+     *
+     * @param event - The click event from the document; only clicks that originate from or within
+     *                an element marked with `data-gf-cta="primary"` will trigger tracking.
      */
     function handleClick(event: MouseEvent) {
       const target = event.target as Element
@@ -130,7 +148,9 @@ export function MetricsProvider({
     }
 
     /**
-     * Handle conversion clicks (for button/link based conversions)
+     * Detects clicks on primary conversion anchors or non-submit conversion buttons and records a conversion using the element's block id.
+     *
+     * @param event - Mouse event used to locate the nearest conversion element (anchor[data-gf-conversion="primary"] or button[data-gf-conversion="primary"]:not([type="submit"])) and extract its block id for tracking
      */
     function handleConversionClick(event: MouseEvent) {
       const target = event.target as Element
@@ -151,7 +171,13 @@ export function MetricsProvider({
     }
 
     /**
-     * Handle form submissions
+     * Handle form submit events and record a conversion for forms marked as primary.
+     *
+     * Processes the given submit `event`; if the event target is an HTMLFormElement
+     * with `data-gf-conversion="primary"`, finds the nearest `data-gf-block`
+     * ancestor and calls `trackConversion` including `blockId` and `metadata: { trigger: 'form_submit' }`.
+     *
+     * @param event - The submit event whose `target` is expected to be the submitted form
      */
     function handleSubmit(event: Event) {
       const form = event.target as HTMLFormElement

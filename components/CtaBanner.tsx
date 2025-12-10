@@ -15,6 +15,14 @@ export interface CtaBannerProps {
   className?: string
 }
 
+/**
+ * Renders a centered call-to-action banner with heading, optional eyebrow and subhead, and one or two CTAs.
+ *
+ * The secondary CTA is rendered only when both `secondaryCtaLabel` and `secondaryCtaHref` are provided.
+ *
+ * @param background - Visual theme for the banner; one of `'primary'`, `'dark'`, or `'gradient'`. Defaults to `'primary'`.
+ * @param blockId - Identifier applied to the root `section` as `data-gf-block` for metrics/tracking. Defaults to `'cta_banner_v1'`.
+ */
 export function CtaBanner({
   eyebrow,
   heading,
