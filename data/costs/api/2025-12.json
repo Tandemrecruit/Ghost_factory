@@ -792,5 +792,50 @@
       "has_syntax_feedback": true,
       "has_visual_feedback": false
     }
+  },
+  {
+    "timestamp": "2025-12-10T11:25:40.987176",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {
+      "attempt": 5,
+      "has_syntax_feedback": true,
+      "has_visual_feedback": false
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:26:16.403631",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {
+      "attempt": 1,
+      "has_syntax_feedback": false,
+      "has_visual_feedback": false
+    }
+  },
+  {
+    "timestamp": "2025-12-10T11:26:39.863755",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {
+      "attempt": 6,
+      "has_syntax_feedback": true,
+      "has_visual_feedback": false
+    }
   }
 ]
