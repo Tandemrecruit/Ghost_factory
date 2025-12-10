@@ -1,4 +1,4 @@
-# Client Overview
+﻿# Client Overview
 - Business Name:
 - Tagline:
 - Location:
@@ -7,11 +7,11 @@
 - Primary Offer:
 - Secondary Offer(s):
 - Ideal Customer:
-- Brand Voice (3–5 words):
+- Brand Voice (3â€“5 words):
 - Main Goal of This Page: (e.g. book calls, get quote requests, sell a product)
 
 # Core Messaging
-- Core Promise (1–2 sentences):
+- Core Promise (1â€“2 sentences):
 - Top 3 Benefits:
 - Key Objections & Reassurances:
   - Objection 1:
@@ -37,7 +37,7 @@
 - Social Proof / Testimonials:
 - Competitors / Inspiration URLs:
 - Service Area / Locations:
-- Pricing Strategy (starting price / range / “contact us”):
+- Pricing Strategy (starting price / range / â€œcontact usâ€):
 - Legal / Compliance Notes:
 
 # Project Logistics

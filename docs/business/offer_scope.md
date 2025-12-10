@@ -1,6 +1,6 @@
-# docs/offer_scope.md
+﻿# docs/offer_scope.md
 
-# Offer Scope – Landing Page Build
+# Offer Scope â€“ Landing Page Build
 
 ## 1. Who This Service Is For
 
@@ -14,13 +14,13 @@ This is not a full website or brand overhaul. It is a focused, conversion-orient
 
 ---
 
-## 2. What’s Included (Standard Landing Page Package)
+## 2. Whatâ€™s Included (Standard Landing Page Package)
 
 The standard package includes:
 
 1. **One landing page**
-   - Built in a component-based system (your “landing page factory”)
-   - Structured to match the client’s intake form answers
+   - Built in a component-based system (your â€œlanding page factoryâ€)
+   - Structured to match the clientâ€™s intake form answers
 
 2. **Up to 5 sections**, for example:
    - Hero section with primary call-to-action
@@ -30,7 +30,7 @@ The standard package includes:
    - Final CTA/footer section
 
 3. **Copy and layout generated + refined** based on:
-   - Client’s intake form answers
+   - Clientâ€™s intake form answers
    - Internal intake and strategy agents
    - Your manual review and tweaks
 
@@ -51,7 +51,7 @@ The standard package includes:
 
 ---
 
-## 3. What’s Not Included (Out of Scope)
+## 3. Whatâ€™s Not Included (Out of Scope)
 
 To protect time and scope, the standard package does **not** include:
 
@@ -86,9 +86,9 @@ Standard guidelines:
 
 The landing page build is compatible with two delivery modes:
 
-1. **Managed Hosting** – you host and manage the live page  
-2. **Self-Hosted Handoff** – you deliver code and instructions for the client’s developer
+1. **Managed Hosting** â€“ you host and manage the live page  
+2. **Self-Hosted Handoff** â€“ you deliver code and instructions for the clientâ€™s developer
 
 Details for each option are defined in `hosting_policy.md`.
 
-This scope file governs **what the landing page service does and doesn’t include**, regardless of the hosting option selected.
+This scope file governs **what the landing page service does and doesnâ€™t include**, regardless of the hosting option selected.

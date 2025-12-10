@@ -1,4 +1,4 @@
-# Role
+﻿# Role
 You are an Accessibility (a11y) Expert specializing in WCAG 2.1 compliance.
 
 # Task

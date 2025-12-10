@@ -1,4 +1,4 @@
-# Ghost Factory v1.0 – Single Happy Path Guide
+﻿# Ghost Factory v1.0 â€“ Single Happy Path Guide
 
 **Project:** Ghost Factory  
 **Milestone:** `v1.0` (single-client happy path)  
@@ -13,7 +13,7 @@ v1.0 is **not** the full vision of Ghost Factory.
 
 v1.0 is a **single reliable happy path**:
 
-> Take one demo client from intake → brief → content → generated page, and render it at `/clients/<client-id>` with no errors.
+> Take one demo client from intake â†’ brief â†’ content â†’ generated page, and render it at `/clients/<client-id>` with no errors.
 
 Once this works end-to-end on a fresh machine with a few simple commands, v1.0 is considered **done**.
 
@@ -39,19 +39,19 @@ You can change the exact ID later, but v1.0 assumes:
 Under `clients/`:
 
 - `clients/demo-hvac/`
-  - `intake.md` – human-provided intake / raw notes
-  - `brief.md` – Strategist output (generated)
-  - `content.md` – Copywriter output (generated)
-  - `assets/` – Optional images or static assets for the client
-  - (Optional) `decision-log.md` – notes about choices, if used
+  - `intake.md` â€“ human-provided intake / raw notes
+  - `brief.md` â€“ Strategist output (generated)
+  - `content.md` â€“ Copywriter output (generated)
+  - `assets/` â€“ Optional images or static assets for the client
+  - (Optional) `decision-log.md` â€“ notes about choices, if used
 
 Under `app/clients/`:
 
-- `app/clients/[clientId]/page.tsx` – dynamic route that reads the generated page for `demo-hvac`.
+- `app/clients/[clientId]/page.tsx` â€“ dynamic route that reads the generated page for `demo-hvac`.
 
 The exact file names can be updated as long as this flow remains true:
 
-- Intake → brief → content → generated page → `/clients/demo-hvac`
+- Intake â†’ brief â†’ content â†’ generated page â†’ `/clients/demo-hvac`
 
 ---
 
@@ -114,12 +114,12 @@ The v1.0 page uses a **small, fixed section set**. The exact component names can
    - Show how the offer or service addresses it
 
 3. **Features / benefits section**
-   - 3–6 key features, benefits, or outcomes
+   - 3â€“6 key features, benefits, or outcomes
    - Can be shown as a grid, list, or steps
 
 4. **Social proof placeholder**
    - Even if you have no real testimonials yet, include:
-     - Placeholder testimonials, trust badges, or a “what to expect” style block.
+     - Placeholder testimonials, trust badges, or a â€œwhat to expectâ€ style block.
    - v1.0 does **not** require real testimonials; it just reserves the section.
 
 5. **Final CTA section**
@@ -152,7 +152,7 @@ From a newly cloned repo:
    - `clients/demo-hvac/intake.md`
    - `clients/demo-hvac/` folder structure as described above
 
-   If they don’t, create them using the expected structure.
+   If they donâ€™t, create them using the expected structure.
 
 3. **Run the factory for the demo client**
 
@@ -187,13 +187,13 @@ From a newly cloned repo:
      - Features / benefits
      - Social proof placeholder
      - Final CTA
-   - Page content matches what you’d expect based on `intake.md` → `brief.md` → `content.md`.
+   - Page content matches what youâ€™d expect based on `intake.md` â†’ `brief.md` â†’ `content.md`.
 
 If all of the above pass, v1.0 is functioning correctly on that machine.
 
 ---
 
-## 7. Definition of “Done” for v1.0
+## 7. Definition of â€œDoneâ€ for v1.0
 
 v1.0 is considered **done** when all of the following are true:
 
@@ -223,7 +223,7 @@ v1.0 is considered **done** when all of the following are true:
 - **Documentation:**
   - This file (`docs/internal/ghost-factory-v1.md`) accurately describes:
     - How to run v1.0
-    - What “done” means
+    - What â€œdoneâ€ means
   - If commands or paths change, this doc is updated.
 
 When all items above are true, you can lock v1.0 and move work for multi-client, tracking, experiments, etc. into **v1.5** and beyond.

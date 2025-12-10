@@ -1,4 +1,4 @@
-# Ghost Factory Refactoring Prompts
+﻿# Ghost Factory Refactoring Prompts
 
 Use these prompts sequentially with Claude Code (Sonnet 4.5 or Haiku 4.5).
 Each task is scoped to be completable in one session.
@@ -9,7 +9,7 @@ Each task is scoped to be completable in one session.
 
 ### Task 1.1: Fix Authentication (HIGH PRIORITY)
 
-```
+```text
 Fix the authentication system in lib/auth-utils.ts:
 
 1. REMOVE the fallback that allows all access when DASHBOARD_SECRET is not set
@@ -26,7 +26,7 @@ Keep the Bearer token and X-API-Key checks. Add tests for the new behavior.
 
 ### Task 1.2: Add SQLite Database
 
-```
+```text
 Replace the file-based JSON storage with SQLite:
 
 1. Install better-sqlite3 (npm install better-sqlite3 @types/better-sqlite3)
@@ -56,7 +56,7 @@ Keep the JSON files as backup but use SQLite as primary storage.
 
 ### Task 1.3: Add Request Logging Middleware
 
-```
+```text
 Add request/response logging for API routes:
 
 1. Create lib/request-logger.ts with:
@@ -84,7 +84,7 @@ Add request/response logging for API routes:
 
 ### Task 2.1: Extract Git Operations
 
-```
+```text
 Extract git operations from automation/factory.py into a new module:
 
 1. Create automation/services/git_service.py
@@ -106,7 +106,7 @@ Extract git operations from automation/factory.py into a new module:
 
 ### Task 2.2: Extract Discord Notifications
 
-```
+```text
 Extract Discord notifications from automation/factory.py:
 
 1. Create automation/services/discord_service.py
@@ -126,7 +126,7 @@ Extract Discord notifications from automation/factory.py:
 
 ### Task 2.3: Extract Syntax Checker
 
-```
+```text
 Extract the TypeScript syntax checker from automation/factory.py:
 
 1. Create automation/services/syntax_checker.py
@@ -151,7 +151,7 @@ Extract the TypeScript syntax checker from automation/factory.py:
 
 ### Task 2.4: Extract Pipeline Stages
 
-```
+```text
 Extract pipeline stages from automation/factory.py into separate modules:
 
 1. Create automation/pipeline/ directory with __init__.py
@@ -185,13 +185,14 @@ Extract pipeline stages from automation/factory.py into separate modules:
 
 ### Task 3.1: Add Zod Schemas
 
-```
+```text
 Replace manual validation in lib/schema-validator.ts with Zod:
 
 1. Install Zod: npm install zod
 
 2. Rewrite lib/schema-validator.ts:
 
+   ```typescript
    import { z } from 'zod';
 
    export const TimeEntrySchema = z.object({
@@ -230,7 +231,7 @@ Replace manual validation in lib/schema-validator.ts with Zod:
 
 ### Task 3.2: Add Pydantic to Python
 
-```
+```text
 Add Pydantic validation to the Python automation code:
 
 1. Add pydantic>=2.0 to requirements.txt
@@ -275,7 +276,7 @@ Add Pydantic validation to the Python automation code:
 
 ### Task 4.1: Centralize Configuration
 
-```
+```text
 Create a centralized configuration system:
 
 1. Create automation/config.py:
@@ -321,11 +322,12 @@ Create a centralized configuration system:
 
 ### Task 4.2: Add GitHub Actions CI
 
-```
+```text
 Create a GitHub Actions workflow for CI:
 
 1. Create .github/workflows/ci.yml:
 
+   ```yaml
    name: CI
 
    on:
@@ -342,6 +344,7 @@ Create a GitHub Actions workflow for CI:
          - uses: actions/setup-python@v5
            with:
              python-version: '3.11'
+         - run: pip install -e .  # Install package in editable mode
          - run: pip install -r requirements.txt -r requirements-test.txt
          - run: pytest --cov=automation --cov-report=xml
          - uses: codecov/codecov-action@v3
@@ -364,15 +367,16 @@ Create a GitHub Actions workflow for CI:
          - run: pip install bandit safety
          - run: bandit -r automation/ -ll
          - run: safety check -r requirements.txt
+   ```
 
 2. Create .github/workflows/deploy.yml for deployment (placeholder)
 
 3. Add status badges to README.md
-```
+   ```
 
 ### Task 4.3: Add Pre-commit Hooks
 
-```
+```text
 Add pre-commit hooks for code quality:
 
 1. Create .pre-commit-config.yaml:
@@ -412,7 +416,7 @@ Add pre-commit hooks for code quality:
 
 4. Run pre-commit on all files and fix any issues:
    pre-commit run --all-files
-```
+   ```
 
 ---
 
@@ -420,11 +424,12 @@ Add pre-commit hooks for code quality:
 
 ### Task 5.1: Sanitize AI Inputs
 
-```
+```text
 Add protection against prompt injection in the AI pipeline:
 
 1. Create automation/security/prompt_sanitizer.py:
 
+   ```python
    import re
    from typing import Tuple
 
@@ -459,6 +464,8 @@ Add protection against prompt injection in the AI pipeline:
        content = content.replace("```", "'''")
 
        return content
+   ```
+   ```
 
 2. Update factory.py to use sanitize_user_content() before passing intake content to AI:
    - In select_niche_persona()

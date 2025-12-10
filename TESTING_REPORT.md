@@ -1,4 +1,4 @@
-# Comprehensive Testing Report - Ghost Factory
+﻿# Comprehensive Testing Report - Ghost Factory
 
 ## Executive Summary
 
@@ -52,24 +52,24 @@ Successfully generated a comprehensive unit test suite for the Ghost Factory aut
 Tests the router function with new niche mappings.
 
 **New Functionality:**
-- `webinar_funnel` → `webinar.md` mapping
-- `saas_b2b` → `saas.md` variant
-- `ecommerce_dtc` → `ecommerce.md` variant
+- `webinar_funnel` â†’ `webinar.md` mapping
+- `saas_b2b` â†’ `saas.md` variant
+- `ecommerce_dtc` â†’ `ecommerce.md` variant
 
 **Test Cases:**
-- ✅ `test_saas_classification`
-- ✅ `test_saas_b2b_variant_maps_to_saas` (NEW)
-- ✅ `test_local_service_classification`
-- ✅ `test_ecommerce_classification`
-- ✅ `test_ecommerce_dtc_variant` (NEW)
-- ✅ `test_personal_brand_classification`
-- ✅ `test_webinar_funnel_classification_new` (NEW)
-- ✅ `test_case_insensitive_classification`
-- ✅ `test_invalid_niche_defaults_to_local_service`
-- ✅ `test_empty_response_defaults_to_local_service`
-- ✅ `test_whitespace_in_response_handled`
-- ✅ `test_uses_correct_model`
-- ✅ `test_cost_tracking_called`
+- âœ… `test_saas_classification`
+- âœ… `test_saas_b2b_variant_maps_to_saas` (NEW)
+- âœ… `test_local_service_classification`
+- âœ… `test_ecommerce_classification`
+- âœ… `test_ecommerce_dtc_variant` (NEW)
+- âœ… `test_personal_brand_classification`
+- âœ… `test_webinar_funnel_classification_new` (NEW)
+- âœ… `test_case_insensitive_classification`
+- âœ… `test_invalid_niche_defaults_to_local_service`
+- âœ… `test_empty_response_defaults_to_local_service`
+- âœ… `test_whitespace_in_response_handled`
+- âœ… `test_uses_correct_model`
+- âœ… `test_cost_tracking_called`
 
 ### 2. TestRunVisualDesigner (9 tests)
 Tests the NEW parallel agent for theme generation.
@@ -81,14 +81,14 @@ Tests the NEW parallel agent for theme generation.
 - Runs in parallel with Architect
 
 **Test Cases:**
-- ✅ `test_creates_valid_theme_json`
-- ✅ `test_handles_json_without_markdown_wrapper`
-- ✅ `test_creates_fallback_theme_on_invalid_json`
-- ✅ `test_returns_none_when_intake_missing`
-- ✅ `test_returns_none_on_empty_response`
-- ✅ `test_uses_sonnet_model`
-- ✅ `test_loads_palette_generator_prompt`
-- ✅ `test_time_tracking_called`
+- âœ… `test_creates_valid_theme_json`
+- âœ… `test_handles_json_without_markdown_wrapper`
+- âœ… `test_creates_fallback_theme_on_invalid_json`
+- âœ… `test_returns_none_when_intake_missing`
+- âœ… `test_returns_none_on_empty_response`
+- âœ… `test_uses_sonnet_model`
+- âœ… `test_loads_palette_generator_prompt`
+- âœ… `test_time_tracking_called`
 
 ### 3. TestRunArchitectParallelExecution (9 tests)
 Tests the MODIFIED architect with parallel Visual Designer execution.
@@ -100,15 +100,15 @@ Tests the MODIFIED architect with parallel Visual Designer execution.
 - FAIL-before-PASS critic checking
 
 **Test Cases:**
-- ✅ `test_spawns_visual_designer_in_parallel`
-- ✅ `test_waits_for_visual_designer_completion`
-- ✅ `test_handles_visual_designer_timeout_gracefully`
-- ✅ `test_handles_visual_designer_exception`
-- ✅ `test_critic_loop_pass_on_first_attempt`
-- ✅ `test_critic_loop_retry_on_fail`
-- ✅ `test_critic_loop_max_retries`
-- ✅ `test_saves_original_and_working_copy`
-- ✅ `test_critic_checks_fail_before_pass`
+- âœ… `test_spawns_visual_designer_in_parallel`
+- âœ… `test_waits_for_visual_designer_completion`
+- âœ… `test_handles_visual_designer_timeout_gracefully`
+- âœ… `test_handles_visual_designer_exception`
+- âœ… `test_critic_loop_pass_on_first_attempt`
+- âœ… `test_critic_loop_retry_on_fail`
+- âœ… `test_critic_loop_max_retries`
+- âœ… `test_saves_original_and_working_copy`
+- âœ… `test_critic_checks_fail_before_pass`
 
 ### 4. TestRunCopywriter (9 tests)
 Tests the NEW copywriter function with Copy Critic loop.
@@ -120,14 +120,14 @@ Tests the NEW copywriter function with Copy Critic loop.
 - Detects placeholders and hallucinations
 
 **Test Cases:**
-- ✅ `test_pass_on_first_attempt`
-- ✅ `test_retry_on_critic_fail`
-- ✅ `test_max_retries_exhausted`
-- ✅ `test_empty_response_retries`
-- ✅ `test_handles_intake_processed_fallback`
-- ✅ `test_saves_original_and_working_copy`
-- ✅ `test_ambiguous_critic_response_treated_as_pass`
-- ✅ `test_uses_sonnet_model`
+- âœ… `test_pass_on_first_attempt`
+- âœ… `test_retry_on_critic_fail`
+- âœ… `test_max_retries_exhausted`
+- âœ… `test_empty_response_retries`
+- âœ… `test_handles_intake_processed_fallback`
+- âœ… `test_saves_original_and_working_copy`
+- âœ… `test_ambiguous_critic_response_treated_as_pass`
+- âœ… `test_uses_sonnet_model`
 
 ### 5. TestRunBuilder (5 tests)
 Tests the MODIFIED builder with theme.json support.
@@ -139,28 +139,28 @@ Tests the MODIFIED builder with theme.json support.
 - Applies Tailwind classes per theme
 
 **Test Cases:**
-- ✅ `test_loads_and_applies_theme_json`
-- ✅ `test_works_without_theme_json`
-- ✅ `test_handles_invalid_theme_json`
-- ✅ `test_includes_color_application_instructions`
-- ✅ `test_creates_page_tsx`
+- âœ… `test_loads_and_applies_theme_json`
+- âœ… `test_works_without_theme_json`
+- âœ… `test_handles_invalid_theme_json`
+- âœ… `test_includes_color_application_instructions`
+- âœ… `test_creates_page_tsx`
 
 ### 6. TestEdgeCasesAndErrorHandling (3 tests)
 Tests edge cases and error conditions.
 
 **Test Cases:**
-- ✅ `test_empty_intake_file`
-- ✅ `test_unicode_in_content` (émojis, 你好, etc.)
-- ✅ `test_very_long_content` (10k+ characters)
+- âœ… `test_empty_intake_file`
+- âœ… `test_unicode_in_content` (Ã©mojis, ä½ å¥½, etc.)
+- âœ… `test_very_long_content` (10k+ characters)
 
 ### 7. TestPromptFileValidation (4 tests)
 Validates that new prompt files exist.
 
 **Test Cases:**
-- ✅ `test_copy_critic_prompt_exists`
-- ✅ `test_palette_generator_prompt_exists`
-- ✅ `test_webinar_strategy_prompt_exists`
-- ✅ `test_router_includes_webinar_category`
+- âœ… `test_copy_critic_prompt_exists`
+- âœ… `test_palette_generator_prompt_exists`
+- âœ… `test_webinar_strategy_prompt_exists`
+- âœ… `test_router_includes_webinar_category`
 
 ## Testing Strategy
 
@@ -257,6 +257,7 @@ open htmlcov/index.html
 ### Continuous Integration
 ```bash
 # CI/CD pipeline
+pip install -e .  # Install package in editable mode
 pip install -r requirements-test.txt
 pytest --cov=automation --cov-report=xml --cov-report=term -v
 ```
@@ -264,17 +265,17 @@ pytest --cov=automation --cov-report=xml --cov-report=term -v
 ## Quality Metrics
 
 ### Test Quality
-- ✅ **Isolation:** Each test is independent
-- ✅ **Repeatability:** Tests produce consistent results
-- ✅ **Clarity:** Descriptive names and docstrings
-- ✅ **Coverage:** All code paths tested
-- ✅ **Performance:** Fast execution (< 5s)
+- âœ… **Isolation:** Each test is independent
+- âœ… **Repeatability:** Tests produce consistent results
+- âœ… **Clarity:** Descriptive names and docstrings
+- âœ… **Coverage:** All code paths tested
+- âœ… **Performance:** Fast execution (< 5s)
 
 ### Code Quality
-- ✅ **Syntax:** All tests pass syntax validation
-- ✅ **Style:** Follows pytest conventions
-- ✅ **Documentation:** Comprehensive inline docs
-- ✅ **Maintainability:** Clear structure and organization
+- âœ… **Syntax:** All tests pass syntax validation
+- âœ… **Style:** Follows pytest conventions
+- âœ… **Documentation:** Comprehensive inline docs
+- âœ… **Maintainability:** Clear structure and organization
 
 ## Maintenance Guidelines
 
@@ -303,7 +304,7 @@ pytest --cov=automation --cov-report=xml --cov-report=term -v
 
 ## Success Criteria
 
-✅ **All criteria met:**
+âœ… **All criteria met:**
 - [x] 60+ comprehensive tests created
 - [x] All new functions tested (run_visual_designer, run_copywriter)
 - [x] All modified functions tested (select_niche_persona, run_architect, run_builder)

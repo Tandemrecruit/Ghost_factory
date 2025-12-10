@@ -1,4 +1,4 @@
-# Agent Guide
+﻿# Agent Guide
 
 This file tells **all AI agents and tools** how to behave in this repo so they
 stay aligned with each other and with Ryan.
@@ -57,7 +57,7 @@ decision update instead of silently ignoring it.
 
 - **No public mention of AI**
   - In any user/client-facing copy, UI text, docs, or marketing language:
-    - Do **not** mention AI, LLMs, automation, or “bots”.
+    - Do **not** mention AI, LLMs, automation, or â€œbotsâ€.
   - Internally (code comments, internal docs) it is fine to describe agent
     behavior clearly.
 
@@ -115,7 +115,7 @@ If you are modifying code in these areas, follow the relevant section below.
 
 ## 4. Per-agent roles & behavior
 
-### 4.1 GPT-5.1 (Thinking) – Architect & senior reviewer
+### 4.1 GPT-5.1 (Thinking) â€“ Architect & senior reviewer
 
 **Primary jobs**
 
@@ -134,12 +134,12 @@ If you are modifying code in these areas, follow the relevant section below.
 
 ---
 
-### 4.2 Codex-5.1-max – Implementation & heavy coding
+### 4.2 Codex-5.1-max â€“ Implementation & heavy coding
 
 **Primary jobs**
 
 - Implementing features and refactors designed by the architect agent
-- Writing real code in this repo’s languages and frameworks
+- Writing real code in this repoâ€™s languages and frameworks
 - Applying patterns defined in `DECISIONS.md`
 
 **Behavior**
@@ -155,7 +155,7 @@ If you are modifying code in these areas, follow the relevant section below.
 
 ---
 
-### 4.3 Claude (Opus / Sonnet) – Analyst, spec writer, refactorer
+### 4.3 Claude (Opus / Sonnet) â€“ Analyst, spec writer, refactorer
 
 **Primary jobs**
 
@@ -176,7 +176,7 @@ Opus is preferred for deep analysis; Sonnet for smaller, faster tasks.
 
 ---
 
-### 4.4 Gemini 3 Pro – Content, UX copy, and variation generator
+### 4.4 Gemini 3 Pro â€“ Content, UX copy, and variation generator
 
 **Primary jobs**
 
@@ -195,7 +195,7 @@ Opus is preferred for deep analysis; Sonnet for smaller, faster tasks.
 
 ---
 
-### 4.5 CodeRabbit – Pull request reviewer
+### 4.5 CodeRabbit â€“ Pull request reviewer
 
 **Primary jobs**
 
@@ -245,7 +245,7 @@ to do, so context is not lost.
 
 Update `AGENT_GUIDE.md` when:
 
-- You add, remove, or significantly change an agent’s role.
+- You add, remove, or significantly change an agentâ€™s role.
 - You change how hand-offs between agents should work.
 - You introduce new guardrails that apply across the whole project.
 

@@ -1,4 +1,4 @@
-# COMPONENT LIBRARY MANIFEST
+﻿# COMPONENT LIBRARY MANIFEST
 # The Builder Agent must ONLY use these components.
 
 ---

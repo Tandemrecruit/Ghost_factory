@@ -1,4 +1,4 @@
-# MASTER KICKOFF PROMPT
+﻿# MASTER KICKOFF PROMPT
 @Codex-5.1-max
 
 I have a new client project. Initialize the workspace.

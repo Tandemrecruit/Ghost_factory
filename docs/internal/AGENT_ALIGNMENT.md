@@ -1,4 +1,4 @@
-# Ghost Factory – Agent Alignment Document
+﻿# Ghost Factory â€“ Agent Alignment Document
 
 **Version:** 1.0
 **Last Updated:** 2025-12-10
@@ -23,7 +23,7 @@ Ghost Factory is an **internal landing-page factory tool** that automatically ge
 
 ---
 
-## 2. Current Milestone – v1.0
+## 2. Current Milestone â€“ v1.0
 
 ### What v1.0 IS
 
@@ -39,7 +39,7 @@ When this works end-to-end on a fresh machine, v1.0 is **done**.
 |------|------------------|
 | **Clients** | Single demo client (`demo-hvac`) |
 | **Intake** | Manual copy of raw answers into `clients/<client-id>/intake-raw.md` |
-| **Sanitization** | `intake_sanitizer.py` converts `intake-raw.md` → `intake.md` |
+| **Sanitization** | `intake_sanitizer.py` converts `intake-raw.md` â†’ `intake.md` |
 | **Architect** | Router classifies niche; Strategist generates `brief.md` |
 | **Visual Designer** | Generates `theme.json` with basic colors/fonts |
 | **Copywriter** | Generates `content.md` from the brief |
@@ -77,6 +77,7 @@ These belong to v1.5+ and must NOT be implemented unless explicitly requested:
 **Script:** `automation/intake_sanitizer.py`
 
 **CLI usage:**
+
 ```bash
 python automation/intake_sanitizer.py clients/<client-id>/intake-raw.md
 ```
@@ -99,11 +100,11 @@ python automation/intake_sanitizer.py clients/<client-id>/intake-raw.md
 
 **Substeps:**
 1. **Router** (`prompts/router.md`) classifies the client into a niche:
-   - `SAAS_B2B` → `strategy/saas.md`
-   - `LOCAL_SERVICE` → `strategy/local_service.md`
-   - `ECOMMERCE_DTC` → `strategy/ecommerce.md`
-   - `PERSONAL_BRAND` → `strategy/personal_brand.md`
-   - `WEBINAR_FUNNEL` → `strategy/webinar.md`
+   - `SAAS_B2B` â†’ `strategy/saas.md`
+   - `LOCAL_SERVICE` â†’ `strategy/local_service.md`
+   - `ECOMMERCE_DTC` â†’ `strategy/ecommerce.md`
+   - `PERSONAL_BRAND` â†’ `strategy/personal_brand.md`
+   - `WEBINAR_FUNNEL` â†’ `strategy/webinar.md`
 
 2. **Strategist** (Claude Opus) generates:
    - `brief.md` (working copy)
@@ -207,12 +208,12 @@ Do NOT "fix" code to match outdated docs. Instead:
 
 1. **Read relevant repo files first.** Never design or modify behavior without understanding current implementation.
 2. **Check the manifest** (`design-system/manifest.md`) before adding or using components.
-3. **Check `.cursorrules`** for coding standards.
+3. **Review `.cursorrules`** for coding standards.
 4. **Check this document** for scope boundaries.
 
 ### Priority Order
 
-```
+```text
 Repo Files > Memory > External Chat Context
 ```
 
@@ -239,31 +240,31 @@ If asked to implement features outside v1.0 scope (multi-client, analytics dashb
 ### Code Quality
 
 - Prefer Server Components by default.
-- Use `'use client'` only for interactivity.
-- Use `next/image` for all images.
-- Use `next/link` for all links.
-- Icons from `lucide-react` only.
-- No hardcoded hex colors—use Tailwind variables.
-- No `<img>` or `<a>` tags.
-- No Lorem Ipsum.
+- Client Components: use `'use client'` only for interactivity.
+- Images: use `next/image` for all images.
+- Links: use `next/link` for all links.
+- Icons: source from `lucide-react` only.
+- Colors: avoid hardcoded hex; use Tailwind variables.
+- Tags: no `<img>` or `<a>` tags permitted.
+- Placeholder text: avoid Lorem Ipsum.
 
 ## Using docs/DECISIONS_INBOX.md (for all agents)
 
-The Decisions Inbox is the **staging area** for thoughts and potential decisions. It exists so Ryan and the agents don’t have to remember everything in their heads.
+The Decisions Inbox is the **staging area** for thoughts and potential decisions. It exists so Ryan and the agents donâ€™t have to remember everything in their heads.
 
 ### Inbox legend
 
 Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
 
-- **[NOTE]** – Brain dump, observation, or reminder  
-  - “This might matter later.”
-  - Safe place for models to say “hey, watch this” without changing any rules.
+- **[NOTE]** â€“ Brain dump, observation, or reminder  
+  - â€œThis might matter later.â€
+  - Safe place for models to say â€œhey, watch thisâ€ without changing any rules.
 
-- **[PROPOSAL]** – Suggested decision or rule change  
-  - “We *should probably* make this an explicit rule.”
+- **[PROPOSAL]** â€“ Suggested decision or rule change  
+  - â€œWe *should probably* make this an explicit rule.â€
   - Used when an agent spots a consistent pattern that deserves a formal decision.
 
-- **[DECISION]** – Approved decision, ready to be logged as a D-XXXX  
+- **[DECISION]** â€“ Approved decision, ready to be logged as a D-XXXX  
   - **Only Ryan** is allowed to mark an item as `[DECISION]`.
   - The Decisions Scribe promotes these into `docs/DECISIONS_LOG.md`.
 
@@ -291,9 +292,9 @@ Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
 
 As an agent, add a `[NOTE]` or `[PROPOSAL]` when, for example:
 
-- You see behavior in `factory.py` or `intake_sanitizer.py` that **isn’t documented** in AGENT_ALIGNMENT yet.
-- You think a recurring pattern should be codified (e.g., “QA can return FAIL/ERROR/SKIPPED as long as the page still renders”).
-- You suspect a future conflict or ambiguity (“Builder is using a pattern that isn’t reflected in the manifest”).
+- You see behavior in `factory.py` or `intake_sanitizer.py` that **isnâ€™t documented** in AGENT_ALIGNMENT yet.
+- You think a recurring pattern should be codified (e.g., â€œQA can return FAIL/ERROR/SKIPPED as long as the page still rendersâ€).
+- You suspect a future conflict or ambiguity (â€œBuilder is using a pattern that isnâ€™t reflected in the manifestâ€).
 
 Use the inbox as the **scratchpad for future decisions**, but remember:  
 **Only logged D-XXXX entries and the alignment docs define the current rules.**
@@ -308,7 +309,7 @@ When prompting external coding assistants (Claude, GPT, Codex, Gemini, etc.), in
 
 ### Suggested Prompt Snippet
 
-```
+```text
 Before making any changes, read and obey docs/internal/AGENT_ALIGNMENT.md.
 Restate the v1.0 client pipeline in your own words before doing any work.
 If you encounter any conflicts between docs and code, treat the code as ground truth.
@@ -316,7 +317,7 @@ If you encounter any conflicts between docs and code, treat the code as ground t
 
 ### Longer Context Snippet
 
-```
+```text
 You are working on Ghost Factory v1.0.
 
 Key files to read:
@@ -325,7 +326,7 @@ Key files to read:
 - design-system/manifest.md (component library)
 - .cursorrules (coding standards)
 
-Scope: Single demo client (demo-hvac) flowing from intake-raw.md → intake.md → brief.md → content.md → page.tsx → rendered page.
+Scope: Single demo client (demo-hvac) flowing from intake-raw.md â†’ intake.md â†’ brief.md â†’ content.md â†’ page.tsx â†’ rendered page.
 
 Do NOT implement: multi-client, analytics dashboards, A/B tests, experiments, or features marked as v1.5+.
 ```

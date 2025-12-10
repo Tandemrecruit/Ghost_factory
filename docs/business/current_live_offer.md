@@ -1,6 +1,6 @@
-# Current Live Offer – Done-For-You Landing Page
+﻿# Current Live Offer â€“ Done-For-You Landing Page
 
-This file defines the ONE public-facing offer I’m taking live first.  
+This file defines the ONE public-facing offer Iâ€™m taking live first.  
 Everything else (tiers, white-label, branding packs) is internal only for now.
 
 ---
@@ -11,23 +11,23 @@ Working name:
 
 - Done-for-you landing page
 
-Later I can rename it (e.g. “Launch Landing Page”), but the scope stays the same.
+Later I can rename it (e.g. â€œLaunch Landing Pageâ€), but the scope stays the same.
 
 ---
 
-## What’s Included (Mapped to LP-Standard)
+## Whatâ€™s Included (Mapped to LP-Standard)
 
 This offer maps to my internal LP-Standard tier.
 
 Included:
 
 - One high-converting landing page
-- Roughly 5–6 sections, for example:
-  - Hero: who it’s for, core promise, primary CTA
+- Roughly 5â€“6 sections, for example:
+  - Hero: who itâ€™s for, core promise, primary CTA
   - Problem / solution: what pain it solves and how
-  - Benefits: 3–5 core benefits or outcomes
+  - Benefits: 3â€“5 core benefits or outcomes
   - Social proof: testimonials, reviews, or trust elements (if provided)
-  - FAQ or process: common questions or “how it works”
+  - FAQ or process: common questions or â€œhow it worksâ€
   - Final CTA: clear next step with supporting reminder
 - Strategy and structure:
   - I turn the intake form answers into a clear offer and page structure
@@ -53,15 +53,15 @@ Not included (by default):
 
 Public promise:
 
-- “You’ll receive your first draft within 3–5 business days after you submit the intake form.”
+- â€œYouâ€™ll receive your first draft within 3â€“5 business days after you submit the intake form.â€
 
 Optional rush (future):
 
-- “Priority draft within 2 business days” for an additional rush fee (25–40% of project price).
+- â€œPriority draft within 2 business daysâ€ for an additional rush fee (25â€“40% of project price).
 
 Internal reality:
 
-- Aim to have a solid draft ready within 24–48 hours of completed intake.
+- Aim to have a solid draft ready within 24â€“48 hours of completed intake.
 - Use the remaining time window for:
   - Buffer around my day jobs and life
   - A second look with fresh eyes
@@ -79,14 +79,14 @@ Internal target price range:
 
 - Base internal target: around 450 USD per project.
 - Floor and ceiling are controlled by:
-  - Time estimates (typically 5–7 hours of “brain time” for a standard project),
-  - Desired monthly effective hourly rate (e.g. 50–75 USD/hr),
+  - Time estimates (typically 5â€“7 hours of â€œbrain timeâ€ for a standard project),
+  - Desired monthly effective hourly rate (e.g. 50â€“75 USD/hr),
   - Add-ons like self-hosted handoff or rush turnaround.
 
 Public pricing (to decide later):
 
-- Likely a single clear number (or “starting at” number), e.g. something like:
-  - 4xx–5xx USD for the full landing page.
+- Likely a single clear number (or â€œstarting atâ€ number), e.g. something like:
+  - 4xxâ€“5xx USD for the full landing page.
 - Exact numbers and copy will be set when I write the sales page,
   using this file and docs/internal/pricing_model.md as the source of truth.
 
@@ -103,7 +103,7 @@ Internal rules:
     - Delivering self-hosted code/hand-off assets.
 
 - Deposit is non-refundable once:
-  - The intake form is submitted and work has clearly begun (intake → strategy → draft).
+  - The intake form is submitted and work has clearly begun (intake â†’ strategy â†’ draft).
 
 This is enforced by:
 
@@ -118,15 +118,15 @@ This offer can be combined with:
 
 - Managed Hosting:
   - I host the page and keep it live.
-  - Internal target: 25–35 USD/month per page.
+  - Internal target: 25â€“35 USD/month per page.
 - Self-Hosted Handoff:
   - Client or their dev handles hosting.
-  - Internal handoff fee: +100–150 USD on top of the project.
+  - Internal handoff fee: +100â€“150 USD on top of the project.
 
 At launch:
 
 - I can keep hosting simple in public copy:
-  - “I can either host the page for you for a simple monthly fee, or hand everything off to your developer.”
+  - â€œI can either host the page for you for a simple monthly fee, or hand everything off to your developer.â€
 
 Details and exact numbers are controlled by:
 
@@ -164,7 +164,7 @@ Internal reasoning:
   - One page to explain
   - One offer to sell
 - Makes my pipeline efficient:
-  - Everyone goes through the same intake → draft → revision → delivery path.
+  - Everyone goes through the same intake â†’ draft â†’ revision â†’ delivery path.
 - Gives cleaner data:
   - Easier to see if the offer, pricing, and process work.
 
@@ -175,7 +175,7 @@ LP-Base and LP-Plus remain:
   - Scope is clearly larger/complex (LP-Plus),
   - Without exposing multiple choices to clients right now.
 
-When landing pages feel smooth and I’ve delivered several, I can:
+When landing pages feel smooth and Iâ€™ve delivered several, I can:
 
 - Decide whether to:
   - Introduce visible tiers, or

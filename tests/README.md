@@ -1,4 +1,4 @@
-# Test Suite for Ghost Factory
+﻿# Test Suite for Ghost Factory
 
 Comprehensive unit tests for the Ghost Factory automation pipeline, focusing on new and modified functionality in the current branch.
 

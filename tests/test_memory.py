@@ -14,9 +14,6 @@ import os
 import tempfile
 import shutil
 from unittest.mock import patch, mock_open
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from automation import memory
 

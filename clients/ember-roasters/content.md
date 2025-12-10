@@ -1,4 +1,4 @@
-# Ember Roasters Website Copy
+﻿# Ember Roasters Website Copy
 
 ## Hero Section
 
@@ -6,7 +6,7 @@
 **Coffee Worth Waking Up For**
 
 ### Subheadline
-Small-batch coffee roasted fresh every week and delivered to your door. Every bag shows the roast date—because freshness isn't a feature, it's everything.
+Small-batch coffee roasted fresh every week and delivered to your door. Every bag shows the roast dateâ€”because freshness isn't a feature, it's everything.
 
 ### Supporting Copy
 Join coffee lovers across the country who've traded stale grocery store beans for the real thing: ultra-fresh, farm-direct coffee roasted in small batches right here in Portland.
@@ -16,9 +16,9 @@ Join coffee lovers across the country who've traded stale grocery store beans fo
 **Secondary CTA (text link):** Or try a single bag first
 
 ### Trust Badge (small text near CTA)
-✓ Free shipping on all subscriptions  
-✓ Pause or cancel anytime  
-✓ Roasted within 7 days of delivery
+âœ“ Free shipping on all subscriptions  
+âœ“ Pause or cancel anytime  
+âœ“ Roasted within 7 days of delivery
 
 ---
 
@@ -30,14 +30,14 @@ Join coffee lovers across the country who've traded stale grocery store beans fo
 ### Feature 1: Roasted Fresh, Weekly
 **Icon suggestion:** Calendar with coffee bean
 
-Every bag leaves our roastery within days of roasting—not weeks or months. You'll see the exact roast date printed on every package, guaranteeing you're brewing coffee at its peak flavor window.
+Every bag leaves our roastery within days of roastingâ€”not weeks or months. You'll see the exact roast date printed on every package, guaranteeing you're brewing coffee at its peak flavor window.
 
 No stale beans. No mystery dates. Just coffee the way it's meant to taste.
 
 ### Feature 2: Sourced Direct from Farmers
 **Icon suggestion:** Globe or handshake
 
-We work directly with small farms in Ethiopia, Colombia, and Guatemala—building relationships that let us secure exceptional beans while ensuring farmers get paid fairly.
+We work directly with small farms in Ethiopia, Colombia, and Guatemalaâ€”building relationships that let us secure exceptional beans while ensuring farmers get paid fairly.
 
 You get better coffee. They get a better deal. Everyone wins.
 
@@ -59,7 +59,7 @@ Because a $7 shipping charge shouldn't stand between you and great coffee.
 Pick the subscription that matches your coffee habit. One bag monthly, two bags, or go all-in with our Obsessed tier. Switch anytime.
 
 ### Step 2: We Roast & Ship
-Every week, we roast small batches and ship them out fresh. Your coffee arrives within days of roasting—not weeks.
+Every week, we roast small batches and ship them out fresh. Your coffee arrives within days of roastingâ€”not weeks.
 
 ### Step 3: Brew & Enjoy
 Open the bag. Smell that? That's what fresh coffee actually smells like. Now brew it however you love it and taste the difference roast dates make.
@@ -76,7 +76,7 @@ Open the bag. Smell that? That's what fresh coffee actually smells like. Now bre
 ### Body Copy
 Great coffee starts long before we fire up the roaster. It starts with farmers who care as much about quality as we do.
 
-We've spent years building direct relationships with small farms in Ethiopia's Yirgacheffe region, Colombia's coffee-growing mountains, and the volcanic soils of Guatemala. These aren't transactional relationships—we return to the same farms season after season, working together to improve quality and ensure everyone gets paid fairly.
+We've spent years building direct relationships with small farms in Ethiopia's Yirgacheffe region, Colombia's coffee-growing mountains, and the volcanic soils of Guatemala. These aren't transactional relationshipsâ€”we return to the same farms season after season, working together to improve quality and ensure everyone gets paid fairly.
 
 When you cut out the middlemen and work directly with producers, something magic happens: farmers can focus on quality over quantity, and you get beans that actually taste like something.
 
@@ -86,13 +86,13 @@ Every origin we source tells a story. Every bag we roast honors the people who g
 
 ### Supporting Element (3 origin cards)
 
-**Ethiopia — Yirgacheffe**  
+**Ethiopia â€” Yirgacheffe**  
 Bright, floral, complex. The birthplace of coffee.
 
-**Colombia — Huila**  
+**Colombia â€” Huila**  
 Balanced, sweet, classic. Crowd-pleaser for a reason.
 
-**Guatemala — Antigua**  
+**Guatemala â€” Antigua**  
 Rich, chocolatey, bold. Built for morning rituals.
 
 ---
@@ -103,7 +103,7 @@ Rich, chocolatey, bold. Built for morning rituals.
 **Choose Your Coffee Commitment**
 
 ### Subheadline
-All plans include free shipping and the freedom to pause, skip, or cancel anytime. About **$0.50 per cup**—less than your daily coffee shop run.
+All plans include free shipping and the freedom to pause, skip, or cancel anytime. About **$0.50 per cup**â€”less than your daily coffee shop run.
 
 ---
 
@@ -123,7 +123,7 @@ All plans include free shipping and the freedom to pause, skip, or cancel anytim
 
 ---
 
-### Tier 2: Enthusiast ⭐
+### Tier 2: Enthusiast â­
 
 **$42/month**
 
@@ -166,7 +166,7 @@ All plans include free shipping and the freedom to pause, skip, or cancel anytim
 If your first bag doesn't blow you away, we'll replace it free or refund you completely. No hard feelings.
 
 **Pause or Cancel Anytime**  
-Life happens. Manage your subscription online in seconds—no phone calls, no hassles.
+Life happens. Manage your subscription online in secondsâ€”no phone calls, no hassles.
 
 ---
 
@@ -180,15 +180,15 @@ Life happens. Manage your subscription online in seconds—no phone calls, no ha
 ### Testimonial 1
 "I thought I knew what good coffee tasted like until I tried Ember. The difference fresh roasting makes is absolutely wild. I'm never going back."
 
-**— Sarah M., Seattle, WA**  
+**â€” Sarah M., Seattle, WA**  
 *Enthusiast subscriber since 2023*
 
 ---
 
 ### Testimonial 2
-"Finally, a subscription that doesn't feel like I'm locked into some sketchy contract. I paused for a month when I traveled, restarted when I got back—easy as that. And the coffee? Incredible."
+"Finally, a subscription that doesn't feel like I'm locked into some sketchy contract. I paused for a month when I traveled, restarted when I got backâ€”easy as that. And the coffee? Incredible."
 
-**— Marcus T., Austin, TX**  
+**â€” Marcus T., Austin, TX**  
 *Explorer subscriber since 2024*
 
 ---
@@ -196,7 +196,7 @@ Life happens. Manage your subscription online in seconds—no phone calls, no ha
 ### Testimonial 3
 "As someone with a $2,000 espresso setup, I'm picky about my beans. Ember's roast dates and sourcing transparency sold me immediately. These are the only beans I use now."
 
-**— Jennifer K., Denver, CO**  
+**â€” Jennifer K., Denver, CO**  
 *Obsessed subscriber since 2023*
 
 ---
@@ -204,7 +204,7 @@ Life happens. Manage your subscription online in seconds—no phone calls, no ha
 ### Testimonial 4
 "I was spending $6 a day at coffee shops. Now I'm spending $42 a month and drinking better coffee at home. The math checks out, and my mornings are infinitely better."
 
-**— David L., Portland, OR**  
+**â€” David L., Portland, OR**  
 *Enthusiast subscriber since 2024*
 
 ---
@@ -226,7 +226,7 @@ Compare that to grocery store coffee (often 3-6 months old) or even other "speci
 
 **Is this actually cheaper than my daily coffee shop run?**
 
-Let's do the math: Our Enthusiast plan breaks down to about $0.50 per cup. If you're buying one $5 latte daily, you're spending $150/month. Even cutting that to 3x weekly is $60/month—and you're still drinking better coffee at home with our subscription.
+Let's do the math: Our Enthusiast plan breaks down to about $0.50 per cup. If you're buying one $5 latte daily, you're spending $150/month. Even cutting that to 3x weekly is $60/monthâ€”and you're still drinking better coffee at home with our subscription.
 
 ---
 
@@ -234,7 +234,7 @@ Let's do the math: Our Enthusiast plan breaks down to about $0.50 per cup. If yo
 
 Really. No catch. Log into your account, click "cancel," done. We'd rather you come back on your own terms than feel trapped. Coffee should make you happy, not stressed.
 
-You can also pause deliveries if you're traveling or drowning in beans—we get it.
+You can also pause deliveries if you're traveling or drowning in beansâ€”we get it.
 
 ---
 
@@ -248,19 +248,19 @@ If your first bag doesn't meet your expectations, reach out. We'll send a replac
 
 We ship via USPS Priority Mail. Most orders arrive within 2-4 business days. You'll get tracking info as soon as your order ships.
 
-All subscription orders ship free—that's our promise.
+All subscription orders ship freeâ€”that's our promise.
 
 ---
 
 **Can I choose which origins I receive?**
 
-Explorer subscribers get our featured monthly selections. Enthusiast and Obsessed subscribers can customize their origin choices through your account dashboard. Or just let us surprise you—we're pretty good at this.
+Explorer subscribers get our featured monthly selections. Enthusiast and Obsessed subscribers can customize their origin choices through your account dashboard. Or just let us surprise youâ€”we're pretty good at this.
 
 ---
 
 **What brewing methods work best?**
 
-Our coffee is roasted to shine across all brewing methods: pour-over, French press, drip, espresso, AeroPress—you name it. We provide brewing tips with each order, but honestly, good beans are pretty forgiving.
+Our coffee is roasted to shine across all brewing methods: pour-over, French press, drip, espresso, AeroPressâ€”you name it. We provide brewing tips with each order, but honestly, good beans are pretty forgiving.
 
 ---
 
@@ -272,7 +272,7 @@ Not yet, but we're working on sourcing a decaf that meets our quality standards.
 
 **What's a "micro-lot" and why should I care?**
 
-Micro-lots are small-batch, ultra-premium coffees—think limited harvest from a specific section of a farm. They're often experimental varieties or special processing methods. 
+Micro-lots are small-batch, ultra-premium coffeesâ€”think limited harvest from a specific section of a farm. They're often experimental varieties or special processing methods. 
 
 Enthusiast and Obsessed subscribers get early or exclusive access to these when we source them. They're special, and they don't last long.
 
@@ -291,10 +291,10 @@ Join hundreds of coffee lovers who've upgraded their mornings. First bag guarant
 ---
 
 ### Footer Trust Signals
-✓ Roasted fresh weekly in Portland, OR  
-✓ Direct farmer partnerships since 2021  
-✓ 100% satisfaction guarantee  
-✓ Cancel or pause anytime  
+âœ“ Roasted fresh weekly in Portland, OR  
+âœ“ Direct farmer partnerships since 2021  
+âœ“ 100% satisfaction guarantee  
+âœ“ Cancel or pause anytime  
 
 ---
 
@@ -321,7 +321,7 @@ Join hundreds of coffee lovers who've upgraded their mornings. First bag guarant
 ---
 
 ### Legal Footer
-© 2024 Ember Roasters. Portland, Oregon.  
+Â© 2024 Ember Roasters. Portland, Oregon.  
 [Privacy Policy](#) | [Terms of Service](#)
 
 ---
@@ -357,7 +357,7 @@ Join hundreds of coffee lovers who've upgraded their mornings. First bag guarant
 
 **Unpretentious:** Acknowledged real customer concerns (shipping costs, cancellation fears) with straightforward answers
 
-**Quality-obsessed:** Repeatedly emphasized roast dates, freshness windows, and sourcing transparency—without making it sound exclusive
+**Quality-obsessed:** Repeatedly emphasized roast dates, freshness windows, and sourcing transparencyâ€”without making it sound exclusive
 
 **Human:** Injected personality ("No hard feelings," "We get it") while maintaining professionalism
 

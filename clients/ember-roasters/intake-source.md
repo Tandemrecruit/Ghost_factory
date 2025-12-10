@@ -1,4 +1,4 @@
-# Raw Client Notes - Ember Roasters
+﻿# Raw Client Notes - Ember Roasters
 
 hey so we're a coffee roastery in portland oregon, been around since 2019. we roast small batch specialty coffee and sell direct to consumers and some local cafes. 
 
@@ -47,4 +47,3 @@ timeline: would love to have something up in 2 weeks, not super urgent
 OH also we have some press - featured in Portland Monthly magazine and Willamette Week
 
 thats pretty much it! let me know if you need anything else
-

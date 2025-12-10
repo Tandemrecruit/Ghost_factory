@@ -12,11 +12,6 @@ These tests ensure:
 
 import pytest
 import re
-import os
-import sys
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from automation import factory
 from automation import intake_sanitizer

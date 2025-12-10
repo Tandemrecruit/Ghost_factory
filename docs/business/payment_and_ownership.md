@@ -1,4 +1,4 @@
-# docs/payment_and_ownership.md
+﻿# docs/payment_and_ownership.md
 
 # Payment, Ownership, and Licensing Policy
 
@@ -10,14 +10,14 @@ This file defines how payments, ownership, and rights to the work product are ha
 
 Projects use a **two-milestone payment structure**:
 
-1. **Deposit – 50%**
+1. **Deposit â€“ 50%**
    - Due before any work begins
    - Unlocks:
      - Project slot reservation
      - Access to the full intake form
-     - Start of the intake → draft process once the form is submitted
+     - Start of the intake â†’ draft process once the form is submitted
 
-2. **Final Payment – 50%**
+2. **Final Payment â€“ 50%**
    - Due when the draft has been approved and is ready for launch
    - Unlocks:
      - Final deliverables (code and/or deployment)
@@ -59,11 +59,11 @@ During the draft/revision phase:
 - Drafts are hosted on **your infrastructure** (e.g., your domain or staging environment)
 - The client receives a **preview URL** for review
 - You do **not**:
-  - Push code into the client’s repositories
+  - Push code into the clientâ€™s repositories
   - Provide source code files
-  - Connect the page to the client’s live domain
+  - Connect the page to the clientâ€™s live domain
 
-This keeps the draft clearly in “evaluation only” status until the project is fully paid.
+This keeps the draft clearly in â€œevaluation onlyâ€ status until the project is fully paid.
 
 ---
 
@@ -78,7 +78,7 @@ This keeps the draft clearly in “evaluation only” status until the project i
 
 ### 4.2. After work has started
 
-Work is considered “started” once:
+Work is considered â€œstartedâ€ once:
 
 - The intake form has been submitted and
 - You (or your agents) have begun creating the brief, copy, or page
@@ -93,7 +93,7 @@ At this point:
 If the client:
 
 - Receives the draft and
-- Fails to provide feedback or pay the final 50% within a reasonable period (e.g., 14–30 days),
+- Fails to provide feedback or pay the final 50% within a reasonable period (e.g., 14â€“30 days),
 
 you may:
 

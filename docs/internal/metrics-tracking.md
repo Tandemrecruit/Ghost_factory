@@ -1,4 +1,4 @@
-# Ghost Factory Metrics Tracking (v1)
+﻿# Ghost Factory Metrics Tracking (v1)
 
 A lightweight, privacy-friendly metrics system for measuring landing page performance.
 
@@ -203,24 +203,24 @@ Tests cover:
 
 ```
 lib/
-├── metrics.ts           # Client-side tracking helpers
-├── metrics-schema.ts    # Zod schemas for events
+â”œâ”€â”€ metrics.ts           # Client-side tracking helpers
+â”œâ”€â”€ metrics-schema.ts    # Zod schemas for events
 
 app/api/gf-track/
-└── route.ts             # API endpoint
+â””â”€â”€ route.ts             # API endpoint
 
 components/
-├── MetricsProvider.tsx  # Page wrapper with auto-tracking
-├── HeroSimple.tsx       # + blockId prop
-├── HeroSplit.tsx        # + blockId prop
-├── PricingSimple.tsx    # + blockId prop
-├── CtaBanner.tsx        # + blockId prop
-└── index.ts             # + MetricsProvider export
+â”œâ”€â”€ MetricsProvider.tsx  # Page wrapper with auto-tracking
+â”œâ”€â”€ HeroSimple.tsx       # + blockId prop
+â”œâ”€â”€ HeroSplit.tsx        # + blockId prop
+â”œâ”€â”€ PricingSimple.tsx    # + blockId prop
+â”œâ”€â”€ CtaBanner.tsx        # + blockId prop
+â””â”€â”€ index.ts             # + MetricsProvider export
 
 tests/ts/
-├── metrics-schema.test.ts
-├── metrics-client.test.ts
-└── gf-track-route.test.ts
+â”œâ”€â”€ metrics-schema.test.ts
+â”œâ”€â”€ metrics-client.test.ts
+â””â”€â”€ gf-track-route.test.ts
 ```
 
 ## Future Extensions
