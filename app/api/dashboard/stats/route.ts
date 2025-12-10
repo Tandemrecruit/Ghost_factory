@@ -55,6 +55,12 @@ async function fileExists(target: string) {
   }
 }
 
+/**
+ * Read JSON from the specified file path, returning an empty array when no usable data exists.
+ *
+ * @param target - Path to the JSON file to read
+ * @returns The parsed JSON value, or an empty array if the file is missing or cannot be parsed
+ */
 async function readJson(target: string) {
   return readJsonFile(target, []);
 }
@@ -80,14 +86,13 @@ function normalizeToArray<T>(data: unknown): T[] {
 }
 
 /**
- * Aggregate and return all time log entries found in the month's directory.
+ * Aggregate all time log entries from the specified month's directory.
  *
  * Reads every `.json` file in the data/time_logs/{month} directory, validates each file's contents
- * against the time-logs schema (logging a schema warning for any file with validation errors),
- * and returns a single flattened array containing all entries. If the month directory does not exist,
- * returns an empty array.
+ * against the time-logs schema (logs a schema warning for files with validation errors),
+ * and returns a single flattened array containing all entries.
  *
- * @param month - The month folder name or identifier under `data/time_logs` (for example, `"2023-07"`)
+ * @param month - Month folder name under `data/time_logs` (for example, "2023-07")
  * @returns An array of time log entry objects; empty if the month directory is missing or contains no JSON entries
  */
 async function loadTimeEntries(month: string) {
@@ -110,13 +115,13 @@ async function loadTimeEntries(month: string) {
 }
 
 /**
- * Constructs a fallback balance summary and aggregated raw entries for a given month when no precomputed balance is available.
+ * Builds a fallback balance summary and aggregated raw entries for a month when no precomputed balance exists.
  *
  * @param month - Month identifier in `YYYY-MM` format
- * @returns An object with:
+ * @returns An object containing:
  *   - `month`: the requested month string
- *   - `totals`: aggregated numeric totals (rounded to two decimal places) including `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`, `hours`, `time_saved_hours`, and `effective_hourly_usd`
- *   - `running_balance`: an array (empty for the fallback)
+ *   - `totals`: rounded numeric totals including `revenue_usd`, `costs_usd`, `api_cost_usd`, `hosting_cost_usd`, `payment_fee_usd`, `net_income_usd`, `hours`, `time_saved_hours`, and `effective_hourly_usd`
+ *   - `running_balance`: an empty array for the fallback
  *   - `entries`: raw arrays used to compute totals under `time`, `revenue`, and `costs`
  */
 async function computeFallback(month: string) {
@@ -206,6 +211,14 @@ async function computeFallback(month: string) {
   };
 }
 
+/**
+ * Handle GET requests for a month's balance sheet data.
+ *
+ * Checks authorization, validates the `month` query parameter, and returns the stored balance sheet JSON for that month when available and valid. If the stored file is missing or corrupted, returns a computed fallback summary derived from available data sources. On error returns a JSON error object.
+ *
+ * @param request - The incoming Request for the endpoint, whose URL must include a `month` query parameter.
+ * @returns A JSON response containing the monthly balance sheet data or an `{ error: string }` object. Responds with status 200 on success, 401 when unauthorized, and 400 for other request errors.
+ */
 export async function GET(request: Request) {
   // Check authorization
   if (!isAuthorized(request)) {
