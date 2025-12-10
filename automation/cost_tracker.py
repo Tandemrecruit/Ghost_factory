@@ -69,6 +69,13 @@ def _estimate_tokens(activity: str, cfg: Dict[str, Any]) -> Dict[str, int]:
     return estimates.get(activity, {"input": 0, "output": 0})
 
 
+def _format_token_count(tokens: int) -> str:
+    """Format token count compactly for large numbers."""
+    if tokens >= 1000:
+        return f"{tokens / 1000:.1f}k".rstrip("0").rstrip(".")
+    return str(tokens)
+
+
 def _calculate_cost_with_tiered_pricing(
     input_tokens: int,
     output_tokens: int,
@@ -144,9 +151,14 @@ def record_api_cost(
 
     month_str = now.strftime("%Y-%m")
     _append_entry(API_COST_DIR, month_str, entry)
+    
+    # Format tokens compactly for readability
+    in_tokens_str = _format_token_count(in_tokens)
+    out_tokens_str = _format_token_count(out_tokens)
+    tokens_str = f"{in_tokens_str}+{out_tokens_str}"
+    
     logging.info(
-        f"[cost] provider={provider} model={model} activity={activity} "
-        f"tokens_in={in_tokens} tokens_out={out_tokens} cost=${total_cost}"
+        f"💰 API cost: ${total_cost} | model: {model} | activity: {activity} | tokens: {tokens_str}"
     )
     return entry
 

@@ -2,187 +2,175 @@
 
 ## Overview
 
-Comfort Breeze Heating & Air is a family-owned residential HVAC company serving Sterling Heights, MI and surrounding communities within a 30-40 minute radius. The landing page targets homeowners aged 30-65 who prioritize comfort, safety, and working with trustworthy local experts over DIY solutions. The primary goal is generating phone calls and online scheduling for seasonal tune-ups and emergency no-heat service, with messaging that emphasizes honest pricing, reliability, and the personal touch of a small local crew.
-
----
+Comfort Breeze Heating & Air is a family-owned residential HVAC company serving Sterling Heights, MI and surrounding communities within a 30-40 minute radius. The landing page targets homeowners aged 30-65 who prioritize comfort, safety, and working with trustworthy local experts over DIY solutions. The primary objective is generating inbound phone calls and online scheduling requests for seasonal tune-ups and emergency no-heat service, with messaging that emphasizes honest pricing, reliable service, and genuine local expertise.
 
 ## Brand Colors
 
-- **Primary Blue**: #1E5A8C (trustworthy, professional, cooling)
-- **Secondary Blue**: #3A7CB8 (lighter accent for backgrounds/highlights)
-- **Accent Orange**: #E8732B (warmth, energy, heating, CTAs)
-- **Neutral Dark**: #2D3B4A (text, headers)
-- **Neutral Light**: #F5F7FA (backgrounds, breathing room)
-- **White**: #FFFFFF (clean sections, cards)
-
----
+- **Primary Blue**: Deep, trustworthy blue (#1E4A7C or similar) — conveys reliability and professionalism
+- **Secondary Blue**: Lighter blue (#4A90C2) — for accents and supporting elements
+- **Accent Orange**: Warm orange (#E85A1E) — represents heat, energy, and urgency; use sparingly for CTAs and heat-related messaging
+- **Neutral White/Light Gray**: (#F8F9FA) — clean backgrounds
+- **Text Dark**: (#1A1A1A) — high-contrast readability
 
 ## Sitemap
 
-**Single-Page Landing Structure:**
+**Single Landing Page** with anchored sections:
 
 1. Hero Section
-2. Trust Bar
-3. Services Overview
-4. Why Choose Us
-5. How It Works (3-Step Process)
-6. Safety & Peace of Mind
-7. Service Area
-8. About Us / Meet the Team
-9. Contact / Final CTA
-10. Footer
-
----
+2. Service Overview Bar
+3. Trust Indicators Strip
+4. Services We Offer
+5. Why Sterling Heights Homeowners Call Us
+6. How It Works (3-Step Process)
+7. Safety & Peace of Mind
+8. Service Area
+9. About Comfort Breeze
+10. Final CTA Block
+11. Footer with Contact Details
 
 ## Layout Strategy
 
-### Section 1: Hero
-**Purpose**: Stop the scroll, speak directly to the homeowner's frustration, and drive immediate calls.
+### Section 1: Hero Section
+**Purpose**: Immediately establish relevance, location, and primary action
 
-**Layout**: Full-width background (subtle gradient or lifestyle image of comfortable home), centered headline, subhead, and dual CTAs.
+**Layout**: Full-width with subtle gradient or lifestyle image background (real Michigan home exterior or comfortable family indoors). Left-aligned text block with right-side phone number prominence.
 
-**Content Direction**:
+**Content Elements**:
 - **Headline**: "Stop Sweating and Freezing in Your Own House"
-- **Subhead**: "Sterling Heights' trusted HVAC team—honest pricing, on-time service, no surprise fees."
-- **Primary CTA**: "Call Now to Schedule" (prominent phone number, click-to-call)
-- **Secondary CTA**: "Request a Quote Online" (button linking to form)
+- **Subheadline**: "Sterling Heights' trusted HVAC team — on-time service, upfront pricing, no surprises."
+- **Primary CTA Button**: "Call Now to Schedule Service" (orange, prominent)
+- **Secondary CTA**: "Request a Quote Online" (outlined/ghost button style)
+- **Trust micro-copy below CTAs**: "Same-day emergency service available • Licensed & Insured"
 
-**Design Notes**: Phone number should be large and tappable. Hero image (when available) should show real technician or local home—avoid generic stock. Blues dominate with orange CTA buttons.
+**Rationale**: The headline addresses the emotional frustration homeowners feel. Localization in subheadline immediately qualifies the visitor and builds local trust. Dual CTAs accommodate both phone-first and form-preference visitors.
 
 ---
 
-### Section 2: Trust Bar
-**Purpose**: Immediately establish credibility before visitors scroll further.
+### Section 2: Service Overview Bar
+**Purpose**: Quick scan of capabilities for visitors who want immediate answers
 
-**Layout**: Horizontal strip with 4-5 trust indicators, subtle background differentiation.
+**Layout**: Horizontal strip with icon + short text for each service category (4-6 items)
 
-**Content Direction**:
+**Content Elements**:
+- AC Installation & Replacement
+- Furnace Repair & Replacement
+- Spring AC Tune-Ups
+- Fall Furnace Checks
+- Emergency No-Heat Service
+- Indoor Air Quality
+
+**Rationale**: Many local service seekers arrive with a specific need. This scannable bar helps them confirm "yes, they do what I need" within 3 seconds.
+
+---
+
+### Section 3: Trust Indicators Strip
+**Purpose**: Overcome "stranger danger" objections immediately
+
+**Layout**: Centered horizontal bar with 3-4 trust badges/statements
+
+**Content Elements**:
 - "Family-Owned & Operated"
-- "Licensed & Insured"
-- "Serving Sterling Heights Since [Year]"
-- "Same-Day Emergency Service"
-- "Upfront Pricing—No Surprises"
+- "Licensed & Insured in Michigan"
+- "Serving Metro Detroit Since [Year]" (if available)
+- "Upfront Pricing — No Surprise Fees"
 
-**Design Notes**: Simple icons paired with short text. Keep it scannable. No fake star ratings or unverified claims.
-
----
-
-### Section 3: Services Overview
-**Purpose**: Quickly communicate full service range so visitors know they're in the right place.
-
-**Layout**: Grid of service cards (2x3 on desktop, stacked on mobile), each with icon, service name, and one-line description.
-
-**Services to Include**:
-1. **AC Installation & Replacement** — "Upgrade to reliable cooling that lasts"
-2. **Furnace Repair & Replacement** — "Heat you can count on all winter"
-3. **Spring AC Tune-Ups** — "Get ahead of the heat—schedule early"
-4. **Fall Furnace Check** — "Safe, efficient heating before the cold hits"
-5. **Emergency No-Heat Service** — "Fast response when you need it most"
-6. **Indoor Air Quality Solutions** — "Cleaner air for your family's health"
-
-**Design Notes**: Use consistent iconography in brand blue. Cards should have subtle shadows for depth. Each card could link to a future detailed service page (note for dev).
+**Rationale**: For in-home services, trust is everything. These badges address the top anxieties before the visitor scrolls further.
 
 ---
 
-### Section 4: Why Choose Us
-**Purpose**: Differentiate from big-box competitors and address core objections head-on.
+### Section 4: Services We Offer
+**Purpose**: Detailed but scannable service descriptions
 
-**Layout**: Two-column layout—left side with heading and intro paragraph, right side with 3-4 benefit blocks (icon + headline + short paragraph).
+**Layout**: Two-column card grid (3 cards per row on desktop, stacked on mobile). Each card has icon, service name, 2-3 sentence description, and optional "Learn more" or direct CTA.
 
-**Content Direction**:
+**Content Elements**:
 
-*Intro*: "Why Homeowners Around Sterling Heights Call Us"
+**Card 1 — AC Installation & Replacement**
+"Time for a new system? We'll assess your home, explain your options clearly, and install a unit that fits your budget and cooling needs."
 
-**Benefit 1: Honest, Upfront Pricing**
-"We give you clear options—good, better, best—with pricing before any work starts. No surprise fees, no pressure to upsell."
+**Card 2 — Furnace Repair & Replacement**
+"Whether it's a minor fix or time for a new furnace, we'll give you honest recommendations — not a hard sell."
 
-**Benefit 2: A Small Crew You Can Trust**
-"You'll see the same familiar faces, not a rotating cast of strangers. We're your neighbors, and we treat your home like our own."
+**Card 3 — Spring AC Tune-Up**
+"Get your AC ready before the heat hits. A quick tune-up catches small problems before they become expensive repairs."
 
-**Benefit 3: We Show Up When We Say We Will**
-"Real humans answer the phone during business hours. We confirm appointments and arrive on time—because your time matters."
+**Card 4 — Fall Furnace Check**
+"Our seasonal inspection includes a carbon monoxide safety check, so your family stays warm and safe all winter."
 
-**Benefit 4: Repair-First Mindset**
-"We'll never push a replacement you don't need. We explain your options honestly so you can make the right call for your home and budget."
+**Card 5 — Emergency No-Heat Service**
+"Furnace quit on the coldest night? We offer same-day emergency service to get your heat back fast."
 
-**Design Notes**: Use checkmarks or custom icons. This section should feel warm and personal—consider a small team photo if available.
+**Card 6 — Indoor Air Quality**
+"From air purifiers to humidity control, we can help improve the air your family breathes every day."
 
----
-
-### Section 5: How It Works (3-Step Process)
-**Purpose**: Remove friction by showing how simple it is to get service.
-
-**Layout**: Horizontal 3-step flow with numbered circles, icons, and short descriptions. Stacks vertically on mobile.
-
-**Content Direction**:
-
-**Step 1: Call or Book Online**
-"Give us a call or fill out our quick online form. We'll find a time that works for your schedule."
-
-**Step 2: We Inspect & Explain**
-"Our technician arrives on time, diagnoses the issue, and walks you through your options—no jargon, no pressure."
-
-**Step 3: You Choose, We Fix**
-"Pick the option that fits your needs. We get to work and make sure you're comfortable before we leave."
-
-**Design Notes**: Use connecting lines or arrows between steps. Numbers should be prominent (orange accent). Keep text minimal.
+**Rationale**: Card format allows scanning while providing enough detail for decision-making. Each description subtly addresses objections (honest recommendations, safety checks, budget-friendly).
 
 ---
 
-### Section 6: Safety & Peace of Mind
-**Purpose**: Address the serious (but not fear-mongering) safety aspect of furnace maintenance.
+### Section 5: Why Sterling Heights Homeowners Call Us
+**Purpose**: Differentiation and objection handling through benefits
 
-**Layout**: Single-column centered text block with subtle icon or illustration. Alternatively, a horizontal callout box.
+**Layout**: Three-column feature blocks with icons, or alternating image/text rows
 
-**Content Direction**:
+**Content Elements**:
 
-*Headline*: "Your Family's Safety Is Part of Every Visit"
+**Block 1 — Upfront, Honest Pricing**
+"We give you clear options — good, better, best — with pricing you see before we start. No surprise fees, no pressure."
 
-*Body*: "Every furnace tune-up includes a carbon monoxide safety check. It's a simple step that gives you peace of mind heading into winter—and it's included at no extra charge."
+**Block 2 — Local Crew, Familiar Faces**
+"We're not a franchise or a 1-800 number. When you call, you talk to real people. When we visit, you'll see the same trusted technicians."
 
-**Design Notes**: Keep tone calm and reassuring, not alarmist. A simple home/shield icon works well. Consider a light blue or neutral background to set this apart.
+**Block 3 — We Fix What Needs Fixing**
+"Not every problem needs a new system. We'll tell you honestly whether a repair makes sense or it's time to replace — and explain why."
 
----
+**Block 4 — On-Time, Every Time**
+"Your time matters. We show up when we say we will and keep you informed if anything changes."
 
-### Section 7: Service Area
-**Purpose**: Confirm geographic fit and reinforce local positioning.
-
-**Layout**: Left side with heading and list of communities served; right side with simple service area map (or placeholder for one).
-
-**Content Direction**:
-
-*Headline*: "Proudly Serving Sterling Heights & Nearby Communities"
-
-*Communities List*:
-- Sterling Heights
-- Warren
-- Troy
-- Shelby Township
-- Clinton Township
-- And surrounding areas within 30-40 minutes
-
-*Note*: "Not sure if you're in our service area? Give us a call—we're happy to check."
-
-**Design Notes**: Map should be clean and simple (avoid cluttered Google Maps embed). List format works if map isn't available initially.
+**Rationale**: Each block directly counters the stated objections (price sensitivity, reliability, replace vs. repair). The language is conversational and aligned with the "straightforward, friendly, local, honest" brand voice.
 
 ---
 
-### Section 8: About Us / Meet the Team
-**Purpose**: Build personal connection and reinforce the "small local crew" message.
+### Section 6: How It Works (3-Step Process)
+**Purpose**: Reduce friction by showing simplicity
 
-**Layout**: Two-column—left side with team photo (or placeholder), right side with story copy.
+**Layout**: Horizontal numbered steps with icons (1 → 2 → 3 visual flow)
 
-**Content Direction**:
+**Content Elements**:
 
-*Headline*: "Meet Your Local HVAC Team"
+**Step 1 — Call or Schedule Online**
+"Give us a call or fill out our quick form. We'll find a time that works for your schedule."
 
-*Body*: "Comfort Breeze is a family-owned business right here in Sterling Heights. We started because we saw too many homeowners getting burned by pushy salespeople and surprise bills. Our approach is different: show up on time, explain things in plain English, and do honest work at fair prices. When you call us, you're not getting a call center—you're getting neighbors who care about keeping your home comfortable."
+**Step 2 — We Inspect & Explain**
+"Our technician assesses the situation, explains what's going on in plain English, and gives you options."
 
-**Design Notes**: Authentic photo of owner/team is ideal. If not available, use a placeholder with note for future update. Avoid stock photos of fake technicians.
+**Step 3 — You Decide, We Deliver**
+"Choose what works for you — no pressure. We complete the work and make sure you're comfortable."
+
+**Rationale**: Three-step processes reduce perceived complexity and commitment anxiety. Each step reinforces brand values (flexibility, transparency, no pressure).
 
 ---
 
-### Section 9: Contact / Final CTA
-**Purpose**: Strong closing push for phone calls and secondary option for online requests.
+### Section 7: Safety & Peace of Mind
+**Purpose**: Address safety concerns without fear-mongering
 
-**Layout**: Centered section with prominent phone number, supporting text,
+**Layout**: Single content block with subtle icon (shield or checkmark), possibly with light background color differentiation
+
+**Content Elements**:
+- **Headline**: "Your Family's Safety Is Part of Every Visit"
+- **Body copy**: "Every furnace inspection includes a carbon monoxide check. It's not about scaring you — it's about making sure your home is as safe as it is comfortable. Peace of mind comes standard."
+
+**Rationale**: This addresses the CO safety angle authentically without manipulative fear tactics. Positions safety as a natural part of their thoroughness, not a sales pitch.
+
+---
+
+### Section 8: Service Area
+**Purpose**: Geo-qualify visitors and reinforce local presence
+
+**Layout**: Simple map graphic or illustrated region with listed communities
+
+**Content Elements**:
+- **Headline**: "Proudly Serving Sterling Heights & Surrounding Communities"
+- **Area list**: Sterling Heights, Warren, Troy, Shelby Township, Clinton Township, and neighboring areas within 30-40 minutes
+- **Note**: "Not sure if we cover your area? Give us a call — we're happy to check."
+
+**Rationale**: Local service businesses must clearly define their territory. The friendly "give

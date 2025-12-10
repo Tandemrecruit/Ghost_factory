@@ -65,7 +65,9 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
         with open(RAW_ERRORS_PATH, "w", encoding="utf-8") as f:
             json.dump(errors, f, indent=2)
 
-        logging.info(f"[Memory] Recorded {category} failure: {issue[:50]}...")
+        # Truncate issue for readability, but keep more context than before
+        issue_preview = issue[:80] + "..." if len(issue) > 80 else issue
+        logging.info(f"🧠 Memory: Recorded {category} failure | {issue_preview}")
         return True
 
     except Exception:
@@ -168,7 +170,7 @@ def compile_and_save_rules() -> bool:
         with open(DYNAMIC_RULES_PATH, "w", encoding="utf-8") as f:
             f.write(rules_md)
 
-        logging.info(f"[Memory] Compiled rules from {len(logs)} errors to {DYNAMIC_RULES_PATH}")
+        logging.info(f"🧠 Memory: Compiled rules from {len(logs)} errors | {DYNAMIC_RULES_PATH}")
         return True
 
     except Exception:
@@ -236,7 +238,7 @@ def get_golden_reference() -> Tuple[str, str]:
         with open(sample_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        logging.info(f"[Memory] Loaded golden reference: {sample_file}")
+        logging.info(f"🧠 Memory: Loaded golden reference | {sample_file}")
         return (sample_file, content)
 
     except Exception as e:
@@ -290,7 +292,7 @@ def add_golden_sample(filename: str, content: str) -> bool:
         with open(sample_path, "w", encoding="utf-8") as f:
             f.write(content)
 
-        logging.info(f"[Memory] Added golden sample: {filename}")
+        logging.info(f"🧠 Memory: Added golden sample | {filename}")
         return True
 
     except Exception:

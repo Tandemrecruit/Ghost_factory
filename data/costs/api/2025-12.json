@@ -1366,5 +1366,249 @@
     "output_tokens": 4000,
     "cost_usd": 0.0095,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T11:58:39.857570",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T11:59:36.771707",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T12:00:26.334284",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T12:01:26.860422",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T12:02:35.720390",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T19:42:13.652917",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T19:43:10.012116",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T19:44:06.104358",
+    "provider": "openai",
+    "model": "gpt-5-mini",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.0095,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:00:12.878649",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "router_classify",
+    "client_id": "demo-hvac",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:00:25.003281",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:00:37.389027",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_visual_designer_a11y",
+    "client_id": "demo-hvac",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:00:54.681631",
+    "provider": "anthropic",
+    "model": "claude-opus-4-5-20251101",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "input_tokens": 4000,
+    "output_tokens": 1200,
+    "cost_usd": 0.05,
+    "metadata": {
+      "attempt": 1,
+      "niche": "local_service.md"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:01:04.125682",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_architect_critic",
+    "client_id": "demo-hvac",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:01:58.820277",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "input_tokens": 5000,
+    "output_tokens": 3200,
+    "cost_usd": 0.063,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:02:16.466440",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_copywriter_critic",
+    "client_id": "demo-hvac",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "metadata": {
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:03:07.598758",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:04:02.792860",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:04:57.134374",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:05:48.054710",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:06:44.998529",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-10T20:07:40.514410",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
   }
 ]

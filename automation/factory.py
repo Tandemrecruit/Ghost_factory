@@ -50,6 +50,10 @@ logging.basicConfig(
     datefmt='%H:%M:%S'
 )
 
+# Suppress verbose HTTP request logs from Anthropic SDK's underlying HTTP client
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+
 client_openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 client_anthropic = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
@@ -58,7 +62,7 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 # Tier order: Opus > Sonnet > Haiku (cost and capability)
 # For current pricing, see docs/internal/pricing_model.md
 MODEL_STRATEGY = "claude-opus-4-5-20251101"    # Complex reasoning, brand analysis
-MODEL_CODER = "gpt-5-mini"                     # Code generation - cost saver
+MODEL_CODER = "claude-sonnet-4-5-20250929"     # Code generation
 MODEL_COPY = "claude-sonnet-4-5-20250929"      # Creative writing, instruction following
 MODEL_QA = "claude-haiku-4-5-20251001"       # Visual inspection - using Sonnet until Haiku model is available
 MODEL_ROUTER = "claude-haiku-4-5-20251001"   # Fast classification - using Sonnet until Haiku model is available
@@ -101,18 +105,51 @@ def _llm_messages_create(model: str, client_id: str, activity: str, system: str,
     """
     Unified LLM caller that routes to Anthropic (with backoff) or OpenAI.
     """
+    # #region agent log
+    import json as json_module
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:104", "message": "_llm_messages_create entry", "data": {"model": model, "client_id": client_id, "activity": activity, "is_openai": model.startswith("gpt-")}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
     if model.startswith("gpt-"):
-        resp = client_openai.chat.completions.create(
-            model=model,
-            # OpenAI models in this family expect max_completion_tokens
-            max_completion_tokens=max_tokens,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_content},
-            ],
-        )
-        _record_model_cost("openai", model, activity, client_id, resp)
-        return resp
+        try:
+            resp = client_openai.chat.completions.create(
+                model=model,
+                # OpenAI models in this family expect max_completion_tokens
+                max_completion_tokens=max_tokens,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_content},
+                ],
+            )
+            # #region agent log
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    resp_attrs = {"has_choices": hasattr(resp, "choices"), "choices_len": len(resp.choices) if hasattr(resp, "choices") else 0}
+                    if hasattr(resp, "choices") and resp.choices:
+                        choice = resp.choices[0]
+                        resp_attrs["has_message"] = hasattr(choice, "message")
+                        if hasattr(choice, "message"):
+                            msg = choice.message
+                            resp_attrs["has_content"] = hasattr(msg, "content")
+                            if hasattr(msg, "content"):
+                                resp_attrs["content_type"] = type(msg.content).__name__
+                                resp_attrs["content_len"] = len(str(msg.content)) if msg.content else 0
+                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:115", "message": "OpenAI response received", "data": resp_attrs, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
+            _record_model_cost("openai", model, activity, client_id, resp)
+            return resp
+        except Exception as e:
+            # #region agent log
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:117", "message": "OpenAI API exception", "data": {"model": model, "error_type": type(e).__name__, "error_msg": str(e)[:300]}, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
+            raise
 
     resp = _anthropic_messages_create(
         model=model,
@@ -122,11 +159,23 @@ def _llm_messages_create(model: str, client_id: str, activity: str, system: str,
         system=system,
         messages=[{"role": "user", "content": user_content}],
     )
+    # #region agent log
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            resp_attrs = {"has_content": hasattr(resp, "content"), "content_len": len(resp.content) if hasattr(resp, "content") else 0}
+            if hasattr(resp, "content") and resp.content:
+                resp_attrs["first_block_type"] = type(resp.content[0]).__name__ if resp.content else None
+                if resp.content and hasattr(resp.content[0], "text"):
+                    resp_attrs["first_block_has_text"] = True
+                    resp_attrs["first_block_text_len"] = len(resp.content[0].text) if resp.content[0].text else 0
+            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:142", "message": "Anthropic response received", "data": resp_attrs, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
     _record_model_cost("anthropic", model, activity, client_id, resp)
     return resp
 
 
-def _start_heartbeat(label: str, interval: float = 10.0):
+def _start_heartbeat(label: str, interval: float = 30.0):
     """
     Start a background heartbeat logger to show long-running progress.
     Returns the (event, thread) so callers can stop it.
@@ -185,11 +234,26 @@ def _extract_response_text(response, default=None):
     Returns:
         str: The extracted text, or default if extraction fails
     """
+    # #region agent log
+    import json as json_module
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:188", "message": "_extract_response_text entry", "data": {"response_is_none": response is None, "has_content": hasattr(response, "content") if response else False, "has_choices": hasattr(response, "choices") if response else False}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
     try:
         if response and hasattr(response, 'content') and response.content:
             first_block = response.content[0]
             if hasattr(first_block, 'text') and first_block.text:
-                return first_block.text
+                extracted = first_block.text
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:195", "message": "extracted from Anthropic content", "data": {"extracted_len": len(extracted)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
+                return extracted
         if response and hasattr(response, "choices"):
             choice = response.choices[0]
             content = getattr(choice.message, "content", None)
@@ -200,11 +264,36 @@ def _extract_response_text(response, default=None):
                         texts.append(part.get("text", ""))
                     elif isinstance(part, str):
                         texts.append(part)
-                return "\n".join(t for t in texts if t) or default
+                extracted = "\n".join(t for t in texts if t) or default
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:210", "message": "extracted from OpenAI list content", "data": {"extracted_len": len(extracted) if extracted else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
+                return extracted
             if isinstance(content, str):
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:216", "message": "extracted from OpenAI string content", "data": {"extracted_len": len(content)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
                 return content
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:220", "message": "extraction failed, returning default", "data": {"default": default}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
         return default
-    except (IndexError, AttributeError, TypeError):
+    except (IndexError, AttributeError, TypeError) as e:
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:222", "message": "extraction exception", "data": {"error_type": type(e).__name__, "error_msg": str(e)[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
         return default
 
 
@@ -482,6 +571,36 @@ def send_discord_alert(client_name, status, report=None):
         logging.warning(f"⚠️ Unexpected error sending Discord notification: {e}")
 
 
+def sanitize_windows_paths(error_text: str) -> str:
+    """
+    Remove Windows drive paths from error messages to prevent exposing local file paths in logs.
+    
+    Replaces paths like:
+    - C:/Users/.../AppData/Local/Temp/tmpw4sd64tkk.tsx
+    - C:\Users\...\AppData\Local\Temp\tmpw4sd64tkk.tsx
+    
+    With generic placeholder: page.tsx
+    
+    Parameters:
+        error_text: The error message text that may contain Windows paths
+        
+    Returns:
+        str: Sanitized error text with Windows paths replaced
+    """
+    if not error_text:
+        return error_text
+    
+    # Pattern to match Windows drive paths (e.g., C:/Users/... or C:\Users\...)
+    # Matches: [DriveLetter]:[/\] followed by any path characters
+    # Handles both forward and backslash separators
+    windows_path_pattern = r'[A-Za-z]:[/\\][^\s:<>"|?*]+\.tsx?'
+    
+    # Replace all Windows drive paths with generic placeholder
+    sanitized = re.sub(windows_path_pattern, 'page.tsx', error_text)
+    
+    return sanitized
+
+
 def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, str]:
     """
     Validate TypeScript/TSX code syntax by running the TypeScript compiler.
@@ -569,8 +688,8 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
         else:
             # Combine stdout and stderr for full error output
             error_output = result.stderr or result.stdout or "Unknown compilation error"
-            # Clean up the temp file path from error messages for cleaner logs
-            error_output = error_output.replace(temp_path, "page.tsx")
+            # Sanitize Windows paths from error messages to prevent exposing local file paths
+            error_output = sanitize_windows_paths(error_output)
             logging.warning(f"⚠️ Syntax check failed for {client_id}: {error_output[:200]}...")
             return (False, error_output)
 
@@ -1133,6 +1252,14 @@ def run_builder(client_path):
         client_path (str): Path to the client directory (contains brief.md, content.md,
                           and optionally theme.json). Client ID is derived from basename.
     """
+    # #region agent log
+    import json as json_module
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1136", "message": "run_builder entry", "data": {"client_path": client_path}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
     client_id = os.path.basename(client_path)
     # Validate client ID to prevent path traversal
     validate_client_id_or_raise(client_id, "run_builder")
@@ -1230,6 +1357,12 @@ MANIFEST:
         try:
             while total_attempts < max_total_attempts:
                 total_attempts += 1
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1232", "message": "loop iteration start", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "syntax_feedback": syntax_feedback[:100] if syntax_feedback else None, "visual_feedback": visual_feedback[:100] if visual_feedback else None}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
                 logging.info(f"🔄 Builder cycle {total_attempts}/{max_total_attempts}...")
 
                 # Build user message with any feedback
@@ -1265,6 +1398,12 @@ Please fix the visual issues while maintaining correct syntax."""
                 )
 
                 raw_response = _extract_response_text(msg, default="")
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:1267", "message": "LLM response received", "data": {"total_attempts": total_attempts, "has_response": bool(raw_response), "response_length": len(raw_response) if raw_response else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
                 if not raw_response:
                     logging.error(f"❌ Builder returned empty response on attempt {total_attempts} for {client_id}")
                     memory.record_failure(
@@ -1286,6 +1425,12 @@ Please fix the visual issues while maintaining correct syntax."""
                 # Phase 1: Syntax Check
                 logging.info(f"🔍 Phase 1: Syntax validation (attempt {total_attempts})...")
                 syntax_ok, syntax_error = check_syntax(code, client_id)
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1288", "message": "syntax check result", "data": {"total_attempts": total_attempts, "syntax_ok": syntax_ok, "error_preview": syntax_error[:200] if syntax_error else None}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
 
                 if not syntax_ok:
                     logging.warning(f"⚠️ Syntax check failed on attempt {total_attempts}")
@@ -1311,7 +1456,14 @@ Please fix the visual issues while maintaining correct syntax."""
                 logging.info(f"🔍 Phase 2: Visual QA (attempt {total_attempts})...")
 
                 # Save the code atomically
-                if not atomic_write(target_file, code):
+                write_success = atomic_write(target_file, code)
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "E", "location": "factory.py:1314", "message": "file write result", "data": {"total_attempts": total_attempts, "write_success": write_success, "target_file": target_file}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
+                if not write_success:
                     logging.error(f"Failed to write {target_file}")
                     memory.record_failure(
                         category="builder",
@@ -1323,6 +1475,12 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Run QA
                 qa_status, qa_report, screenshot_path = run_qa(client_path)
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "B", "location": "factory.py:1325", "message": "QA result", "data": {"total_attempts": total_attempts, "qa_status": qa_status, "report_preview": qa_report[:200] if qa_report else None, "has_screenshot": bool(screenshot_path)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
 
                 # Phase 3: Check QA results
                 if qa_status == "PASS":
@@ -1361,6 +1519,12 @@ Please fix the visual issues while maintaining correct syntax."""
             heartbeat_thread.join(timeout=2)
 
         # Phase 4: Finalization
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1364", "message": "loop exit", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "final_qa_status": final_qa_status, "exhausted_attempts": total_attempts >= max_total_attempts}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
         logging.info(f"🏁 Builder completed after {total_attempts} attempts. Final status: {final_qa_status}")
 
         # Compile rules periodically (after learning from this session)
@@ -1393,6 +1557,14 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 
     # Server Check with Auto-Start
     server_ready = ensure_server_running()
+    # #region agent log
+    import json as json_module
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1440", "message": "run_qa server check", "data": {"client_id": client_id, "server_ready": server_ready}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
 
     if not server_ready:
         logging.error("❌ Server unavailable. QA Skipped.")
@@ -1462,6 +1634,12 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
 
         except Exception as e:
             error_msg = f"Visual QA Error: {e!s}"
+            # #region agent log
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1463", "message": "run_qa exception", "data": {"client_id": client_id, "error_type": type(e).__name__, "error_msg": str(e)[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
             logging.exception("❌ Visual QA Error")
             return ("ERROR", error_msg, screenshot_path)
 

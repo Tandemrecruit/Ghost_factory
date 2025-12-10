@@ -218,5 +218,45 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-10T20:00:37.400344",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 26.02,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:01:04.139801",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 52.76,
+    "time_saved_seconds": 7147.24,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:02:16.478136",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 72.33,
+    "time_saved_seconds": 10727.67,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T20:07:41.587139",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 325.11,
+    "time_saved_seconds": 14074.89,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]
