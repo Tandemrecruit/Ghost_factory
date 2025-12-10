@@ -247,6 +247,57 @@ If asked to implement features outside v1.0 scope (multi-client, analytics dashb
 - No `<img>` or `<a>` tags.
 - No Lorem Ipsum.
 
+## Using docs/DECISIONS_INBOX.md (for all agents)
+
+The Decisions Inbox is the **staging area** for thoughts and potential decisions. It exists so Ryan and the agents don’t have to remember everything in their heads.
+
+### Inbox legend
+
+Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
+
+- **[NOTE]** – Brain dump, observation, or reminder  
+  - “This might matter later.”
+  - Safe place for models to say “hey, watch this” without changing any rules.
+
+- **[PROPOSAL]** – Suggested decision or rule change  
+  - “We *should probably* make this an explicit rule.”
+  - Used when an agent spots a consistent pattern that deserves a formal decision.
+
+- **[DECISION]** – Approved decision, ready to be logged as a D-XXXX  
+  - **Only Ryan** is allowed to mark an item as `[DECISION]`.
+  - The Decisions Scribe promotes these into `docs/DECISIONS_LOG.md`.
+
+### Rules for all agents
+
+- You **MAY add** new `[NOTE]` and `[PROPOSAL]` bullets to `DECISIONS_INBOX.md` when you:
+  - Notice a mismatch between docs and code.
+  - Think a behavior should be standardized (e.g., error-handling style, stack choices).
+  - Want to remind Future Ryan about a potential improvement or risk.
+
+- You **MUST NOT**:
+  - Change `[NOTE]` or `[PROPOSAL]` items into `[DECISION]`.
+  - Edit existing D-XXXX entries in `DECISIONS_LOG.md`.
+  - Treat `[NOTE]` or `[PROPOSAL]` as if they are already binding rules.
+
+### How the pipeline uses the inbox
+
+- Ryan reviews `[NOTE]` / `[PROPOSAL]` items and, when ready, turns selected bullets into `[DECISION]`.
+- The **Decisions Scribe** agent:
+  - Reads `DECISIONS_INBOX.md` and `DECISIONS_LOG.md`.
+  - Converts only `[DECISION]` bullets into new `D-XXXX` entries.
+  - Cleans them out of the inbox, leaving `[NOTE]` and `[PROPOSAL]` untouched.
+
+### When you should add a note or proposal
+
+As an agent, add a `[NOTE]` or `[PROPOSAL]` when, for example:
+
+- You see behavior in `factory.py` or `intake_sanitizer.py` that **isn’t documented** in AGENT_ALIGNMENT yet.
+- You think a recurring pattern should be codified (e.g., “QA can return FAIL/ERROR/SKIPPED as long as the page still renders”).
+- You suspect a future conflict or ambiguity (“Builder is using a pattern that isn’t reflected in the manifest”).
+
+Use the inbox as the **scratchpad for future decisions**, but remember:  
+**Only logged D-XXXX entries and the alignment docs define the current rules.**
+
 ---
 
 ## 6. How to Use This Document in Prompts
