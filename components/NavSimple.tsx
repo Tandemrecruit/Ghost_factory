@@ -55,15 +55,31 @@ export function NavSimple({
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 md:flex">
-            {links.map((link, index) => (
-              <Link
-                key={index}
-                href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link, index) => {
+              const isHashLink = link.href.startsWith('#')
+              const Component = isHashLink ? 'a' : Link
+              const props = isHashLink
+                ? {
+                    href: link.href,
+                    onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.preventDefault()
+                      const element = document.querySelector(link.href)
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }
+                    },
+                  }
+                : { href: link.href }
+              return (
+                <Component
+                  key={index}
+                  {...props}
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Component>
+              )
+            })}
             {ctaLabel && ctaHref && (
               <Link href={ctaHref} className="btn-primary text-sm">
                 {ctaLabel}
@@ -94,16 +110,35 @@ export function NavSimple({
           )}
         >
           <div className="flex flex-col gap-4 pt-4">
-            {links.map((link, index) => (
-              <Link
-                key={index}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link, index) => {
+              const isHashLink = link.href.startsWith('#')
+              const Component = isHashLink ? 'a' : Link
+              const props = isHashLink
+                ? {
+                    href: link.href,
+                    onClick: (e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.preventDefault()
+                      setIsMobileMenuOpen(false)
+                      const element = document.querySelector(link.href)
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }
+                    },
+                  }
+                : {
+                    href: link.href,
+                    onClick: () => setIsMobileMenuOpen(false),
+                  }
+              return (
+                <Component
+                  key={index}
+                  {...props}
+                  className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </Component>
+              )
+            })}
             {ctaLabel && ctaHref && (
               <Link
                 href={ctaHref}

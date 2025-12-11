@@ -2,83 +2,106 @@
 
 ## Hero Section
 
-### Headline
-**Stop Sweating and Freezing in Your Own House**
+### Headline (H1)
+Stop Sweating—and Freezing—in Your Own Home
 
 ### Subheadline
-Sterling Heights' trusted HVAC team — on-time service, upfront pricing, no surprises.
+Sterling Heights families trust Comfort Breeze for honest HVAC service with upfront pricing and no surprises.
 
 ### Primary CTA
-**Call Now to Schedule Service: (586) XXX-XXXX**
+📞 Call Now: [(586) 555-HVAC]
 
 ### Secondary CTA
-**Request a Quote Online →**
+Request a Quote Online
 
-### Trust Micro-Copy
-✓ Same-day emergency service available • Licensed & Insured in Michigan
-
----
-
-## Service Overview Bar
-
-**AC Installation & Replacement** | **Furnace Repair & Replacement** | **Spring AC Tune-Ups** | **Fall Furnace Checks** | **Emergency No-Heat Service** | **Indoor Air Quality**
+### Trust Micro-copy
+✓ Same-Day Emergency Service Available | ✓ Licensed & Insured | ✓ Family-Owned Since 2008
 
 ---
 
-## Trust Indicators Strip
+## Trust Bar
 
-🏠 **Family-Owned & Operated** | ✓ **Licensed & Insured in Michigan** | ⭐ **Serving Metro Detroit Since 2012** | 💰 **Upfront Pricing — No Surprise Fees**
+**Licensed & Insured** | **Locally Owned & Operated in Michigan** | **15+ Years Serving Your Neighbors** | **Real Humans Answer the Phone** | **Serving Within 40 Minutes of Sterling Heights**
 
 ---
 
-## Services We Offer
+## Services Overview
 
 ### AC Installation & Replacement
-Time for a new system? We'll assess your home, explain your options clearly, and install a unit that fits your budget and cooling needs. No confusing jargon — just honest advice about what makes sense for your house and your family.
+**Cool comfort for Michigan summers**
+
+Stay comfortable when the heat hits. We'll help you choose the right system for your home and budget—installed correctly, the first time.
 
 ### Furnace Repair & Replacement
-Whether it's a minor fix or time for a new furnace, we'll give you honest recommendations — not a hard sell. We've repaired 20-year-old furnaces and installed brand-new systems. We'll tell you which option makes the most sense for you.
+**Heat you can count on all winter**
 
-### Spring AC Tune-Up
-Get your AC ready before the heat hits. A quick tune-up catches small problems before they become expensive repairs. We'll clean, inspect, and make sure everything's running efficiently — so you're not caught off guard during the first heat wave.
+Don't wait for the coldest night of the year. We repair and replace furnaces with honest advice about what makes sense for your situation.
 
-### Fall Furnace Check
-Our seasonal inspection includes a carbon monoxide safety check, so your family stays warm and safe all winter. We'll test all the important stuff, replace your filter, and let you know if anything needs attention before the cold weather arrives.
+### Spring AC Tune-Ups
+**Get ahead of the heat wave**
+
+A spring check-up catches small problems before they become expensive emergencies. Cool air when you need it most, guaranteed.
+
+### Fall Furnace Checkups
+**Safe, efficient heating before the cold hits**
+
+We'll make sure your furnace is ready for winter—running safely, efficiently, and reliably all season long.
 
 ### Emergency No-Heat Service
-Furnace quit on the coldest night? We offer same-day emergency service to get your heat back fast. We know you can't wait until next Tuesday when it's 15 degrees outside — we'll prioritize your call and get someone out quickly.
+**Same-day response when you need it most**
+
+Furnace quit in the middle of winter? We offer same-day emergency service because we know you can't wait until next Tuesday.
 
 ### Indoor Air Quality
-From air purifiers to humidity control, we can help improve the air your family breathes every day. If you've noticed more dust, dry air in winter, or allergies acting up at home, we can suggest solutions that actually work.
+**Breathe easier at home**
+
+From air purifiers to humidity control, we'll help you create a healthier home environment for your family.
+
+### Section CTA
+**Not sure what you need? Call us — we'll help you figure it out.**
+
+📞 [(586) 555-HVAC]
 
 ---
 
-## Why Sterling Heights Homeowners Call Us
+## Why Choose Comfort Breeze
 
-### Upfront, Honest Pricing
-We give you clear options — good, better, best — with pricing you see before we start. No surprise fees, no pressure. You'll know exactly what you're paying for and why. If something unexpected comes up, we'll explain it and get your approval before proceeding.
+### Upfront Pricing, No Surprise Fees
 
-### Local Crew, Familiar Faces
-We're not a franchise or a 1-800 number. When you call, you talk to real people who live and work in this community. When we visit, you'll see the same trusted technicians — not a different stranger every time. We're your neighbors, not a call center three states away.
+We'll explain your options—good, better, and best—before any work begins. The price we quote is the price you pay. No hidden charges, no "oh, by the way" fees when the job's done.
 
-### We Fix What Needs Fixing
-Not every problem needs a new system. We'll tell you honestly whether a repair makes sense or it's time to replace — and explain why. If your 8-year-old AC just needs a $200 part, we're not going to tell you to spend $5,000 on a new unit. But if you're looking at the third expensive repair on a 20-year-old system, we'll explain when replacement becomes the smarter investment.
+### Same Faces, Every Visit
 
-### On-Time, Every Time
-Your time matters. We show up when we say we will and keep you informed if anything changes. You'll get a call when we're on our way, and if we're running late (it happens), you'll know ahead of time. No waiting around all day wondering when we'll arrive.
+We're a small local crew, not a rotating cast of strangers. You'll see familiar faces who know your home and your system. We remember you called last spring about that noisy compressor, and we'll ask how it's been running.
+
+### We Show Up When We Say We Will
+
+Your time matters. We call ahead, arrive on schedule, and respect your home like it's our own. Shoe covers aren't optional—they're standard. Same with cleaning up after ourselves.
+
+### Honest Recommendations
+
+We'll only suggest replacement when repair isn't the smart choice. You get options and straight talk—never a hard sell. If your 8-year-old furnace needs a $200 part, we're not going to pressure you into a $6,000 replacement.
 
 ---
 
 ## How It Works
 
-### Step 1 — Call or Schedule Online
-Give us a call at **(586) XXX-XXXX** or fill out our quick online form. We'll find a time that works for your schedule — including evenings and weekends when needed. We'll also let you know what to expect during the visit.
+### Step 1: Call or Request Online
 
-### Step 2 — We Inspect & Explain
-Our technician assesses the situation, explains what's going on in plain English, and gives you options. We'll show you what we're seeing, answer your questions, and provide clear pricing for each solution. Take your time — we're not here to rush you.
+Reach a real person during business hours. Tell us what's going on—we'll ask a few quick questions to understand the issue. If it's an emergency, we'll get someone out the same day.
 
-### Step 3 — You Decide, We Deliver
-Choose what works for you — no pressure, no sales tactics. We complete the work carefully, clean up after ourselves, and make sure you're comfortable with everything before we leave. You'll also get straightforward advice on maintenance so you can avoid future problems.
+### Step 2: We Come to You & Inspect
+
+Our technician arrives on time, takes a thorough look at your system, and explains exactly what's happening in plain English. No jargon, no runaround—just honest answers.
+
+### Step 3: You Choose Your Option
+
+We present clear options with upfront pricing. You decide what's right for your home and budget—no pressure, no surprises. We'll even walk you through the pros and cons of each choice.
+
+### Section CTA
+**Ready to get comfortable?**
+
+[Call (586) 555-HVAC]
 
 ---
 
@@ -86,11 +109,9 @@ Choose what works for you — no pressure, no sales tactics. We complete the wor
 
 ### Your Family's Safety Is Part of Every Visit
 
-Every furnace inspection includes a carbon monoxide check. It's not about scaring you — it's about making sure your home is as safe as it is comfortable. 
+Every furnace inspection includes a carbon monoxide check—because keeping your family safe matters as much as keeping them warm. It's just part of how we do things.
 
-Carbon monoxide is invisible and odorless, and a cracked heat exchanger or blocked vent can create a dangerous situation without you knowing. We test during every visit because it takes two minutes and could save your family's life. If we find an issue, we'll explain exactly what it is, why it matters, and what your options are to fix it safely.
-
-Peace of mind comes standard with every service call.
+We test for proper ventilation, look for gas leaks, and make sure your system is operating the way it should. You'll never pay extra for safety checks. They're built into every service call, because that's how it should be done.
 
 ---
 
@@ -98,76 +119,135 @@ Peace of mind comes standard with every service call.
 
 ### Proudly Serving Sterling Heights & Surrounding Communities
 
-We provide reliable HVAC service throughout Metro Detroit, typically within a 30-40 minute drive of Sterling Heights. Our regular service area includes:
+We're based right here in Sterling Heights. When you call Comfort Breeze, you're calling your neighbors.
 
-**Sterling Heights** • **Warren** • **Troy** • **Shelby Township** • **Clinton Township** • **Macomb Township** • **Rochester Hills** • **Utica** • **Fraser** • **Roseville** • **St. Clair Shores** • **Harrison Township**
+**Communities we serve:**
+- Sterling Heights
+- Warren
+- Troy
+- Shelby Township
+- Clinton Township
+- Utica
+- Rochester Hills
+- Madison Heights
+- Fraser
+- And neighbors within 30-40 minutes
 
-**Not sure if we cover your area?** Give us a call at **(586) XXX-XXXX** — we're happy to check. If we're a bit outside your area but can still help, we'll let you know. And if we can't make it work, we'll try to point you toward someone who can.
-
----
-
-## About Comfort Breeze
-
-### Real People, Real Service, Real Commitment to This Community
-
-Comfort Breeze Heating & Air is a family-owned HVAC company based right here in Sterling Heights. We're not the biggest operation in Metro Detroit, and that's by design.
-
-We started this business because we were tired of seeing homeowners treated like transaction numbers — pressured into unnecessary replacements, hit with surprise charges, or left waiting for service trucks that never showed up on time. 
-
-We believe you deserve better than that. You deserve clear answers, honest recommendations, and technicians who respect your home and your budget. You deserve to work with people who'll still be here next year when you need your annual tune-up.
-
-Our team lives in the communities we serve. We're licensed and insured professionals who take pride in doing things right — the first time, every time. We don't do high-pressure sales. We don't pad estimates. We don't disappear after the job is done.
-
-We show up on time, explain what's happening with your system in terms you can understand, give you real options at honest prices, and stand behind our work. That's it. That's the whole business model.
-
-**When your heating or cooling isn't working the way it should, we're here to help — honestly, reliably, and without the runaround.**
+If you're not sure whether we serve your area, give us a call. If we can't help you, we'll point you toward someone who can.
 
 ---
 
-## Customer Testimonials
+## About / Meet the Team
 
-### What Sterling Heights Homeowners Are Saying
+### Family-Owned, Locally Operated
 
-**"Finally found an HVAC company I can trust"**  
-*"Our furnace went out on a Saturday night in January. Comfort Breeze had someone here Sunday morning. The technician was professional, explained everything clearly, and had us back up and running in a couple hours. Price was fair and they didn't try to sell us a new system we didn't need."*  
-— **Linda M., Sterling Heights**
+Comfort Breeze was founded by Mike Patterson right here in Sterling Heights. After 12 years working for one of the big national HVAC chains, Mike saw too many homeowners get burned by surprise bills and technicians who treated them like a number.
 
-**"Honest advice when I needed it most"**  
-*"I called three companies about replacing our AC. Two tried to upsell me immediately. Comfort Breeze actually looked at our system, fixed a minor issue for under $200, and said we'd probably get another 3-4 years out of it. That kind of honesty earned my business for life."*  
-— **Robert T., Warren**
+He started Comfort Breeze with a simple promise: do honest work, charge fair prices, and treat every home like it belongs to family. Fifteen years later, we're still keeping that promise—one furnace, one air conditioner, one neighbor at a time.
 
-**"They show up when they say they will"**  
-*"Sounds simple, but it's rare. Every appointment has been on time. They call when they're on the way. The same technician has come out twice now and remembers our setup. It's refreshing to work with a local company that actually cares."*  
-— **Jennifer K., Troy**
+Our crew is small by design. We'd rather do excellent work for fewer families than rush through appointments to hit a quota. You'll get to know us, and we'll get to know your home's quirks (like that basement door that sticks, or where you keep the circuit breaker).
 
-**"No pressure, just options"**  
-*"Needed a new furnace and was dreading the sales pitch. The Comfort Breeze team gave me three options at different price points, explained the pros and cons of each, and let me decide. No pressure, no tricks. Installation was clean and professional."*  
-— **Mike D., Shelby Township**
-
-**"Peace of mind for my parents"**  
-*"I hired Comfort Breeze to do a furnace inspection for my elderly parents. They were patient, thorough, and made sure my mom understood everything. They found a small carbon monoxide concern and fixed it same-day. Can't thank them enough."*  
-— **Susan L., Clinton Township**
+When you call Comfort Breeze, you're not getting a corporation. You're getting Mike, Dave, and Sarah—people who live in the same community, shop at the same stores, and understand what matters to Sterling Heights families.
 
 ---
 
-## Final CTA Block
+## Testimonials
 
-### Ready for Comfort You Can Count On?
+### What Your Neighbors Are Saying
 
-Whether you need an emergency repair, a seasonal tune-up, or honest advice about replacement, we're here to help.
+**"Mike explained everything without talking down to me."**
 
-**Call us today: (586) XXX-XXXX**
+"I was dreading calling an HVAC company because I didn't want to be sold something I didn't need. Mike came out, showed me exactly what was wrong with my furnace, and gave me three different options with honest advice about each one. No pressure, no sales pitch—just straight talk. We went with the mid-level repair and it's been running perfectly for two years."
 
-Or schedule online — we'll call you back within 2 hours during business hours.
+— *Jennifer M., Sterling Heights*
 
-**[Schedule Service Online →](#)**
+---
 
-**Office Hours:**  
-Monday-Friday: 7:00 AM - 7:00 PM  
-Saturday: 8:00 AM - 5:00 PM  
-Sunday: Emergency service available
+**"They showed up exactly when they said they would."**
 
-**Same-day emergency service • Licensed & insured • Upfront pricing • No surprise fees**
+"I've dealt with so many contractors who give you a four-hour window and show up six hours late. Comfort Breeze called 30 minutes before arrival, showed up right on time, and had my AC back up and running in under an hour. It's such a relief to work with professionals who respect your schedule."
+
+— *Robert K., Warren*
+
+---
+
+**"Same-day emergency service saved us."**
+
+"Our furnace died on the coldest night of January. I called Comfort Breeze at 7 PM, expecting to leave a voicemail. A real person answered. Dave was at our house by 8:30 PM and had us back up and running before 10. The price was exactly what he quoted on the phone—no 'emergency surcharge' surprises. We've used them for everything since."
+
+— *The Torres Family, Troy*
+
+---
+
+**"They told me I DIDN'T need a replacement."**
+
+"Another company told me my 10-year-old AC unit was 'on its last legs' and I needed to replace it immediately for $7,500. I got a second opinion from Comfort Breeze. Mike said it just needed a $300 part and some refrigerant. That was three years ago and it's still running strong. I appreciate the honesty—not every company would talk you OUT of a big sale."
+
+— *David L., Clinton Township*
+
+---
+
+**"I trust them completely."**
+
+"I'm a single mom and I don't know anything about furnaces or AC units. I need someone I can trust to be honest with me and not take advantage. The Comfort Breeze team has been servicing my HVAC system for five years now. They explain things in normal language, they're always fair with pricing, and I never feel like I'm being upsold. That peace of mind is worth everything."
+
+— *Amanda S., Shelby Township*
+
+---
+
+**"The small details matter."**
+
+"Shoe covers without being asked. Tarps under their work area. Called 20 minutes before arrival. Cleaned up everything when they were done. These might seem like small things, but they show respect. Comfort Breeze treats your home the way you'd want it treated. That's rare these days."
+
+— *Michael and Karen P., Sterling Heights*
+
+---
+
+## Contact / Final CTA Section
+
+### Ready to Get Comfortable?
+
+Whether you need an emergency repair or you're planning ahead with a seasonal tune-up, we're here to help.
+
+### Call Now
+📞 **(586) 555-HVAC**
+
+Call during business hours and talk to a real person. We'll answer your questions and get you scheduled—usually within 24-48 hours (same-day for emergencies).
+
+**Business Hours:**
+- Monday - Friday: 7:00 AM - 6:00 PM
+- Saturday: 8:00 AM - 4:00 PM
+- Sunday: Emergency calls only
+
+---
+
+### Or Request Service Online
+
+**We'll get back to you within 2 business hours (usually much faster).**
+
+[Contact Form Fields:]
+- **Your Name** (required)
+- **Phone Number** (required)
+- **Email Address** (required)
+- **Service Address** (City, ZIP)
+- **What can we help you with?** (dropdown)
+  - AC Repair or Service
+  - Furnace Repair or Service
+  - Installation or Replacement Quote
+  - Seasonal Tune-Up
+  - Emergency No-Heat
+  - Not Sure - Need Advice
+- **Tell us more** (optional text area)
+  - When did you first notice the problem? What's happening with your system? Any other details that might help us?
+- **Preferred contact method** (checkboxes)
+  - Phone call
+  - Text message
+  - Email
+- **When's the best time to reach you?** (text field)
+
+[Submit Button: "Request Service"]
+
+**What happens next?** We'll review your request and call you within 2 business hours to discuss your needs and schedule a convenient time for service.
 
 ---
 
@@ -175,35 +255,130 @@ Sunday: Emergency service available
 
 ### Comfort Breeze Heating & Air
 
-**Phone:** (586) XXX-XXXX  
-**Email:** service@comfortbreezehvac.com  
-**Address:** [Street Address], Sterling Heights, MI 48313
+**Phone:** (586) 555-HVAC
 
-**Service Area:** Sterling Heights, Warren, Troy, Shelby Township, Clinton Township, and surrounding Metro Detroit communities
+**Email:** info@comfortbreezehvac.com
 
-**Hours:**  
-Monday-Friday: 7:00 AM - 7:00 PM  
-Saturday: 8:00 AM - 5:00 PM  
-Sunday: Emergency service available
+**Address:** [Street Address], Sterling Heights, MI 48312
 
----
-
-**Quick Links:**  
-[Services](#services) • [Why Choose Us](#why) • [Service Area](#area) • [About Us](#about) • [Contact](#contact)
-
-**Services:**  
-AC Installation & Repair • Furnace Installation & Repair • Seasonal Tune-Ups • Emergency Service • Indoor Air Quality
+**Hours:**
+Monday - Friday: 7:00 AM - 6:00 PM
+Saturday: 8:00 AM - 4:00 PM
+Sunday: Emergency calls only
 
 ---
 
-**Licensed & Insured in Michigan** • Family-Owned & Operated
+### Quick Links
+- [AC Services](#)
+- [Furnace Services](#)
+- [Seasonal Tune-Ups](#)
+- [Emergency Service](#)
+- [Service Area](#)
+- [About Us](#)
+- [Contact](#)
+
+---
+
+### Service Area
+Sterling Heights | Warren | Troy | Shelby Township | Clinton Township | Utica | Rochester Hills | Madison Heights | Fraser
+
+And surrounding communities within 30-40 minutes
+
+---
+
+### Connect With Us
+[Facebook icon] [Google icon] [Nextdoor icon]
+
+---
+
+**Licensed & Insured** | **Michigan License #[XXXXX]**
 
 © 2024 Comfort Breeze Heating & Air. All rights reserved.
 
-*We respect your privacy. We'll never share your information with third parties.*
+*Your comfort is our business. Your trust is our foundation.*
 
 ---
 
-**Note:** This copy emphasizes conversational, trustworthy language that addresses homeowner objections directly. It avoids industry jargon, presents honest positioning (acknowledging when repairs make sense vs. replacement), and maintains consistent focus on the core value proposition: honest, reliable, local HVAC service without pressure or surprises.
+## Additional Features Section (Optional Enhancement)
 
-The testimonials follow authentic patterns (specific details, mixed service types, genuine voice) and reinforce key differentiators. All CTAs are clear and friction-reducing, with phone-first emphasis for emergency-minded visitors and online options for planners.
+### Why Fall Furnace Check-Ups Matter
+
+Don't wait for the first cold snap to discover your furnace isn't working. A fall tune-up catches problems early, improves efficiency, and gives you peace of mind all winter long.
+
+**What's included in every fall furnace check-up:**
+- Complete safety inspection including carbon monoxide testing
+- Cleaning of burners and heat exchanger
+- Filter replacement
+- Thermostat calibration check
+- Inspection of all electrical connections
+- Blower motor lubrication
+- Ductwork visual inspection
+- Full system performance test
+
+**The result?** A furnace that runs safely, efficiently, and reliably when you need it most.
+
+**Fall Tune-Up Special: $89** (Regular $129)
+
+[Schedule Your Fall Check-Up]
+
+---
+
+### Why Spring AC Tune-Ups Matter
+
+Michigan summers can get hot fast. The worst time to discover your AC isn't cooling properly is during a 90-degree heat wave when every HVAC company is booked solid.
+
+**What's included in every spring AC tune-up:**
+- Refrigerant level check and adjustment if needed
+- Condenser coil cleaning
+- Evaporator coil inspection
+- Condensate drain cleaning
+- Electrical connection inspection
+- Thermostat calibration check
+- Air filter replacement
+- Full system performance test
+
+**The result?** Cool, comfortable air exactly when you need it, without the emergency call premium.
+
+**Spring Tune-Up Special: $79** (Regular $119)
+
+[Schedule Your Spring Check-Up]
+
+---
+
+### Frequently Asked Questions
+
+**How quickly can you get here for an emergency?**
+
+For true emergencies (no heat in winter, no AC during a heat wave), we offer same-day service and typically arrive within 2-4 hours of your call. We'll give you an estimated arrival time when you call.
+
+**Do you offer financing?**
+
+Yes. For larger projects like system replacements, we offer financing options through [financing partner]. We'll walk you through the options when we provide your estimate.
+
+**What brands do you work on?**
+
+We service all major HVAC brands including Carrier, Trane, Lennox, Rheem, Goodman, American Standard, and more. If you have a less common brand, give us a call—we can usually help.
+
+**How do I know if I need repair or replacement?**
+
+Great question. We'll always give you both options with honest advice. Generally, if your system is less than 10-12 years old and the repair costs less than half of replacement, repair makes sense. If it's older and needs expensive repairs, replacement might be the smarter long-term choice. We'll explain the math and let you decide.
+
+**Do you provide written estimates?**
+
+Yes, always. You'll get a written estimate before any work begins, and we'll explain exactly what we're doing and why.
+
+**What payment methods do you accept?**
+
+Cash, check, all major credit cards, and financing for qualified buyers.
+
+**Are you licensed and insured?**
+
+Yes. We're fully licensed and insured in the state of Michigan. License #[XXXXX].
+
+**What if I'm not home during the appointment?**
+
+As long as we can safely access your HVAC system and you're comfortable with it, we can work while you're not home. Many customers provide garage codes or leave doors unlocked. We'll discuss the details when we schedule your appointment.
+
+---
+
+*End of Website Copy*

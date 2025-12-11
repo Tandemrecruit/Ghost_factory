@@ -18,35 +18,35 @@ Ghost Factory automates the creation of high-converting landing pages. The syste
 
 ```text
 ghost-factory/
-â”œâ”€â”€ app/                    # Next.js App Router
-â”‚   â”œâ”€â”€ layout.tsx          # Root layout
-â”‚   â”œâ”€â”€ page.tsx            # Home page
-â”‚   â”œâ”€â”€ globals.css         # Global styles & Tailwind
-â”‚   â”œâ”€â”€ dashboard/          # Internal dashboard
-â”‚   â””â”€â”€ clients/
-â”‚       â””â”€â”€ [clientId]/     # Dynamic client pages
-â”œâ”€â”€ automation/             # Python automation pipeline
-â”‚   â”œâ”€â”€ factory.py          # Main orchestrator
-â”‚   â”œâ”€â”€ cost_tracker.py     # API cost tracking
-â”‚   â”œâ”€â”€ time_tracker.py     # Time logging
-â”‚   â”œâ”€â”€ revenue_tracker.py  # Revenue tracking
-â”‚   â”œâ”€â”€ intake_sanitizer.py # Input sanitization
-â”‚   â”œâ”€â”€ schema_validator.py # Data validation
-â”‚   â””â”€â”€ ...                 # Additional utilities
-â”œâ”€â”€ clients/                # Client data (watched by factory)
-â”‚   â””â”€â”€ [client-id]/
-â”‚       â”œâ”€â”€ intake.md       # Input brief
-â”‚       â”œâ”€â”€ brief.md        # Generated strategy
-â”‚       â”œâ”€â”€ content.md      # Generated copy
-â”‚       â””â”€â”€ assets/         # Client images
-â”œâ”€â”€ components/             # Reusable UI components (23 total)
-â”œâ”€â”€ data/                   # Runtime data storage
-â”‚   â”œâ”€â”€ costs/              # API cost logs
-â”‚   â”œâ”€â”€ time_logs/          # Time tracking data
-â”‚   â””â”€â”€ memory/             # Agent memory storage
-â”œâ”€â”€ design-system/
-â”‚   â””â”€â”€ manifest.md         # Component API reference
-â”œâ”€â”€ docs/                   # Documentation
+├── app/                    # Next.js App Router
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Home page
+│   ├── globals.css         # Global styles & Tailwind
+│   ├── dashboard/          # Internal dashboard
+│   └── clients/
+│       └── [clientId]/     # Dynamic client pages
+├── automation/             # Python automation pipeline
+│   ├── factory.py          # Main orchestrator
+│   ├── cost_tracker.py     # API cost tracking
+│   ├── time_tracker.py     # Time logging
+│   ├── revenue_tracker.py  # Revenue tracking
+│   ├── intake_sanitizer.py # Input sanitization
+│   ├── schema_validator.py # Data validation
+│   └── ...                 # Additional utilities
+├── clients/                # Client data (watched by factory)
+│   └── [client-id]/
+│       ├── intake.md       # Input brief
+│       ├── brief.md        # Generated strategy
+│       ├── content.md      # Generated copy
+│       └── assets/         # Client images
+├── components/             # Reusable UI components (23 total)
+├── data/                   # Runtime data storage
+│   ├── costs/              # API cost logs
+│   ├── time_logs/          # Time tracking data
+│   └── memory/             # Agent memory storage
+├── design-system/
+│   └── manifest.md         # Component API reference
+├── docs/                   # Documentation
 â”‚   â”œâ”€â”€ business/           # Business policies & offers
 â”‚   â”œâ”€â”€ internal/           # Technical guides
 â”‚   â””â”€â”€ operations/         # SOPs & checklists

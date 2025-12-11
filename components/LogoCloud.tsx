@@ -43,7 +43,7 @@ export function LogoCloud({
               </span>
             )}
             {heading && (
-              <h2 className="text-xl font-semibold text-muted-foreground md:text-2xl">
+              <h2 className="text-xl font-semibold text-foreground md:text-2xl">
                 {heading}
               </h2>
             )}
@@ -58,8 +58,9 @@ export function LogoCloud({
                 <div
                   key={index}
                   className={cn(
-                    'flex h-8 w-24 items-center justify-center text-xs text-muted-foreground md:h-10 md:w-32'
+                    'flex h-8 w-24 items-center justify-center rounded border border-border bg-background px-3 text-xs font-medium text-foreground shadow-sm md:h-10 md:w-32 md:text-sm'
                   )}
+                  title={logo.name}
                 >
                   {logo.name}
                 </div>

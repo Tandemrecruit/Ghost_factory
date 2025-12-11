@@ -56,10 +56,10 @@ export function HeroSplit({
         >
           {/* Content */}
           <div className="flex flex-col items-start">
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl lg:text-6xl">
               {heading}
             </h1>
-            <p className="mb-8 max-w-xl text-lg text-muted-foreground md:text-xl">
+            <p className="mb-8 max-w-xl text-lg text-slate-700 md:text-xl">
               {subhead}
             </p>
             <Link

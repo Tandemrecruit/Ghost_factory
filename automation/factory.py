@@ -1337,20 +1337,29 @@ Generate improved website content that addresses the feedback above."""
                 user_content = brief
 
             # Generate content
-            msg = _anthropic_messages_create(
-                model=MODEL_COPY,
-                client_id=client_id,
-                activity="pipeline_copywriter",
-                max_tokens=4000,
-                system=copywriter_prompt,
-                messages=[{"role": "user", "content": user_content}],
-            )
-            _record_model_cost(
-                "anthropic", MODEL_COPY, "pipeline_copywriter",
-                client_id, msg, {"attempt": attempt}
-            )
+            # region agent mock
+            _log_aligned("info", "📝", "Copywriter", f"generating content (MOCKED) (attempt {attempt})...")
+            content = """# Hero
+Title: Best HVAC in Town
+Subtitle: Stay cool.
+[Insert Date]
+"""
+            msg = None
+            # endregion
+            # msg = _anthropic_messages_create(
+            #     model=MODEL_COPY,
+            #     client_id=client_id,
+            #     activity="pipeline_copywriter",
+            #     max_tokens=4000,
+            #     system=copywriter_prompt,
+            #     messages=[{"role": "user", "content": user_content}],
+            # )
+            # _record_model_cost(
+            #     "anthropic", MODEL_COPY, "pipeline_copywriter",
+            #     client_id, msg, {"attempt": attempt}
+            # )
 
-            content = _extract_response_text(msg)
+            # content = _extract_response_text(msg)
             if not content:
                 _log_aligned("error", "❌", "Copywriter", f"returned empty response on attempt {attempt}")
                 if attempt >= MAX_CRITIC_RETRIES:
@@ -1395,6 +1404,21 @@ Please evaluate this content against the intake and brief."""
                 break
 
             critic_response = critic_response_text.strip()
+
+            # region agent log
+            import json
+            import time
+            with open(r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log", "a", encoding="utf-8") as _debug_f:
+                _debug_f.write(json.dumps({
+                    "sessionId": "debug-session",
+                    "runId": "run1",
+                    "hypothesisId": "all",
+                    "location": "automation/factory.py:1400",
+                    "message": "Copy Critic raw response",
+                    "data": {"raw_response": critic_response},
+                    "timestamp": int(time.time() * 1000)
+                }) + "\n")
+            # endregion
 
             # Decision - PASS or FAIL
             # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
@@ -1901,6 +1925,108 @@ def check_invisible_text_static(page_tsx_path: str, theme_path: Optional[str] = 
     return issues
 
 
+def check_missing_images_playwright(page) -> list:
+    """
+    Check for missing or broken images using Playwright.
+    
+    Parameters:
+        page: Playwright page object
+        
+    Returns:
+        list: List of dicts with missing image issues, each containing:
+            - element: description of the element (tag + class/id)
+            - src: image source URL/path
+            - issue_type: "missing", "broken", or "error"
+    """
+    # #region agent log
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1904", "message": "check_missing_images_playwright entry", "data": {}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
+    
+    issues = []
+    
+    try:
+        # Check all img elements
+        img_elements = page.query_selector_all("img")
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1912", "message": "found img elements", "data": {"count": len(img_elements)}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
+        
+        for img in img_elements:
+            try:
+                src = img.get_attribute("src") or img.get_attribute("data-src") or ""
+                if not src:
+                    continue
+                
+                # Check if image loaded successfully
+                is_loaded = img.evaluate("""
+                    (el) => {
+                        return el.complete && el.naturalWidth > 0 && el.naturalHeight > 0;
+                    }
+                """)
+                
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1928", "message": "checking image", "data": {"src": src[:100], "is_loaded": is_loaded}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
+                
+                if not is_loaded:
+                    tag_name = img.evaluate("el => el.tagName.toLowerCase()")
+                    class_name = img.get_attribute("class") or ""
+                    alt_text = img.get_attribute("alt") or ""
+                    
+                    issues.append({
+                        "element": f"{tag_name}" + (f".{class_name.split()[0]}" if class_name else ""),
+                        "src": src,
+                        "alt": alt_text,
+                        "issue_type": "broken"
+                    })
+            except Exception as e:
+                # #region agent log
+                try:
+                    with open(log_path, "a", encoding="utf-8") as f:
+                        f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1945", "message": "image check exception", "data": {"error": str(e)[:100]}, "timestamp": int(time.time() * 1000)}) + "\n")
+                except: pass
+                # #endregion
+                continue
+        
+        # Check Next.js Image components (they render as img with specific classes)
+        # Also check for background-image CSS that might reference missing images
+        bg_image_elements = page.query_selector_all("[style*='background-image'], [style*='backgroundImage']")
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1954", "message": "found bg-image elements", "data": {"count": len(bg_image_elements)}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
+        
+    except Exception as e:
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1960", "message": "check_missing_images_playwright exception", "data": {"error": str(e)[:100]}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
+        _log_aligned("warning", "⚠️", "QA", f"Missing images check failed: {e}")
+    
+    # #region agent log
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1967", "message": "check_missing_images_playwright exit", "data": {"issues_count": len(issues)}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
+    
+    return issues
+
+
 def check_invisible_text_playwright(page) -> list:
     """
     Check for invisible text using Playwright's computed styles.
@@ -1915,6 +2041,14 @@ def check_invisible_text_playwright(page) -> list:
             - background_color: RGB color string
             - text_preview: first 50 chars of text content
     """
+    # #region agent log
+    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+    try:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:1980", "message": "check_invisible_text_playwright entry", "data": {}, "timestamp": int(time.time() * 1000)}) + "\n")
+    except: pass
+    # #endregion
+    
     issues = []
     
     try:
@@ -1924,6 +2058,9 @@ def check_invisible_text_playwright(page) -> list:
             'a', 'button', 'label', 'li', 'td', 'th', 'div'
         ]
         
+        total_elements_checked = 0
+        low_contrast_count = 0
+        
         for selector in text_selectors:
             elements = page.query_selector_all(selector)
             for element in elements:
@@ -1932,6 +2069,8 @@ def check_invisible_text_playwright(page) -> list:
                     text_content = element.inner_text().strip()
                     if not text_content or len(text_content) < 1:
                         continue
+                    
+                    total_elements_checked += 1
                     
                     # Get computed styles
                     text_color = element.evaluate("""
@@ -1982,8 +2121,18 @@ def check_invisible_text_playwright(page) -> list:
                         b_diff = abs(text_rgb[2] - bg_rgb[2])
                         total_diff = (r_diff + g_diff + b_diff) / 3.0
                         
+                        # #region agent log
+                        if total_diff < 50:  # Log all potentially problematic cases
+                            try:
+                                with open(log_path, "a", encoding="utf-8") as f:
+                                    f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:2045", "message": "low contrast detected", "data": {"text_color": text_color, "bg_color": bg_color, "diff": round(total_diff, 1), "threshold_13": total_diff < 13, "threshold_30": total_diff < 30}, "timestamp": int(time.time() * 1000)}) + "\n")
+                            except: pass
+                        # #endregion
+                        
                         # Flag if colors are very similar (within 5% of 255 range = ~13 units)
+                        # Also flag low contrast cases (within ~12% = ~30 units) for hard-to-read text
                         if total_diff < 13:
+                            low_contrast_count += 1
                             # Get element description
                             tag_name = element.evaluate("el => el.tagName.toLowerCase()")
                             class_name = element.get_attribute("class") or ""
@@ -1994,12 +2143,40 @@ def check_invisible_text_playwright(page) -> list:
                                 "text_color": text_color,
                                 "background_color": bg_color,
                                 "text_preview": text_preview,
-                                "color_diff": round(total_diff, 1)
+                                "color_diff": round(total_diff, 1),
+                                "severity": "invisible"
+                            })
+                        elif total_diff < 30:  # Hard to read but not invisible
+                            low_contrast_count += 1
+                            tag_name = element.evaluate("el => el.tagName.toLowerCase()")
+                            class_name = element.get_attribute("class") or ""
+                            text_preview = text_content[:50].replace('\n', ' ')
+                            
+                            issues.append({
+                                "element": f"{tag_name}" + (f".{class_name.split()[0]}" if class_name else ""),
+                                "text_color": text_color,
+                                "background_color": bg_color,
+                                "text_preview": text_preview,
+                                "color_diff": round(total_diff, 1),
+                                "severity": "hard_to_read"
                             })
                 except Exception as e:
                     # Skip elements that can't be inspected
                     continue
+        
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:2085", "message": "check_invisible_text_playwright exit", "data": {"total_checked": total_elements_checked, "low_contrast_count": low_contrast_count, "issues_count": len(issues)}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
     except Exception as e:
+        # #region agent log
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:2091", "message": "check_invisible_text_playwright exception", "data": {"error": str(e)[:100]}, "timestamp": int(time.time() * 1000)}) + "\n")
+        except: pass
+        # #endregion
         _log_aligned("warning", "⚠️", "QA", f"Invisible text check failed: {e}")
     
     return issues
@@ -2039,18 +2216,52 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 
         browser = None
         try:
-            # Capture screenshot and check for invisible text
+            # #region agent log
+            log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A,B", "location": "factory.py:2040", "message": "run_qa starting browser", "data": {"url": url, "client_id": client_id}, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
+            
+            # Capture screenshot and check for invisible text and missing images
             invisible_text_issues = []
+            missing_image_issues = []
             with sync_playwright() as p:
                 browser = p.chromium.launch()
                 try:
                     page = browser.new_page(viewport={"width": 390, "height": 844})
                     page.goto(url)
                     page.wait_for_timeout(3000)  # Wait for hydration
+                    
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A,B", "location": "factory.py:2052", "message": "page loaded, taking screenshot", "data": {}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
+                    
                     page.screenshot(path=screenshot_path, full_page=True)
+                    
+                    # Check for missing images before closing browser
+                    missing_image_issues = check_missing_images_playwright(page)
+                    
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:2060", "message": "missing images check complete", "data": {"issues_count": len(missing_image_issues)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
                     
                     # Check for invisible text before closing browser
                     invisible_text_issues = check_invisible_text_playwright(page)
+                    
+                    # #region agent log
+                    try:
+                        with open(log_path, "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "C", "location": "factory.py:2067", "message": "invisible text check complete", "data": {"issues_count": len(invisible_text_issues)}, "timestamp": int(time.time() * 1000)}) + "\n")
+                    except: pass
+                    # #endregion
                 finally:
                     # Ensure browser is always closed, even on exception
                     if browser:
@@ -2096,6 +2307,13 @@ def run_qa(client_path) -> Tuple[str, str, str]:
             with open(screenshot_path, "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode("utf-8")
 
+            # #region agent log
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "B", "location": "factory.py:2099", "message": "calling vision model", "data": {"missing_images_count": len(missing_image_issues), "invisible_text_count": len(invisible_text_issues)}, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
+            
             msg = _anthropic_messages_create(
                 model=MODEL_QA,
                 client_id=client_id,
@@ -2110,11 +2328,17 @@ def run_qa(client_path) -> Tuple[str, str, str]:
 2. Text readability (no overlapping, truncated text)
 3. Button/CTA visibility
 4. Overall professional appearance
-5. Invisible text detection
+5. Missing images and logos (CRITICAL)
+   - Check for any broken image placeholders, missing logos, or image loading errors
+   - Look for empty image containers, broken image icons, or placeholder text where images should be
+   - Verify all logos, hero images, testimonial avatars, and other visual assets are present
+   - Report any instances where images appear to be missing or failed to load
+6. Invisible or hard-to-read text detection
    - Check for any text that appears to have the same color as its background
    - Look for text elements that are present in the DOM but not visible
-   - Report any instances where text color matches background color
+   - Report any instances where text color matches or is too similar to background color
    - Pay special attention to text on colored backgrounds (not just white)
+   - Flag text that is hard to read due to low contrast, even if not completely invisible
 
 Return 'PASS' if the page looks good and functional.
 If there are issues, return 'FAIL: [list specific visual problems]'."""}
@@ -2125,19 +2349,56 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
 
             report = msg.content[0].text
             
+            # #region agent log
+            try:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "B", "location": "factory.py:2130", "message": "vision model response received", "data": {"report_preview": report[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
+            except: pass
+            # #endregion
+            
+            # Append missing image issues if found
+            if missing_image_issues:
+                report += "\n\n## Missing/Broken Images Detected (Automated Check)\n\n"
+                report += f"Found {len(missing_image_issues)} image(s) that failed to load:\n\n"
+                for i, issue in enumerate(missing_image_issues[:10], 1):  # Limit to 10 for brevity
+                    report += f"{i}. **{issue['element']}**: Image source `{issue['src']}` failed to load"
+                    if issue.get('alt'):
+                        report += f" (alt: \"{issue['alt']}\")"
+                    report += "\n\n"
+                if len(missing_image_issues) > 10:
+                    report += f"... and {len(missing_image_issues) - 10} more issues.\n\n"
+                # If missing images found, force FAIL status
+                if "PASS" in report and not report.strip().startswith("FAIL"):
+                    report = "FAIL: Missing images detected\n\n" + report
+                    _log_aligned("warning", "⚠️", "QA", f"missing images detected for {client_id}: {len(missing_image_issues)} issues")
+            
             # Append invisible text issues if found
             if invisible_text_issues:
-                report += "\n\n## Invisible Text Issues Detected (Automated Check)\n\n"
-                report += f"Found {len(invisible_text_issues)} element(s) with text color matching background:\n\n"
-                for i, issue in enumerate(invisible_text_issues[:10], 1):  # Limit to 10 for brevity
-                    report += f"{i}. **{issue['element']}**: Text color `{issue['text_color']}` matches background `{issue['background_color']}` (diff: {issue['color_diff']})\n"
-                    report += f"   Text preview: \"{issue['text_preview']}\"\n\n"
-                if len(invisible_text_issues) > 10:
-                    report += f"... and {len(invisible_text_issues) - 10} more issues.\n\n"
-                # If invisible text found, force FAIL status
+                invisible_issues = [i for i in invisible_text_issues if i.get('severity') == 'invisible']
+                hard_to_read_issues = [i for i in invisible_text_issues if i.get('severity') == 'hard_to_read']
+                
+                report += "\n\n## Text Readability Issues Detected (Automated Check)\n\n"
+                
+                if invisible_issues:
+                    report += f"Found {len(invisible_issues)} element(s) with invisible text (color matches background):\n\n"
+                    for i, issue in enumerate(invisible_issues[:10], 1):  # Limit to 10 for brevity
+                        report += f"{i}. **{issue['element']}**: Text color `{issue['text_color']}` matches background `{issue['background_color']}` (diff: {issue['color_diff']})\n"
+                        report += f"   Text preview: \"{issue['text_preview']}\"\n\n"
+                    if len(invisible_issues) > 10:
+                        report += f"... and {len(invisible_issues) - 10} more invisible text issues.\n\n"
+                
+                if hard_to_read_issues:
+                    report += f"Found {len(hard_to_read_issues)} element(s) with hard-to-read text (low contrast):\n\n"
+                    for i, issue in enumerate(hard_to_read_issues[:10], 1):  # Limit to 10 for brevity
+                        report += f"{i}. **{issue['element']}**: Text color `{issue['text_color']}` has low contrast with background `{issue['background_color']}` (diff: {issue['color_diff']})\n"
+                        report += f"   Text preview: \"{issue['text_preview']}\"\n\n"
+                    if len(hard_to_read_issues) > 10:
+                        report += f"... and {len(hard_to_read_issues) - 10} more hard-to-read text issues.\n\n"
+                
+                # If invisible or hard-to-read text found, force FAIL status
                 if "PASS" in report and not report.strip().startswith("FAIL"):
-                    report = "FAIL: Invisible text detected\n\n" + report
-                    _log_aligned("warning", "⚠️", "QA", f"invisible text detected for {client_id}: {len(invisible_text_issues)} issues")
+                    report = "FAIL: Text readability issues detected\n\n" + report
+                    _log_aligned("warning", "⚠️", "QA", f"text readability issues detected for {client_id}: {len(invisible_text_issues)} issues")
             
             with open(os.path.join(client_path, "qa_report.md"), "w", encoding="utf-8") as f:
                 f.write(report)

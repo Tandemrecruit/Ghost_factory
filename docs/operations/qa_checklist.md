@@ -44,6 +44,18 @@ This is an internal checklist to run **before** sending any draft or final landi
   - Headline, subheadline, and section headings are clearly distinct
   - Key messages are easy to scan
 
+- [ ] **Text contrast and readability**
+  - All text is clearly readable against its background
+  - Headlines are dark enough on light backgrounds (check in both light and dark mode)
+  - Body text has sufficient contrast (WCAG AA minimum)
+  - No light gray text on white backgrounds
+
+- [ ] **Images and assets**
+  - All referenced images load correctly or show appropriate fallbacks
+  - Logo fallbacks are visible and readable (not just tiny text)
+  - Missing images don't break the layout
+  - Image alt text is present and descriptive
+
 ---
 
 ## 3. Content QA

@@ -1058,5 +1058,45 @@
       "client_id": "demo-saas",
       "attempt": 3
     }
+  },
+  {
+    "timestamp": "2025-12-11T03:54:52.392364",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(18,26): error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T03:56:21.456621",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [list specific visual problems]\n\n**Critical Issues Identified:**\n\n1. **Missing Images/Logos (CRITICAL)**\n   - Multiple image containers appear empty throughout the page\n   - Testimonial/avatar sections show no profile images\n   - Hero section images are not visible/failed to load\n   - Company ",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-11T03:57:42.732257",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Missing images and logos detected]\n\n**Specific Issues:**\n\n1. **Missing Logo/Branding** - No visible company logo at the top of the page where it should be present\n2. **Missing Hero Image** - The hero section appears to lack a background image or featured visual\n3. **Missing Testimonial Avatar",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-11T03:58:56.500121",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(433,48): error TS1005: ',' expected.\npage.tsx(433,50): error TS1005: ',' expected.\npage.tsx(433,70): error TS1005: '{' expected.\npage.tsx(433,72): error TS1002: Unterminated string literal.\npage.tsx(434,21): error TS1005: ':' expected.\npage.tsx(434,29): error TS1005: ',' expected.\npage.tsx(",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
   }
 ]
