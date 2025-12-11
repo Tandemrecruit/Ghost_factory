@@ -151,14 +151,6 @@ def _llm_messages_create(model: str, client_id: str, activity: str, system: str,
     """
     Unified LLM caller that routes to Anthropic (with backoff) or OpenAI.
     """
-    # #region agent log
-    import json as json_module
-    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:104", "message": "_llm_messages_create entry", "data": {"model": model, "client_id": client_id, "activity": activity, "is_openai": model.startswith("gpt-")}, "timestamp": int(time.time() * 1000)}) + "\n")
-    except: pass
-    # #endregion
     if model.startswith("gpt-"):
         try:
             resp = client_openai.chat.completions.create(
@@ -170,31 +162,9 @@ def _llm_messages_create(model: str, client_id: str, activity: str, system: str,
                     {"role": "user", "content": user_content},
                 ],
             )
-            # #region agent log
-            try:
-                with open(log_path, "a", encoding="utf-8") as f:
-                    resp_attrs = {"has_choices": hasattr(resp, "choices"), "choices_len": len(resp.choices) if hasattr(resp, "choices") else 0}
-                    if hasattr(resp, "choices") and resp.choices:
-                        choice = resp.choices[0]
-                        resp_attrs["has_message"] = hasattr(choice, "message")
-                        if hasattr(choice, "message"):
-                            msg = choice.message
-                            resp_attrs["has_content"] = hasattr(msg, "content")
-                            if hasattr(msg, "content"):
-                                resp_attrs["content_type"] = type(msg.content).__name__
-                                resp_attrs["content_len"] = len(str(msg.content)) if msg.content else 0
-                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:115", "message": "OpenAI response received", "data": resp_attrs, "timestamp": int(time.time() * 1000)}) + "\n")
-            except: pass
-            # #endregion
             _record_model_cost("openai", model, activity, client_id, resp)
             return resp
         except Exception as e:
-            # #region agent log
-            try:
-                with open(log_path, "a", encoding="utf-8") as f:
-                    f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:117", "message": "OpenAI API exception", "data": {"model": model, "error_type": type(e).__name__, "error_msg": str(e)[:300]}, "timestamp": int(time.time() * 1000)}) + "\n")
-            except: pass
-            # #endregion
             raise
 
     resp = _anthropic_messages_create(
@@ -205,18 +175,6 @@ def _llm_messages_create(model: str, client_id: str, activity: str, system: str,
         system=system,
         messages=[{"role": "user", "content": user_content}],
     )
-    # #region agent log
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            resp_attrs = {"has_content": hasattr(resp, "content"), "content_len": len(resp.content) if hasattr(resp, "content") else 0}
-            if hasattr(resp, "content") and resp.content:
-                resp_attrs["first_block_type"] = type(resp.content[0]).__name__ if resp.content else None
-                if resp.content and hasattr(resp.content[0], "text"):
-                    resp_attrs["first_block_has_text"] = True
-                    resp_attrs["first_block_text_len"] = len(resp.content[0].text) if resp.content[0].text else 0
-            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:142", "message": "Anthropic response received", "data": resp_attrs, "timestamp": int(time.time() * 1000)}) + "\n")
-    except: pass
-    # #endregion
     _record_model_cost("anthropic", model, activity, client_id, resp)
     return resp
 
@@ -284,25 +242,11 @@ def _extract_response_text(response, default=None):
     Returns:
         str: The extracted text, or default if extraction fails
     """
-    # #region agent log
-    import json as json_module
-    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:188", "message": "_extract_response_text entry", "data": {"response_is_none": response is None, "has_content": hasattr(response, "content") if response else False, "has_choices": hasattr(response, "choices") if response else False}, "timestamp": int(time.time() * 1000)}) + "\n")
-    except: pass
-    # #endregion
     try:
         if response and hasattr(response, 'content') and response.content:
             first_block = response.content[0]
             if hasattr(first_block, 'text') and first_block.text:
                 extracted = first_block.text
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:195", "message": "extracted from Anthropic content", "data": {"extracted_len": len(extracted)}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 return extracted
         if response and hasattr(response, "choices"):
             choice = response.choices[0]
@@ -315,35 +259,11 @@ def _extract_response_text(response, default=None):
                     elif isinstance(part, str):
                         texts.append(part)
                 extracted = "\n".join(t for t in texts if t) or default
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:210", "message": "extracted from OpenAI list content", "data": {"extracted_len": len(extracted) if extracted else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 return extracted
             if isinstance(content, str):
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:216", "message": "extracted from OpenAI string content", "data": {"extracted_len": len(content)}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 return content
-        # #region agent log
-        try:
-            with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:220", "message": "extraction failed, returning default", "data": {"default": default}, "timestamp": int(time.time() * 1000)}) + "\n")
-        except: pass
-        # #endregion
         return default
     except (IndexError, AttributeError, TypeError) as e:
-        # #region agent log
-        try:
-            with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:222", "message": "extraction exception", "data": {"error_type": type(e).__name__, "error_msg": str(e)[:200]}, "timestamp": int(time.time() * 1000)}) + "\n")
-        except: pass
-        # #endregion
         return default
 
 
@@ -1156,10 +1076,19 @@ Please evaluate the accessibility of this color palette."""
                 _log_aligned("warning", "⚠️", "A11y Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                 break
 
+            # Extract text from markdown code blocks if present
             a11y_response = a11y_response_text.strip()
+            code_block_match = re.search(r'```(?:text|markdown)?\s*([\s\S]*?)\s*```', a11y_response)
+            if code_block_match:
+                a11y_response = code_block_match.group(1).strip()
+            else:
+                a11y_response = a11y_response_text.strip()
 
-            # Decision - PASS or FAIL
-            if a11y_response.startswith("FAIL"):
+            # Normalize: uppercase for case-insensitive matching
+            a11y_response_upper = a11y_response.upper()
+
+            # Decision - PASS or FAIL (search anywhere in response, not just start)
+            if "FAIL" in a11y_response_upper:
                 _log_aligned("warning", "⚠️", "A11y Critic", f"rejected theme on attempt {attempt}")
                 previous_feedback = a11y_response
 
@@ -1174,11 +1103,12 @@ Please evaluate the accessibility of this color palette."""
                 if attempt >= MAX_A11Y_RETRIES:
                     _log_aligned("error", "❌", "A11y Critic", f"Max a11y retries ({MAX_A11Y_RETRIES}) reached. Using last generated theme.")
                     break
-            elif a11y_response.startswith("PASS"):
+            elif "PASS" in a11y_response_upper:
                 _log_aligned("info", "✅", "A11y Critic", f"approved theme on attempt {attempt}")
                 break
             else:
-                _log_aligned("warning", "⚠️", "A11y Critic", "response unclear (no PASS/FAIL). Proceeding with theme.")
+                # Log the actual response for debugging
+                _log_aligned("warning", "⚠️", "A11y Critic", f"response unclear (no PASS/FAIL found). Response: {a11y_response[:200]}... Proceeding with theme.")
                 break
 
         # Ensure we have a valid theme
@@ -1311,25 +1241,32 @@ Please evaluate this brief against the original intake."""
                     _log_aligned("warning", "⚠️", "Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                     break
 
+                # Extract text from markdown code blocks if present
                 critic_response = critic_response_text.strip()
-                
-                # Handle markdown headers (e.g. "# PASS" or "**FAIL**")
-                clean_response = critic_response.lstrip("#*").strip()
+                code_block_match = re.search(r'```(?:text|markdown)?\s*([\s\S]*?)\s*```', critic_response)
+                if code_block_match:
+                    clean_response = code_block_match.group(1).strip()
+                else:
+                    # Handle markdown headers (e.g. "# PASS" or "**FAIL**")
+                    clean_response = critic_response.lstrip("#*").strip()
 
-                # Step 5: Decision - PASS or FAIL
+                # Normalize: uppercase for case-insensitive matching
+                clean_response_upper = clean_response.upper()
+
+                # Step 5: Decision - PASS or FAIL (search anywhere in response, not just start)
                 # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
-                if clean_response.startswith("FAIL"):
+                if "FAIL" in clean_response_upper:
                     _log_aligned("warning", "⚠️", "Critic", f"rejected brief on attempt {attempt}")
                     previous_feedback = clean_response
                     if attempt >= MAX_CRITIC_RETRIES:
                         _log_aligned("error", "❌", "Critic", f"Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated brief.")
                         break  # Explicit break to exit loop after max retries
-                elif clean_response.startswith("PASS"):
+                elif "PASS" in clean_response_upper:
                     _log_aligned("info", "✅", "Critic", f"approved brief on attempt {attempt}")
                     break
                 else:
-                    # Ambiguous response - treat as pass but log warning
-                    _log_aligned("warning", "⚠️", "Critic", "response unclear (no PASS/FAIL). Proceeding with brief.")
+                    # Ambiguous response - log the actual response for debugging
+                    _log_aligned("warning", "⚠️", "Critic", f"response unclear (no PASS/FAIL found). Response: {clean_response[:200]}... Proceeding with brief.")
                     break
 
             # Step 6: Validate and save the brief
@@ -1499,24 +1436,32 @@ Please evaluate this content against the intake and brief."""
                 _log_aligned("warning", "⚠️", "Copy Critic", f"returned empty response on attempt {attempt}. Treating as PASS.")
                 break
 
+            # Extract text from markdown code blocks if present
             critic_response = critic_response_text.strip()
-            
-            # Handle markdown headers (e.g. "# PASS" or "**FAIL**")
-            clean_response = critic_response.lstrip("#*").strip()
+            code_block_match = re.search(r'```(?:text|markdown)?\s*([\s\S]*?)\s*```', critic_response)
+            if code_block_match:
+                clean_response = code_block_match.group(1).strip()
+            else:
+                # Handle markdown headers (e.g. "# PASS" or "**FAIL**")
+                clean_response = critic_response.lstrip("#*").strip()
 
-            # Decision - PASS or FAIL
+            # Normalize: uppercase for case-insensitive matching
+            clean_response_upper = clean_response.upper()
+
+            # Decision - PASS or FAIL (search anywhere in response, not just start)
             # IMPORTANT: Check FAIL first to avoid false positives when "PASS" appears in failure text
-            if clean_response.startswith("FAIL"):
+            if "FAIL" in clean_response_upper:
                 _log_aligned("warning", "⚠️", "Copy Critic", f"rejected content on attempt {attempt}")
                 previous_feedback = clean_response
                 if attempt >= MAX_CRITIC_RETRIES:
                     _log_aligned("error", "❌", "Copy Critic", f"Max critic retries ({MAX_CRITIC_RETRIES}) reached. Using last generated content.")
                     break
-            elif clean_response.startswith("PASS"):
+            elif "PASS" in clean_response_upper:
                 _log_aligned("info", "✅", "Copy Critic", f"approved content on attempt {attempt}")
                 break
             else:
-                _log_aligned("warning", "⚠️", "Copy Critic", "response unclear (no PASS/FAIL). Proceeding with content.")
+                # Ambiguous response - log the actual response for debugging
+                _log_aligned("warning", "⚠️", "Copy Critic", f"response unclear (no PASS/FAIL found). Response: {clean_response[:200]}... Proceeding with content.")
                 break
 
         # Validate content before saving
@@ -1555,14 +1500,6 @@ def run_builder(client_path):
         client_path (str): Path to the client directory (contains brief.md, content.md,
                           and optionally theme.json). Client ID is derived from basename.
     """
-    # #region agent log
-    import json as json_module
-    log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"
-    try:
-        with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1136", "message": "run_builder entry", "data": {"client_path": client_path}, "timestamp": int(time.time() * 1000)}) + "\n")
-    except: pass
-    # #endregion
     client_id = os.path.basename(client_path)
     # Validate client ID to prevent path traversal
     validate_client_id_or_raise(client_id, "run_builder")
@@ -1637,6 +1574,11 @@ RULES:
 9. CRITICAL: Generate COMPLETE, syntactically valid TypeScript/TSX code. All template literals, strings, JSX tags, and code blocks must be properly closed. The code must compile without errors.
 10. Ensure all opening braces {{, brackets [, parentheses (, backticks (backtick character), and JSX tags have matching closing characters.
 
+FORBIDDEN (DO NOT USE):
+- NO `<img>` tags - ALWAYS use `next/image` Image component with proper imports
+- NO `<a>` tags - ALWAYS use Next.js `<Link>` component from 'next/link'
+- NO Lorem Ipsum or placeholder text - use actual content from the brief
+
 MANIFEST:
 {manifest}
 
@@ -1667,12 +1609,6 @@ MANIFEST:
         try:
             while total_attempts < max_total_attempts:
                 total_attempts += 1
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1232", "message": "loop iteration start", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "syntax_feedback": syntax_feedback[:100] if syntax_feedback else None, "visual_feedback": visual_feedback[:100] if visual_feedback else None}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 _log_aligned("info", "🔄", "Builder cycle", f"{total_attempts}/{max_total_attempts}...")
 
                 # Build user message with any feedback
@@ -1715,12 +1651,6 @@ Please fix the visual issues while maintaining correct syntax."""
                 )
 
                 raw_response = _extract_response_text(msg, default="")
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "D", "location": "factory.py:1267", "message": "LLM response received", "data": {"total_attempts": total_attempts, "has_response": bool(raw_response), "response_length": len(raw_response) if raw_response else 0}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 if not raw_response:
                     _log_aligned("error", "❌", "Builder", f"returned empty response on attempt {total_attempts} for {client_id}")
                     memory.record_failure(
@@ -1732,12 +1662,6 @@ Please fix the visual issues while maintaining correct syntax."""
                     continue
 
                 # Extract code from response
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1418", "message": "code extraction start", "data": {"total_attempts": total_attempts, "raw_response_len": len(raw_response), "has_code_block": "```" in raw_response}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 # Try multiple regex patterns in order of specificity
                 patterns = [
                     r'```tsx\s*(.*?)```',  # Explicit tsx block
@@ -1752,36 +1676,15 @@ Please fix the visual issues while maintaining correct syntax."""
                     match = re.search(pattern, raw_response, re.DOTALL)
                     if match:
                         code = match.group(1).strip()
-                        # #region agent log
-                        try:
-                            with open(log_path, "a", encoding="utf-8") as f:
-                                code_preview = code[:200] if code else ""
-                                backtick_count = code.count("`") if code else 0
-                                template_expr_count = code.count("${") if code else 0
-                                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1512", "message": "code extracted from block", "data": {"total_attempts": total_attempts, "code_len": len(code), "code_preview": code_preview, "backtick_count": backtick_count, "template_expr_count": template_expr_count, "pattern_used": pattern[:40]}, "timestamp": int(time.time() * 1000)}) + "\n")
-                        except: pass
-                        # #endregion
                         break
                 
                 if not code:
                     _log_aligned("warning", "⚠️", "Builder", "No code blocks found in Builder response. Using raw output.")
                     code = raw_response.strip()
-                    # #region agent log
-                    try:
-                        with open(log_path, "a", encoding="utf-8") as f:
-                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1523", "message": "no code block found, using raw", "data": {"total_attempts": total_attempts, "code_len": len(code)}, "timestamp": int(time.time() * 1000)}) + "\n")
-                    except: pass
-                    # #endregion
 
                 # Phase 1: Syntax Check
                 _log_aligned("info", "🔍", "Phase 1", f"Syntax validation (attempt {total_attempts})...")
                 syntax_ok, syntax_error = check_syntax(code, client_id)
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1288", "message": "syntax check result", "data": {"total_attempts": total_attempts, "syntax_ok": syntax_ok, "error_preview": syntax_error[:200] if syntax_error else None}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
 
                 if not syntax_ok:
                     _log_aligned("warning", "⚠️", "Syntax check", f"failed on attempt {total_attempts}")
@@ -1813,13 +1716,6 @@ Please fix the visual issues while maintaining correct syntax."""
                     error_history.append(error_type)
                     if len(error_history) > 3:
                         error_history.pop(0)
-                    
-                    # #region agent log
-                    try:
-                        with open(log_path, "a", encoding="utf-8") as f:
-                            f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1597", "message": "error pattern tracking", "data": {"total_attempts": total_attempts, "error_type": error_type, "is_module_error": is_module_error, "consecutive_same_errors": consecutive_same_errors, "last_error_type": last_error_type}, "timestamp": int(time.time() * 1000)}) + "\n")
-                    except: pass
-                    # #endregion
                     
                     # Early exit conditions to save API credits:
                     # 1. Module resolution errors = config issue, exit after 2 attempts (saves 4 API calls)
@@ -1857,12 +1753,6 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Save the code atomically
                 write_success = atomic_write(target_file, code)
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "E", "location": "factory.py:1314", "message": "file write result", "data": {"total_attempts": total_attempts, "write_success": write_success, "target_file": target_file}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
                 if not write_success:
                     _log_aligned("error", "❌", "Builder", f"Failed to write {target_file}")
                     memory.record_failure(
@@ -1875,12 +1765,6 @@ Please fix the visual issues while maintaining correct syntax."""
 
                 # Run QA
                 qa_status, qa_report, screenshot_path = run_qa(client_path)
-                # #region agent log
-                try:
-                    with open(log_path, "a", encoding="utf-8") as f:
-                        f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "B", "location": "factory.py:1325", "message": "QA result", "data": {"total_attempts": total_attempts, "qa_status": qa_status, "report_preview": qa_report[:200] if qa_report else None, "has_screenshot": bool(screenshot_path)}, "timestamp": int(time.time() * 1000)}) + "\n")
-                except: pass
-                # #endregion
 
                 # Phase 3: Check QA results
                 if qa_status == "PASS":
@@ -1919,12 +1803,6 @@ Please fix the visual issues while maintaining correct syntax."""
             heartbeat_thread.join(timeout=2)
 
         # Phase 4: Finalization
-        # #region agent log
-        try:
-            with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json_module.dumps({"sessionId": "debug-session", "runId": "run1", "hypothesisId": "A", "location": "factory.py:1364", "message": "loop exit", "data": {"total_attempts": total_attempts, "max_total_attempts": max_total_attempts, "final_qa_status": final_qa_status, "exhausted_attempts": total_attempts >= max_total_attempts}, "timestamp": int(time.time() * 1000)}) + "\n")
-        except: pass
-        # #endregion
         _log_aligned("info", "🏁", "Builder", f"completed after {total_attempts} attempts. Final status: {final_qa_status}")
 
         # Compile rules periodically (after learning from this session)

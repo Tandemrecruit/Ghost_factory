@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import {
   HeroSimple,
   LogoCloud,
@@ -92,11 +93,15 @@ export default function Page() {
             ProductFlow gives your team a single source of truth for product planning, feedback management, and sprint execution. See what you're building, why it matters, and who it's for—all in one place.
           </p>
           <div className="bg-white rounded-lg shadow-2xl p-4">
-            <img
-              src="/images/productflow-dashboard.png"
-              alt="The ProductFlow dashboard showing roadmaps, feedback, and sprints working together"
-              className="w-full rounded"
-            />
+            <div className="relative w-full aspect-video rounded overflow-hidden">
+              <Image
+                src="/images/productflow-dashboard.png"
+                alt="The ProductFlow dashboard showing roadmaps, feedback, and sprints working together"
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1152px"
+              />
+            </div>
           </div>
         </div>
       </SectionWrapper>

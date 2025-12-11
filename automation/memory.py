@@ -28,6 +28,107 @@ os.makedirs(DATA_MEMORY_DIR, exist_ok=True)
 os.makedirs(GOLDEN_SAMPLES_DIR, exist_ok=True)
 
 
+def _format_syntax_errors_human_readable(error_output: str) -> str:
+    """
+    Parse TypeScript error output and format it in a human-readable way for terminal display.
+    
+    Extracts key information: file, line numbers, error types, and messages.
+    Returns a concise summary suitable for terminal output.
+    
+    Parameters:
+        error_output: Raw TypeScript compiler error output
+        
+    Returns:
+        str: Human-readable error summary
+    """
+    if not error_output:
+        return "Unknown syntax error"
+    
+    # Remove "TypeScript compilation failed: " prefix if present
+    if error_output.startswith("TypeScript compilation failed: "):
+        error_output = error_output[len("TypeScript compilation failed: "):]
+    
+    # Parse errors: format is typically "file.tsx(line,col): error TS####: message"
+    error_pattern = r'(\S+)\((\d+),(\d+)\):\s+error\s+(TS\d+):\s+([^\n]+)'
+    matches = re.findall(error_pattern, error_output)
+    
+    if not matches:
+        # Fallback: try to extract at least the first error line
+        first_line = error_output.split('\n')[0].strip()
+        if 'error TS' in first_line:
+            # Extract error code if present
+            ts_match = re.search(r'error (TS\d+)', first_line)
+            error_code = ts_match.group(1) if ts_match else "error"
+            return f"syntax error: {error_code}"
+        return "syntax error (see logs for details)"
+    
+    # Group errors by file and line
+    errors_by_file = {}
+    for file, line, col, code, message in matches:
+        if file not in errors_by_file:
+            errors_by_file[file] = []
+        errors_by_file[file].append({
+            'line': int(line),
+            'col': int(col),
+            'code': code,
+            'message': message.strip()
+        })
+    
+    # Build human-readable summary
+    parts = []
+    total_errors = len(matches)
+    
+    for file, errors in errors_by_file.items():
+        # Group by line number
+        lines_with_errors = {}
+        for err in errors:
+            line_num = err['line']
+            if line_num not in lines_with_errors:
+                lines_with_errors[line_num] = []
+            lines_with_errors[line_num].append(err)
+        
+        # Format: "3 errors in page.tsx (line 126: missing comma, line 127: unexpected token)"
+        line_summaries = []
+        for line_num in sorted(lines_with_errors.keys())[:3]:  # Show max 3 lines
+            errs = lines_with_errors[line_num]
+            # Get the first error message, simplified
+            first_msg = errs[0]['message']
+            # Simplify common error messages
+            if first_msg.startswith("',' expected"):
+                msg = "missing comma"
+            elif first_msg.startswith("':' expected"):
+                msg = "missing colon"
+            elif first_msg.startswith("';' expected"):
+                msg = "missing semicolon"
+            elif first_msg.startswith("'}' expected"):
+                msg = "missing closing brace"
+            elif first_msg.startswith("')' expected"):
+                msg = "missing closing parenthesis"
+            elif first_msg.startswith("Identifier expected"):
+                msg = "invalid identifier"
+            elif first_msg.startswith("Unterminated string literal"):
+                msg = "unclosed string"
+            elif first_msg.startswith("Unterminated template literal"):
+                msg = "unclosed template"
+            elif "Cannot find module" in first_msg:
+                msg = "module not found"
+            else:
+                # Truncate long messages
+                msg = first_msg[:40] + "..." if len(first_msg) > 40 else first_msg
+            
+            line_summaries.append(f"line {line_num}: {msg}")
+        
+        if len(lines_with_errors) > 3:
+            line_summaries.append(f"... and {len(lines_with_errors) - 3} more lines")
+        
+        file_summary = f"{len(matches)} error{'s' if len(matches) > 1 else ''} in {file}"
+        if line_summaries:
+            file_summary += f" ({', '.join(line_summaries)})"
+        parts.append(file_summary)
+    
+    return " | ".join(parts) if parts else f"{total_errors} syntax error(s)"
+
+
 def _log_memory(level: str, emoji: str, label: str, message: str):
     """
     Log a message with aligned header formatting (matches factory._log_aligned format).
@@ -102,8 +203,14 @@ def record_failure(category: str, issue: str, fix: str, metadata: Optional[Dict[
         with open(RAW_ERRORS_PATH, "w", encoding="utf-8") as f:
             json.dump(errors, f, indent=2)
 
-        # Truncate issue for readability, but keep more context than before
-        issue_preview = issue[:80] + "..." if len(issue) > 80 else issue
+        # Format issue for terminal display
+        # If it's a syntax error with TypeScript compilation output, format it human-readably
+        if category == "syntax" and issue.startswith("TypeScript compilation failed: "):
+            issue_preview = _format_syntax_errors_human_readable(issue)
+        else:
+            # Truncate issue for readability, but keep more context than before
+            issue_preview = issue[:80] + "..." if len(issue) > 80 else issue
+        
         _log_memory("info", "🧠", "Memory", f"Recorded {category} failure | {issue_preview}")
         return True
 
