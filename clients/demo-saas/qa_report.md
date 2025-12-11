@@ -1,0 +1,1 @@
+FAIL: [The page displays only "Internal Server Error" text on a blank white background. This indicates a critical server-side error rather than a functional mobile UI. The page is missing all content, images, logos, CTAs, buttons, and structural elements. This is not a rendering issue but a complete failure to load the intended page content.]

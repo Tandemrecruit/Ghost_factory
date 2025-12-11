@@ -258,5 +258,45 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-11T04:48:00.998957",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-saas",
+    "duration_seconds": 254.22,
+    "time_saved_seconds": 10545.78,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:50:15.886265",
+    "activity": "pipeline_qa",
+    "client_id": "demo-saas",
+    "duration_seconds": 6.67,
+    "time_saved_seconds": 3593.33,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:52:30.344259",
+    "activity": "pipeline_qa",
+    "client_id": "demo-saas",
+    "duration_seconds": 7.08,
+    "time_saved_seconds": 3592.92,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:52:30.359137",
+    "activity": "pipeline_builder",
+    "client_id": "demo-saas",
+    "duration_seconds": 269.36,
+    "time_saved_seconds": 14130.64,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

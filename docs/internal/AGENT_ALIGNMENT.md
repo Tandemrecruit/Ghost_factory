@@ -1,4 +1,4 @@
-﻿# Ghost Factory â€“ Agent Alignment Document
+﻿# Ghost Factory — Agent Alignment Document
 
 **Version:** 1.0
 **Last Updated:** 2025-12-10
@@ -23,7 +23,7 @@ Ghost Factory is an **internal landing-page factory tool** that automatically ge
 
 ---
 
-## 2. Current Milestone â€“ v1.0
+## 2. Current Milestone — v1.0
 
 ### What v1.0 IS
 
@@ -39,7 +39,7 @@ When this works end-to-end on a fresh machine, v1.0 is **done**.
 |------|------------------|
 | **Clients** | Single demo client (`demo-hvac`) |
 | **Intake** | Manual copy of raw answers into `clients/<client-id>/intake-raw.md` |
-| **Sanitization** | `intake_sanitizer.py` converts `intake-raw.md` â†’ `intake.md` |
+| **Sanitization** | `intake_sanitizer.py` converts `intake-raw.md` → `intake.md` |
 | **Architect** | Router classifies niche; Strategist generates `brief.md` |
 | **Visual Designer** | Generates `theme.json` with basic colors/fonts |
 | **Copywriter** | Generates `content.md` from the brief |
@@ -100,20 +100,17 @@ python automation/intake_sanitizer.py clients/<client-id>/intake-raw.md
 
 **Substeps:**
 1. **Router** (`prompts/router.md`) classifies the client into a niche:
-   - `SAAS_B2B` â†’ `strategy/saas.md`
-   - `LOCAL_SERVICE` â†’ `strategy/local_service.md`
-   - `ECOMMERCE_DTC` â†’ `strategy/ecommerce.md`
-   - `PERSONAL_BRAND` â†’ `strategy/personal_brand.md`
-   - `WEBINAR_FUNNEL` â†’ `strategy/webinar.md`
-
+   - `SAAS_B2B` → `strategy/saas.md`
+   - `LOCAL_SERVICE` → `strategy/local_service.md`
+   - `ECOMMERCE_DTC` → `strategy/ecommerce.md`
+   - `PERSONAL_BRAND` → `strategy/personal_brand.md`
+   - `WEBINAR_FUNNEL` → `strategy/webinar.md`
 2. **Strategist** (Claude Opus) generates:
    - `brief.md` (working copy)
    - `brief.orig.md` (immutable original)
-
 3. **Strategy Critic** (`prompts/critique/strategy_critic.md`) reviews the brief:
    - Returns `PASS` or `FAIL: [issues]`
    - On FAIL, feeds feedback back to Strategist for retry (max 3 attempts)
-
 4. **Visual Designer** (runs in parallel):
    - Uses `prompts/design/palette_generator.md`
    - Generates `theme.json` with colors, fonts, and styling values
@@ -250,21 +247,19 @@ If asked to implement features outside v1.0 scope (multi-client, analytics dashb
 
 ## Using docs/DECISIONS_INBOX.md (for all agents)
 
-The Decisions Inbox is the **staging area** for thoughts and potential decisions. It exists so Ryan and the agents donâ€™t have to remember everything in their heads.
+The Decisions Inbox is the **staging area** for thoughts and potential decisions. It exists so Ryan and the agents don't have to remember everything in their heads.
 
 ### Inbox legend
 
 Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
 
-- **[NOTE]** â€“ Brain dump, observation, or reminder  
-  - â€œThis might matter later.â€
-  - Safe place for models to say â€œhey, watch thisâ€ without changing any rules.
-
-- **[PROPOSAL]** â€“ Suggested decision or rule change  
-  - â€œWe *should probably* make this an explicit rule.â€
+- **[NOTE]** "“ Brain dump, observation, or reminder  
+  - "This might matter later."
+  - Safe place for models to say "hey, watch this" without changing any rules.
+- **[PROPOSAL]** "“ Suggested decision or rule change  
+  - "We *should probably* make this an explicit rule."
   - Used when an agent spots a consistent pattern that deserves a formal decision.
-
-- **[DECISION]** â€“ Approved decision, ready to be logged as a D-XXXX  
+- **[DECISION]** — Approved decision, ready to be logged as a D-XXXX  
   - **Only Ryan** is allowed to mark an item as `[DECISION]`.
   - The Decisions Scribe promotes these into `docs/DECISIONS_LOG.md`.
 
@@ -274,7 +269,6 @@ Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
   - Notice a mismatch between docs and code.
   - Think a behavior should be standardized (e.g., error-handling style, stack choices).
   - Want to remind Future Ryan about a potential improvement or risk.
-
 - You **MUST NOT**:
   - Change `[NOTE]` or `[PROPOSAL]` items into `[DECISION]`.
   - Edit existing D-XXXX entries in `DECISIONS_LOG.md`.
@@ -292,9 +286,9 @@ Each bullet in `docs/DECISIONS_INBOX.md` must start with one of:
 
 As an agent, add a `[NOTE]` or `[PROPOSAL]` when, for example:
 
-- You see behavior in `factory.py` or `intake_sanitizer.py` that **isnâ€™t documented** in AGENT_ALIGNMENT yet.
-- You think a recurring pattern should be codified (e.g., â€œQA can return FAIL/ERROR/SKIPPED as long as the page still rendersâ€).
-- You suspect a future conflict or ambiguity (â€œBuilder is using a pattern that isnâ€™t reflected in the manifestâ€).
+- You see behavior in `factory.py` or `intake_sanitizer.py` that **isn"™t documented** in AGENT_ALIGNMENT yet.
+- You think a recurring pattern should be codified (e.g., "QA can return FAIL/ERROR/SKIPPED as long as the page still renders").
+- You suspect a future conflict or ambiguity ("Builder is using a pattern that isn"™t reflected in the manifest").
 
 Use the inbox as the **scratchpad for future decisions**, but remember:  
 **Only logged D-XXXX entries and the alignment docs define the current rules.**
@@ -326,7 +320,7 @@ Key files to read:
 - design-system/manifest.md (component library)
 - .cursorrules (coding standards)
 
-Scope: Single demo client (demo-hvac) flowing from intake-raw.md â†’ intake.md â†’ brief.md â†’ content.md â†’ page.tsx â†’ rendered page.
+Scope: Single demo client (demo-hvac) flowing from intake-raw.md → intake.md → brief.md → content.md → page.tsx → rendered page.
 
 Do NOT implement: multi-client, analytics dashboards, A/B tests, experiments, or features marked as v1.5+.
 ```

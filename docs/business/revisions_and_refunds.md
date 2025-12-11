@@ -14,7 +14,7 @@ The standard landing page package includes:
 
 - **One revision round** after the initial draft
 
-A â€œrevision roundâ€ means:
+A "revision round" means:
 
 - The client reviews the draft
 - The client sends a consolidated list of changes
@@ -74,7 +74,7 @@ This can be evaluated case-by-case.
 
 ### 3.2. After Work Begins (Non-Refundable Deposit)
 
-Work is considered â€œbegunâ€ once:
+Work is considered "begun" once:
 
 - The client has submitted the intake form, and
 - You or your system have started generating the brief, copy, or page

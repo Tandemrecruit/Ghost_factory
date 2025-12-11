@@ -30,14 +30,12 @@ Keep the Bearer token and X-API-Key checks. Add tests for the new behavior.
 Replace the file-based JSON storage with SQLite:
 
 1. Install better-sqlite3 (npm install better-sqlite3 @types/better-sqlite3)
-
 2. Create lib/db.ts with:
    - Database initialization function
    - Tables: time_entries, api_costs, hosting_costs, revenue_entries
    - Schema should match the existing TypeScript interfaces in lib/schema-validator.ts
    - Add created_at and updated_at timestamps
    - Create indexes on timestamp and client_id columns
-
 3. Create lib/db-queries.ts with functions:
    - insertTimeEntry(entry: TimeEntry)
    - insertApiCost(entry: ApiCostEntry)
@@ -46,9 +44,7 @@ Replace the file-based JSON storage with SQLite:
    - getTimeEntriesByMonth(month: string): TimeEntry[]
    - getCostsByMonth(month: string): { api: ApiCostEntry[], hosting: HostingCostEntry[] }
    - getRevenueByMonth(month: string): RevenueEntry[]
-
 4. Update app/api/dashboard/stats/route.ts to use the new database queries instead of reading JSON files
-
 5. Create a migration script (scripts/migrate-json-to-sqlite.ts) that reads existing JSON files from data/ and inserts them into SQLite
 
 Keep the JSON files as backup but use SQLite as primary storage.
@@ -63,7 +59,6 @@ Add request/response logging for API routes:
    - A function that logs: timestamp, method, path, status code, duration_ms, client IP
    - Log to both console and a file (logs/api-requests.log)
    - Use JSON format for easy parsing
-
 2. Create a wrapper function for API route handlers:
 
    export function withLogging(handler: (req: Request) => Promise<Response>) {
@@ -74,7 +69,6 @@ Add request/response logging for API routes:
    }
 
 3. Update all routes in app/api/dashboard/ to use this wrapper
-
 4. Add logs/ to .gitignore
 ```
 
@@ -88,19 +82,14 @@ Add request/response logging for API routes:
 Extract git operations from automation/factory.py into a new module:
 
 1. Create automation/services/git_service.py
-
 2. Move these functions from factory.py:
    - git_pull()
    - git_commit_and_push(client_id)
-
 3. Add proper error handling and return types:
    - git_pull() -> Tuple[bool, Optional[str]]  # (success, error_message)
    - git_commit_and_push(client_id) -> Tuple[bool, Optional[str]]
-
 4. Add retry logic with exponential backoff (3 retries, 2s/4s/8s delays)
-
 5. Update factory.py to import from automation.services.git_service
-
 6. Add unit tests in tests/test_git_service.py
 ```
 
@@ -110,17 +99,13 @@ Extract git operations from automation/factory.py into a new module:
 Extract Discord notifications from automation/factory.py:
 
 1. Create automation/services/discord_service.py
-
 2. Move send_discord_alert() from factory.py
-
 3. Improve the function:
    - Add type hints for all parameters
    - Add retry logic (2 retries with 1s delay)
    - Create an enum for status types: SUCCESS, QA_FAILED, WARNING, ERROR
    - Add a queue mechanism so notifications don't block the pipeline
-
 4. Update factory.py to import from automation.services.discord_service
-
 5. Add unit tests in tests/test_discord_service.py
 ```
 
@@ -130,9 +115,7 @@ Extract Discord notifications from automation/factory.py:
 Extract the TypeScript syntax checker from automation/factory.py:
 
 1. Create automation/services/syntax_checker.py
-
 2. Move check_syntax() function from factory.py
-
 3. Improve the function:
    - Add caching: if code hash matches a recently-checked hash, skip recheck
    - Add timeout parameter (default 30s)
@@ -145,7 +128,6 @@ Extract the TypeScript syntax checker from automation/factory.py:
          warnings: List[str]
 
 4. Update factory.py to import from automation.services.syntax_checker
-
 5. Add unit tests in tests/test_syntax_checker.py
 ```
 
@@ -155,27 +137,21 @@ Extract the TypeScript syntax checker from automation/factory.py:
 Extract pipeline stages from automation/factory.py into separate modules:
 
 1. Create automation/pipeline/ directory with __init__.py
-
 2. Create automation/pipeline/architect.py:
    - Move run_architect() function
    - Move run_visual_designer() function
-
 3. Create automation/pipeline/copywriter.py:
    - Move run_copywriter() function
-
 4. Create automation/pipeline/builder.py:
    - Move run_builder() function
    - Move related constants (MAX_SYNTAX_RETRIES, etc.)
-
 5. Create automation/pipeline/qa.py:
    - Move run_qa() function
    - Move finalize_client() function
-
 6. Update factory.py to:
    - Import from the new pipeline modules
    - Keep only the main loop and orchestration logic
    - Should be under 200 lines after extraction
-
 7. Update all tests to use new import paths
 ```
 
@@ -189,7 +165,6 @@ Extract pipeline stages from automation/factory.py into separate modules:
 Replace manual validation in lib/schema-validator.ts with Zod:
 
 1. Install Zod: npm install zod
-
 2. Rewrite lib/schema-validator.ts:
 
    ```typescript
@@ -219,13 +194,10 @@ Replace manual validation in lib/schema-validator.ts with Zod:
    // Add schemas for HostingCostEntry and RevenueEntry
 
 3. Export type inference: export type TimeEntry = z.infer<typeof TimeEntrySchema>
-
 4. Create validation functions that wrap Zod's safeParse:
    - validateTimeEntry(entry: unknown) -> { valid: boolean; error?: string; data?: TimeEntry }
    - validateTimeLogs(data: unknown[]) -> { valid: boolean; errors: string[]; data?: TimeEntry[] }
-
 5. Update all imports in API routes to use new types
-
 6. Run existing tests to ensure compatibility
 ```
 
@@ -235,7 +207,6 @@ Replace manual validation in lib/schema-validator.ts with Zod:
 Add Pydantic validation to the Python automation code:
 
 1. Add pydantic>=2.0 to requirements.txt
-
 2. Create automation/schemas.py with Pydantic models:
 
    from pydantic import BaseModel, Field
@@ -264,9 +235,7 @@ Add Pydantic validation to the Python automation code:
    # Add HostingCostEntry and RevenueEntry
 
 3. Update automation/schema_validator.py to use Pydantic models
-
 4. Update time_tracker.py and cost_tracker.py to validate entries before saving
-
 5. Add tests for the new schemas
 ```
 
@@ -314,9 +283,7 @@ Create a centralized configuration system:
    config = FactoryConfig.from_env()
 
 2. Update factory.py to use config.watch_dir, config.model_strategy, etc.
-
 3. Create a .env.example with all configurable options documented
-
 4. Add a config validation function that runs at startup
 ```
 
@@ -370,7 +337,6 @@ Create a GitHub Actions workflow for CI:
    ```
 
 2. Create .github/workflows/deploy.yml for deployment (placeholder)
-
 3. Add status badges to README.md
    ```
 
@@ -390,7 +356,6 @@ Add pre-commit hooks for code quality:
          - id: check-yaml
          - id: check-json
          - id: check-added-large-files
-
      - repo: https://github.com/psf/black
        rev: 24.3.0
        hooks:
@@ -401,7 +366,6 @@ Add pre-commit hooks for code quality:
        rev: 5.13.2
        hooks:
          - id: isort
-
      - repo: https://github.com/pycqa/flake8
        rev: 7.0.0
        hooks:
@@ -409,7 +373,6 @@ Add pre-commit hooks for code quality:
            args: [--max-line-length=120]
 
 2. Add to requirements-dev.txt: pre-commit>=3.6.0
-
 3. Update README.md with setup instructions:
    pip install pre-commit
    pre-commit install
@@ -472,9 +435,7 @@ Add protection against prompt injection in the AI pipeline:
    - In run_architect()
    - In run_copywriter()
    - In run_builder()
-
 3. Add logging when suspicious patterns are detected (but don't block - just warn)
-
 4. Add tests for the sanitizer
 ```
 

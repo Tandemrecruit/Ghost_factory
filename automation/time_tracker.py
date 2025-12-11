@@ -80,6 +80,14 @@ def _format_time_readable(seconds: float) -> str:
         return f"{seconds:.1f}s"
 
 
+def _simplify_activity_name(activity: str) -> str:
+    """Simplify activity names for cleaner logging."""
+    # Remove "pipeline_" prefix if present: pipeline_copywriter -> copywriter
+    if activity.startswith("pipeline_"):
+        return activity.replace("pipeline_", "", 1)
+    return activity
+
+
 def _compute_time_saved(activity: str, duration_seconds: float, cfg: Dict[str, Any]) -> float:
     baseline_minutes = cfg.get("baseline_minutes", {})
     baseline = baseline_minutes.get(activity)
@@ -118,7 +126,9 @@ def log_time_entry(
     duration_str = _format_time_readable(duration_seconds)
     saved_str = _format_time_readable(time_saved_seconds) if time_saved_seconds > 0 else "0s"
     client_str = client_id or "n/a"
-    message = f"{activity} for {client_str} | {duration_str} (saved {saved_str})"
+    # Simplify activity name for cleaner logging
+    simplified_activity = _simplify_activity_name(activity)
+    message = f"{simplified_activity} for {client_str} | {duration_str} (saved {saved_str})"
     
     # Dynamic emoji padding using unicodedata
     emoji = "⏱️"

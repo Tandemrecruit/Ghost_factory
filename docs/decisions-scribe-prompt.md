@@ -18,7 +18,6 @@ Authority:
 Your job:
 
 1. Parse ONLY the [DECISION] bullets in the Inbox into new Decisions Log entries using this format:
-
    - ID: D-XXXX (4 digits, sequential, no gaps)
    - Date: YYYY-MM-DD
    - Category: [architecture|code-style|testing|product|policy|infra|automation]
@@ -33,12 +32,10 @@ Your job:
 2. Merge them into DECISIONS_LOG.md under the "Entries" section, after the last existing D-XXXX.
    - Do NOT edit or renumber existing D-ids.
    - New decisions must continue the numbering (e.g., existing D-0005 → next is D-0006, etc.).
-
 3. Produce a cleaned-up DECISIONS_INBOX.md:
    - Remove the [DECISION] bullets that you successfully logged.
    - Preserve all [NOTE] and [PROPOSAL] bullets unchanged.
    - Preserve the header/legend.
-
 4. Return TWO complete files:
    - The updated DECISIONS_LOG.md
    - The updated DECISIONS_INBOX.md

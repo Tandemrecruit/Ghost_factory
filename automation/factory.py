@@ -656,6 +656,101 @@ def sanitize_windows_paths(error_text: str) -> str:
     return sanitized
 
 
+def _format_syntax_errors_human_readable(error_output: str) -> str:
+    """
+    Parse TypeScript error output and format it in a human-readable way for terminal display.
+    
+    Extracts key information: file, line numbers, error types, and messages.
+    Returns a concise summary suitable for terminal output.
+    
+    Parameters:
+        error_output: Raw TypeScript compiler error output
+        
+    Returns:
+        str: Human-readable error summary
+    """
+    if not error_output:
+        return "Unknown syntax error"
+    
+    # Parse errors: format is typically "file.tsx(line,col): error TS####: message"
+    # Pattern matches: filename(line,col): error TS####: message
+    # Message continues until next error line (starts with filename) or end of string
+    error_pattern = r'(\S+)\((\d+),(\d+)\):\s+error\s+(TS\d+):\s+([^\n]+)'
+    matches = re.findall(error_pattern, error_output)
+    
+    if not matches:
+        # Fallback: try to extract at least the first error line
+        first_line = error_output.split('\n')[0].strip()
+        if 'error TS' in first_line:
+            # Extract error code if present
+            ts_match = re.search(r'error (TS\d+)', first_line)
+            error_code = ts_match.group(1) if ts_match else "error"
+            return f"syntax error: {error_code}"
+        return "syntax error (see logs for details)"
+    
+    # Group errors by file and line
+    errors_by_file = {}
+    for file, line, col, code, message in matches:
+        if file not in errors_by_file:
+            errors_by_file[file] = []
+        errors_by_file[file].append({
+            'line': int(line),
+            'col': int(col),
+            'code': code,
+            'message': message.strip()
+        })
+    
+    # Build human-readable summary
+    parts = []
+    total_errors = len(matches)
+    
+    for file, errors in errors_by_file.items():
+        # Group by line number
+        lines_with_errors = {}
+        for err in errors:
+            line_num = err['line']
+            if line_num not in lines_with_errors:
+                lines_with_errors[line_num] = []
+            lines_with_errors[line_num].append(err)
+        
+        # Format: "3 errors in page.tsx (line 126: missing comma, line 127: unexpected token)"
+        line_summaries = []
+        for line_num in sorted(lines_with_errors.keys())[:3]:  # Show max 3 lines
+            errs = lines_with_errors[line_num]
+            # Get the first error message, simplified
+            first_msg = errs[0]['message']
+            # Simplify common error messages
+            if first_msg.startswith("',' expected"):
+                msg = "missing comma"
+            elif first_msg.startswith("':' expected"):
+                msg = "missing colon"
+            elif first_msg.startswith("';' expected"):
+                msg = "missing semicolon"
+            elif first_msg.startswith("'}' expected"):
+                msg = "missing closing brace"
+            elif first_msg.startswith("')' expected"):
+                msg = "missing closing parenthesis"
+            elif first_msg.startswith("Identifier expected"):
+                msg = "invalid identifier"
+            elif first_msg.startswith("Unterminated string literal"):
+                msg = "unclosed string"
+            else:
+                # Truncate long messages
+                msg = first_msg[:40] + "..." if len(first_msg) > 40 else first_msg
+            
+            line_summaries.append(f"line {line_num}: {msg}")
+        
+        if len(lines_with_errors) > 3:
+            line_summaries.append(f"... and {len(lines_with_errors) - 3} more lines")
+        
+        file_summary = f"{len(matches)} error{'s' if len(matches) > 1 else ''} in {file}"
+        if line_summaries:
+            file_summary += f" ({', '.join(line_summaries)})"
+        parts.append(file_summary)
+    
+    return " | ".join(parts) if parts else f"{total_errors} syntax error(s)"
+
+
 def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, str]:
     """
     Validate TypeScript/TSX code syntax by running the TypeScript compiler.
@@ -885,7 +980,14 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 _log_aligned("info", "✅", "Syntax check", f"passed for {client_id} (dependency errors ignored)")
                 return (True, "")
             
-            _log_aligned("warning", "⚠️", "Syntax check", f"failed for {client_id}: {filtered_output[:200]}...")
+            # Format human-readable summary for terminal
+            human_readable = _format_syntax_errors_human_readable(filtered_output)
+            
+            # Log verbose output to debug level (saved in logs but not shown in terminal by default)
+            logging.debug(f"[Syntax check] Full error output for {client_id}:\n{filtered_output}")
+            
+            # Show clean summary in terminal
+            _log_aligned("warning", "⚠️", "Syntax check", f"failed for {client_id}: {human_readable}")
             return (False, filtered_output)
 
     except subprocess.TimeoutExpired:
@@ -1933,20 +2035,62 @@ def check_missing_images_playwright(page) -> list:
                     continue
                 
                 # Check if image loaded successfully
-                is_loaded = img.evaluate("""
+                # Also check for error state (Next.js Image components might have error handlers)
+                img_state = img.evaluate("""
                     (el) => {
-                        return el.complete && el.naturalWidth > 0 && el.naturalHeight > 0;
+                        // Check if image loaded successfully
+                        const isComplete = el.complete;
+                        const hasDimensions = el.naturalWidth > 0 && el.naturalHeight > 0;
+                        
+                        // Check if image has error attribute (some frameworks set this)
+                        const hasError = el.hasAttribute('data-error') || 
+                                       el.classList.contains('error') ||
+                                       el.style.display === 'none';
+                        
+                        // Check if parent has error handling (Next.js Image might hide broken images)
+                        const parent = el.parentElement;
+                        const parentHidesImage = parent && (
+                            parent.style.display === 'none' ||
+                            parent.classList.contains('image-error')
+                        );
+                        
+                        return {
+                            isLoaded: isComplete && hasDimensions && !hasError && !parentHidesImage,
+                            naturalWidth: el.naturalWidth,
+                            naturalHeight: el.naturalHeight,
+                            complete: isComplete,
+                            hasError: hasError
+                        };
                     }
                 """)
                 
-                if not is_loaded:
+                # Also check network errors by attempting to verify the image actually loaded
+                # If naturalWidth/Height are 0, the image likely failed to load
+                if not img_state["isLoaded"] or img_state["naturalWidth"] == 0 or img_state["naturalHeight"] == 0:
                     tag_name = img.evaluate("el => el.tagName.toLowerCase()")
                     class_name = img.get_attribute("class") or ""
                     alt_text = img.get_attribute("alt") or ""
                     
+                    # Extract actual source URL (Next.js might use optimized URLs)
+                    actual_src = src
+                    original_src = src
+                    if "_next/image" in src:
+                        # Try to extract the original URL from Next.js optimized image URL
+                        import urllib.parse
+                        try:
+                            parsed = urllib.parse.urlparse(src)
+                            query_params = urllib.parse.parse_qs(parsed.query)
+                            if 'url' in query_params:
+                                original_src = urllib.parse.unquote(query_params['url'][0])
+                                actual_src = original_src  # Use original for reporting
+                        except:
+                            pass
+                    
                     issues.append({
                         "element": f"{tag_name}" + (f".{class_name.split()[0]}" if class_name else ""),
-                        "src": src,
+                        "src": actual_src,
+                        "original_src": original_src,  # Keep both for reference
+                        "optimized_src": src if "_next/image" in src else None,
                         "alt": alt_text,
                         "issue_type": "broken"
                     })
@@ -2119,16 +2263,60 @@ def run_qa(client_path) -> Tuple[str, str, str]:
             # Capture screenshot and check for invisible text and missing images
             invisible_text_issues = []
             missing_image_issues = []
+            network_errors = []
             with sync_playwright() as p:
                 browser = p.chromium.launch()
                 try:
                     page = browser.new_page(viewport={"width": 390, "height": 844})
+                    
+                    # Monitor network requests to catch 404s for images
+                    def handle_response(response):
+                        if response.status == 404:
+                            url = response.url
+                            # Only track image-related 404s
+                            if any(ext in url.lower() for ext in ['.jpg', '.jpeg', '.png', '.svg', '.gif', '.webp', '/images/', '/image']):
+                                network_errors.append({
+                                    "url": url,
+                                    "status": 404,
+                                    "type": "network_404"
+                                })
+                    
+                    page.on("response", handle_response)
+                    
                     page.goto(url)
                     page.wait_for_timeout(3000)  # Wait for hydration
                     page.screenshot(path=screenshot_path, full_page=True)
                     
                     # Check for missing images before closing browser
                     missing_image_issues = check_missing_images_playwright(page)
+                    
+                    # Add network 404s to missing image issues
+                    for error in network_errors:
+                        # Extract filename and clean path from URL
+                        from urllib.parse import urlparse, unquote, parse_qs
+                        parsed = urlparse(error["url"])
+                        
+                        # Handle Next.js optimized URLs
+                        clean_path = parsed.path
+                        if "_next/image" in error["url"]:
+                            # Extract original URL from query parameter
+                            query_params = parse_qs(parsed.query)
+                            if 'url' in query_params:
+                                clean_path = unquote(query_params['url'][0])
+                        
+                        filename = unquote(clean_path.split("/")[-1]) if clean_path else ""
+                        # Format as /images/filename for consistency
+                        display_path = f"/images/{filename}" if filename and '.' in filename else clean_path
+                        
+                        missing_image_issues.append({
+                            "element": "network_request",
+                            "src": display_path,
+                            "original_src": display_path,
+                            "optimized_src": error["url"] if "_next/image" in error["url"] else None,
+                            "alt": "",
+                            "issue_type": "404_not_found",
+                            "filename": filename
+                        })
                     
                     # Check for invisible text before closing browser
                     invisible_text_issues = check_invisible_text_playwright(page)
@@ -2217,9 +2405,39 @@ If there are issues, return 'FAIL: [list specific visual problems]'."""}
                 report += "\n\n## Missing/Broken Images Detected (Automated Check)\n\n"
                 report += f"Found {len(missing_image_issues)} image(s) that failed to load:\n\n"
                 for i, issue in enumerate(missing_image_issues[:10], 1):  # Limit to 10 for brevity
-                    report += f"{i}. **{issue['element']}**: Image source `{issue['src']}` failed to load"
+                    # Use original source path for better readability
+                    display_src = issue.get('original_src') or issue.get('src', '')
+                    # Extract filename for cleaner display
+                    if display_src:
+                        from urllib.parse import urlparse, unquote
+                        try:
+                            parsed = urlparse(display_src)
+                            path = parsed.path
+                            # Handle Next.js optimized URLs - extract from query param if needed
+                            if not path or path == '/' or '_next/image' in display_src:
+                                if 'url=' in display_src:
+                                    # Extract from query parameter
+                                    import re
+                                    match = re.search(r'url=([^&]+)', display_src)
+                                    if match:
+                                        path = unquote(match.group(1))
+                            
+                            filename = unquote(path.split("/")[-1]) if path else ''
+                            if filename and '.' in filename:
+                                # Always show as /images/filename for consistency
+                                display_src = f"/images/{filename}"
+                            elif path and path.startswith('/images/'):
+                                # Already a clean path
+                                display_src = path
+                        except:
+                            pass
+                    
+                    report += f"{i}. **{issue['element']}**: Image source `{display_src}` failed to load"
                     if issue.get('alt'):
                         report += f" (alt: \"{issue['alt']}\")"
+                    # Show optimized URL if different from original
+                    if issue.get('optimized_src') and issue.get('optimized_src') != display_src:
+                        report += f"\n   *Next.js optimized URL: `{issue['optimized_src']}`*"
                     report += "\n\n"
                 if len(missing_image_issues) > 10:
                     report += f"... and {len(missing_image_issues) - 10} more issues.\n\n"

@@ -49,21 +49,21 @@ ghost-factory/
 ├── docs/                   # Documentation
 │   ├── business/           # Business policies & offers
 │   ├── internal/           # Technical guides
-â”‚   â””â”€â”€ │   └── operations/         # SOPs & checklists
+│   └── operations/         # SOPs & checklists
 ├── lib/                    # TypeScript utilities
 │   ├── utils.ts            # cn() helper
 │   ├── icons.tsx           # Icon mapping
 │   ├── metrics.ts          # Analytics tracking
 │   ├── schema-validator.ts # Runtime validation
-â”‚   â””â”€â”€ ...                 # Additional utilities
+│   └── ...                 # Additional utilities
 ├── prompts/                # AI agent prompts
 │   ├── strategy/           # Industry-specific strategies
 │   ├── critique/           # Review agent prompts
-â”‚   â””â”€â”€ │   └── design/             # Design generation prompts
+│   └── design/             # Design generation prompts
 ├── tests/                  # Test suites
 │   ├── *.py                # Python tests (pytest)
-â”‚   â””â”€â”€ │   └── ts/                 # TypeScript tests (vitest)
-â””└── └── templates/              # Page templates
+│   └── ts/                 # TypeScript tests (vitest)
+└── templates/              # Page templates
 ```
 
 ## Getting Started

@@ -1,6 +1,6 @@
 ﻿# docs/qa_checklist.md
 
-# QA Checklist â€“ Pre-Client Delivery
+# QA Checklist "“ Pre-Client Delivery
 
 This is an internal checklist to run **before** sending any draft or final landing page to a client.
 
@@ -9,7 +9,7 @@ This is an internal checklist to run **before** sending any draft or final landi
 ## 1. Functional QA
 
 - [ ] **Primary CTA works**
-  - Button text matches the clientâ€™s desired action
+  - Button text matches the client"™s desired action
   - Click goes to the correct:
     - Phone number (`tel:` link)
     - Booking/calendar URL
@@ -66,7 +66,7 @@ This is an internal checklist to run **before** sending any draft or final landi
   - Contact details (phone/email/URL) are correct
 
 - [ ] **Offer and audience alignment**
-  - The copy clearly describes the clientâ€™s actual offer
+  - The copy clearly describes the client"™s actual offer
   - The primary audience matches the intake (no mismatched personas)
   - Benefits and promises align with what the client provided
 
@@ -89,13 +89,13 @@ This is an internal checklist to run **before** sending any draft or final landi
   - No medical or legal claims that could be risky
 
 - [ ] **Must-avoid topics honored**
-  - Check the intake for â€œred flagsâ€ or â€œdonâ€™t say thisâ€
+  - Check the intake for "red flags" or "don"™t say this"
   - Confirm those phrases and ideas are **not** present on the page
 
 - [ ] **Legal/disclaimer notes included if needed**
   - If the client mentioned disclaimers, required statements, or industry rules, confirm:
     - They are present, or
-    - Youâ€™ve flagged them to the client as a needed addition
+    - You"™ve flagged them to the client as a needed addition
 
 ---
 
@@ -118,9 +118,9 @@ This is an internal checklist to run **before** sending any draft or final landi
 
 ---
 
-## 6. Final â€œHuman Feelâ€ Check
+## 6. Final "Human Feel" Check
 
-Take 30â€“60 seconds and ask:
+Take 30"“60 seconds and ask:
 
 - [ ] Would I be comfortable sending this page to a paying client as a first draft?
 - [ ] Does the page clearly communicate:
@@ -129,5 +129,7 @@ Take 30â€“60 seconds and ask:
   - What the offer is
   - What action the visitor should take next?
 
-If yes, itâ€™s ready to send to the client as a draft or final.  
+If yes, it"™s ready to send to the client as a draft or final.  
+
 If no, fix the biggest issue first, then re-check.
+

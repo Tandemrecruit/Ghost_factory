@@ -32,6 +32,21 @@ The following images are referenced in `app/clients/demo-saas/page.tsx`:
 - `marcus-rodriguez.jpg` - Avatar for Marcus Rodriguez testimonial
 - `jennifer-park.jpg` - Avatar for Jennifer Park testimonial
 
+## Required Images for demo-hvac
+
+The following images are referenced in `app/clients/demo-hvac/page.tsx`:
+
+### Logo
+- `comfort-breeze-logo.svg` - Main logo for navigation header (⚠️ **MISSING** - needs to be created)
+
+### Testimonial Avatars
+- `avatar-female-1.jpg` - Avatar for Jennifer M. testimonial (⚠️ **MISSING**)
+- `avatar-male-1.jpg` - Avatar for Robert T. testimonial (⚠️ **MISSING**)
+- `avatar-female-2.jpg` - Avatar for Linda K. testimonial (⚠️ **MISSING**)
+- `avatar-male-2.jpg` - Avatar for David S. testimonial (⚠️ **MISSING**)
+- `avatar-female-3.jpg` - Avatar for Maria G. testimonial (⚠️ **MISSING**)
+- `avatar-couple-1.jpg` - Avatar for Michael and Susan P. testimonial (⚠️ **MISSING**)
+
 ## Note
 
 The components (LogoCloud, NavSimple, TestimonialCards, HeroSplit) have built-in error handling and will display fallback text or placeholders if images are missing. However, for the best user experience, all referenced images should be added to this directory.

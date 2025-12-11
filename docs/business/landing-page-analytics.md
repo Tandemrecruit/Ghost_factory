@@ -34,10 +34,10 @@ We do **not** track individual people across different sites. This is about over
 
 Your landing page usually has one primary action, such as:
 
-- â€œBook a free callâ€
-- â€œGet a quoteâ€
-- â€œStart applicationâ€
-- â€œOrder nowâ€
+- "Book a free call"
+- "Get a quote"
+- "Start application"
+- "Order now"
 
 We track how many visitors click that main CTA, and what percentage of total visitors that represents. This is your CTA click-through rate (CTR).
 
@@ -48,7 +48,7 @@ This helps answer:
 
 ### 3. Conversions
 
-A â€œconversionâ€ is the main success event we agree on for your page, for example:
+A "conversion" is the main success event we agree on for your page, for example:
 
 - Completed contact form
 - Appointment booked
@@ -72,11 +72,11 @@ This helps us refine future versions of the page and make smarter layout decisio
 
 Including this level of tracking means:
 
-- Youâ€™re not guessing â€“ you can see whatâ€™s actually happening.
+- You"™re not guessing "“ you can see what"™s actually happening.
 - You can see whether small changes (like a new headline or CTA text) move the needle.
 - You have simple numbers you can share with partners, managers, or investors if needed.
 
-Over time, it also lets us build a sense of â€œwhat tends to workâ€ for businesses like yours so we can keep improving.
+Over time, it also lets us build a sense of "what tends to work" for businesses like yours so we can keep improving.
 
 ---
 
@@ -86,7 +86,7 @@ We take a simple, privacy-conscious approach:
 
 - We do **not** collect names, email addresses, phone numbers, or any form contents in analytics.
 - We do **not** use this tracking for advertising, remarketing, or selling data.
-- We only track anonymous events like â€œpage viewed,â€ â€œbutton clicked,â€ or â€œform completed,â€ along with basic page identifiers.
+- We only track anonymous events like "page viewed," "button clicked," or "form completed," along with basic page identifiers.
 - Data is used to understand performance and improve your page and similar projects.
 
 If we ever propose adding more advanced tracking (for example, connecting to your existing analytics account), we will discuss it with you first and get your approval.
@@ -107,12 +107,14 @@ If you already have an analytics tool you prefer, we can often align our setup w
 
 ## What we need from you
 
-Before we launch, weâ€™ll agree on:
+Before we launch, we"™ll agree on:
 
 1. **Your primary goal**  
-   For example: â€œBooked calls,â€ â€œCompleted quote requests,â€ or â€œOrders started.â€
+
+   For example: "Booked calls," "Completed quote requests," or "Orders started."
 
 2. **Your primary CTA**  
+
    The button or link that matters most for this goal.
 
-Once those are clear, weâ€™ll wire the tracking to match so the numbers you see reflect the outcomes you care about most.
+Once those are clear, we"™ll wire the tracking to match so the numbers you see reflect the outcomes you care about most.

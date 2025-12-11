@@ -78,17 +78,11 @@
 ## Usage Notes for Builder Agent
 
 1. **Icon Values**: All icon props accept lucide-react icon names as strings (e.g., "zap", "shield", "check", "star", "heart", "clock", "users", "award", "mail", "phone", "map-pin", "lock", "check-circle", "alert-circle", "x", "target", "building", "globe", "trending-up", "briefcase", "calendar", "crown", "gift", "sparkles", "quote", "minus").
-
 2. **Image Paths**: All `imageSrc`, `logoSrc`, `avatarSrc`, and `thumbnailSrc` props expect relative paths (e.g., "/images/hero.jpg") or absolute URLs.
-
 3. **Link Hrefs**: All `href` and `ctaHref` props accept relative paths (e.g., "/pricing") or absolute URLs (e.g., "https://calendly.com/...").
-
 4. **Arrays**: When a prop expects an array, provide at least 1 item. Most components work best with 3-6 items for visual balance.
-
 5. **Composition**: Build pages by stacking components vertically. Use `SectionWrapper` to control background colors and spacing between sections.
-
 6. **Responsive**: All components are mobile-responsive by default. No additional props needed for responsive behavior.
-
 7. **Total Components Available**: 22 components across 10 categories. Do NOT invent new components - use only what is listed in this manifest.
 
 ---

@@ -1,4 +1,4 @@
-﻿# Ghost Factory â€“ Internal Service Overview
+﻿# Ghost Factory — Internal Service Overview
 
 > Internal use only. This file is for me and future collaborators. Never share this file (or its language) directly with clients.
 
@@ -13,7 +13,7 @@ Ghost Factory is my internal engine for building modern, conversion-focused land
 - Content system: markdown and configuration files in `clients/[client-id]/` that describe the client, their offer, and the page content.
 - Design system: reusable components documented in `design-system/manifest.md` and implemented in `components/`.
 
-**Key idea:** All of this exists to support my freelance services (starting with Fiverr gigs). Clients never need to know how the internals work. Publicly, it is â€œa custom workflow and template libraryâ€ instead of â€œAI agents and automation.â€
+**Key idea:** All of this exists to support my freelance services (starting with Fiverr gigs). Clients never need to know how the internals work. Publicly, it is "a custom workflow and template library" instead of "AI agents and automation."
 
 ---
 
@@ -28,25 +28,21 @@ High-level automation flow based on the current architecture:
      - Goal for the page
      - Design preferences and references
      - Must-have sections and constraints
-
 2. **Strategy / Brief**
-   - The â€œStrategistâ€ stage turns the intake into a focused `brief.md`:
+   - The "Strategist" stage turns the intake into a focused `brief.md`:
      - Positioning and angle
      - Main promise and key benefits
      - Suggested section order and content hierarchy
    - This can be done via my AI tools and/or manual editing.
-
 3. **Copywriting**
-   - The â€œCopywriterâ€ stage produces `content.md`:
+   - The "Copywriter" stage produces `content.md`:
      - Headline, subheadline
      - Section-by-section copy
      - CTAs, FAQs, guarantees, etc.
-
 4. **Page Assembly**
-   - The â€œBuilderâ€ stage uses the component library to assemble a page for that client.
+   - The "Builder" stage uses the component library to assemble a page for that client.
    - Output is a React/Next.js page (for example, in `app/clients/[clientId]/page.tsx` or a similar structure).
    - Components used are defined in the design system (`design-system/manifest.md` and `components/`).
-
 5. **QA and Preview**
    - I run the Next.js dev server (`npm run dev`) and visit the client page route.
    - I check:
@@ -54,7 +50,6 @@ High-level automation flow based on the current architecture:
      - Responsiveness (desktop / mobile)
      - Copy (typos, clarity, consistent tone)
      - Links and CTAs (buttons go where they should)
-
 6. **Packaging for Delivery**
    - Depending on the service package, I deliver:
      - A deployed link (e.g., Vercel URL) and/or
@@ -77,7 +72,7 @@ High-level automation flow based on the current architecture:
 ### Manual / human steps
 
 - Deciding which client requests are realistic or should be pushed back on.
-- Adjusting the brief and copy so it matches the clientâ€™s personality and niche.
+- Adjusting the brief and copy so it matches the client's personality and niche.
 - Fixing layout edge cases, visual polish, and design choices.
 - Final QA and sign-off before anything is delivered.
 - Communicating with the client on Fiverr (questions, clarifications, revision handling).
@@ -87,22 +82,19 @@ High-level automation flow based on the current architecture:
 ## 4. Business Constraints (Rules for Myself)
 
 1. **No AI language in public**
-   - Never mention â€œAI,â€ â€œagents,â€ or â€œautomationâ€ in:
+   - Never mention "AI," "agents," or "automation" in:
      - Fiverr gig titles or descriptions
      - Client messages
      - Any public documentation
-   - Public language is about â€œprocess,â€ â€œworkflow,â€ â€œtemplates,â€ and â€œexperience.â€
-
+   - Public language is about "process," "workflow," "templates," and "experience."
 2. **Realistic timelines**
    - Even if Ghost Factory can produce a page draft in hours, I give clients a longer deadline (several days) to protect:
      - My schedule (two jobs + side projects)
      - Buffer for revisions and emergencies
      - The perceived value of the work
-
 3. **Scope discipline**
    - Start with **one primary service**: landing page design/build.
    - Avoid custom web apps, complex integrations, or full-branding retainers until the base offer is proven.
-
 4. **Technical boundaries**
    - Keep the tech stack simple:
      - Next.js, React, Tailwind, basic forms.
@@ -117,12 +109,12 @@ High-level automation flow based on the current architecture:
 
 Ghost Factory is the engine behind my first Fiverr gig:
 
-- Gig: â€œI will design a clean, conversion-focused landing page.â€
+- Gig: "I will design a clean, conversion-focused landing page."
 - Fiverr is the front door; Ghost Factory is the workshop behind the scenes.
 - Internal mapping:
-  - Fiverr order â†’ `clients/[client-id]/intake.md`
-  - Draft page â†’ Next.js route under `app/clients/[clientId]/`
-  - Delivery â†’ combination of link, screenshots, and/or code bundle.
+  - Fiverr order → `clients/[client-id]/intake.md`
+  - Draft page → Next.js route under `app/clients/[clientId]/`
+  - Delivery → combination of link, screenshots, and/or code bundle.
 
 The detailed mapping between Fiverr packages and what I deliver lives in `FIVERR_LANDING_PAGE_WORKFLOW.md`.
 
@@ -131,10 +123,10 @@ The detailed mapping between Fiverr packages and what I deliver lives in `FIVERR
 ## 6. Next Steps / TODOs (Internal)
 
 - Refine the intake structure I want to use for `intake.md`.
-- Tighten the component library so I have 1â€“2 favorite patterns for:
+- Tighten the component library so I have 1–2 favorite patterns for:
   - Hero
   - Features
   - Social proof
   - Pricing
   - CTA
-- Keep a running list of â€œgood examplesâ€ Iâ€™ve shipped so I can reuse structures and patterns.
+- Keep a running list of "good examples" I"™ve shipped so I can reuse structures and patterns.

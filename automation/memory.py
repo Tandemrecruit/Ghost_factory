@@ -11,6 +11,7 @@ This module provides long-term learning capabilities by:
 import json
 import os
 import random
+import re
 import logging
 import unicodedata
 from datetime import datetime

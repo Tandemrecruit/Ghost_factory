@@ -1,7 +1,8 @@
-﻿# Intake â†’ Draft Ready SOP
+﻿# Intake → Draft Ready SOP
 
 Purpose  
-Define the exact steps from â€œclient pays depositâ€ to â€œinternal draft is ready for my review,â€ using the Google Form, Sanitizer, and Ghost_factory.
+
+Define the exact steps from "client pays deposit" to "internal draft is ready for my review," using the Google Form, Sanitizer, and Ghost_factory.
 
 This SOP is internal only. Clients never see this file.
 
@@ -24,9 +25,9 @@ Once those are true, this SOP starts.
 
 ## 2. Files and Systems Involved
 
-- Google Form â€“ client-facing intake questionnaire.
-- Google Sheet â€“ stores each form submission.
-- Ghost_factory repo â€“ local / GitHub project:
+- Google Form "“ client-facing intake questionnaire.
+- Google Sheet "“ stores each form submission.
+- Ghost_factory repo "“ local / GitHub project:
   - docs/project_tracker.md
   - clients/<client_id>/
     - intake-raw.md (temporary raw answers)
@@ -35,7 +36,7 @@ Once those are true, this SOP starts.
     - brief.md (architecture/strategy)
     - content.md (copy and sections)
     - qa_report.md (agent QA output)
-- Discord (optional) â€“ notifications/logs from Ghost_factory.
+- Discord (optional) "“ notifications/logs from Ghost_factory.
 
 ---
 
@@ -47,7 +48,9 @@ Once those are true, this SOP starts.
    Example row:
 
    | client_id    | business_name          | contact_name | contact_email     | status           | package     | hosting  | deposit_date | form_sent_date | form_received_date | draft_ready_date | sent_to_client_date | revision_request_date | revision_complete_date | final_payment_date | final_delivery_date | notes                         |
+
    |--------------|------------------------|--------------|-------------------|------------------|-------------|----------|--------------|----------------|--------------------|------------------|----------------------|-----------------------|-----------------------|--------------------|---------------------|-------------------------------|
+
    | clearflow-oh | ClearFlow Plumbing LLC | Jamie Carter | jamie@example.com | INTAKE_PENDING   | LP-Standard | managed  | 2025-12-07   | 2025-12-07     |                    |                  |                      |                       |                       |                    |                     | Internal dry run (test only). |
 
 3. Fill in at least:
@@ -79,42 +82,46 @@ At this point:
 
 ## 5. Create clients/<client_id>/intake-raw.md
 
-This step will eventually be automated with Google Apps Script. For now, itâ€™s manual but follows a strict format.
+This step will eventually be automated with Google Apps Script. For now, it"™s manual but follows a strict format.
 
 1. In the repo, create the client folder:
 
    - clients/<client_id>/
    - Example: clients/clearflow-oh/
 
-2. Open the Google Sheet row for this clientâ€™s response.
+2. Open the Google Sheet row for this client"™s response.
 3. Create a new file: clients/<client_id>/intake-raw.md.
 4. Copy questions and answers into the file in this structure:
 
    (Each question, then its answer, then a blank line.)
 
        What is your business name?
+
        ClearFlow Plumbing LLC
 
        Do you have an existing page or website? If yes, paste the URL
+
        https://clearflowplumbing.com
 
-       Where are you located? (Business location or â€œOnline Onlyâ€)
+       Where are you located? (Business location or "Online Only")
+
        Dayton, OH
 
        In one sentence, what does your business do?
+
        We provide 24/7 emergency plumbing services for homeowners in Dayton.
 
 5. Save the file.
 6. Update the project tracker:
 
-   - Set form_received_date to todayâ€™s date.
+   - Set form_received_date to today"™s date.
    - Set status = PIPELINE_RUNNING.
 
 ---
 
 ## 6. Run the Intake Sanitizer (Conceptual)
 
-This documents the logic; youâ€™ll actually run the script when youâ€™re at your desktop.
+This documents the logic; you"™ll actually run the script when you"™re at your desktop.
 
 The Sanitizer should:
 
@@ -149,11 +156,11 @@ Once intake.md exists for client_id, Ghost_factory should:
 4. Build the React/Next page for that client (for example app/clients/<client_id>/page.tsx).
 5. Run QA and write clients/<client_id>/qa_report.md.
 
-You donâ€™t manually edit the tracker during these internal steps; status remains PIPELINE_RUNNING.
+You don"™t manually edit the tracker during these internal steps; status remains PIPELINE_RUNNING.
 
 ---
 
-## 8. When Is a Draft Considered â€œReadyâ€ Internally?
+## 8. When Is a Draft Considered "Ready" Internally?
 
 A draft is considered internally ready when:
 
@@ -168,24 +175,25 @@ A draft is considered internally ready when:
 At this point:
 
 1. Update project tracker:
-   - Set draft_ready_date to todayâ€™s date.
+   - Set draft_ready_date to today"™s date.
    - Set status = DRAFT_REVIEW.
 
 2. Do a quick manual check using docs/qa_checklist.md:
    - The page clearly reflects the business, offer, and main CTA.
    - No obviously broken layout on desktop or mobile.
-   - No wild promises or banned phrases from the intake â€œred flagsâ€.
+   - No wild promises or banned phrases from the intake "red flags".
 
 You are not sending anything to the client yet.  
-This SOP ends at â€œdraft is ready for my eyes.â€
+
+This SOP ends at "draft is ready for my eyes."
 
 ---
 
 ## 9. Summary Checklist
 
-From â€œdeposit paidâ€ to â€œdraft ready for my reviewâ€:
+From "deposit paid" to "draft ready for my review":
 
-- [ ] Add row to docs/project_tracker.md â†’ status = INTAKE_PENDING.
+- [ ] Add row to docs/project_tracker.md → status = INTAKE_PENDING.
 - [ ] Send intake form link to client.
 - [ ] Confirm Google Form submission in the Sheet.
 - [ ] Create clients/<client_id>/ folder.

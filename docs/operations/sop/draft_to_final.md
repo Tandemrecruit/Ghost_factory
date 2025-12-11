@@ -1,7 +1,8 @@
-﻿# Draft â†’ Final Delivery SOP
+﻿# Draft → Final Delivery SOP
 
 Purpose  
-Define the exact steps from â€œdraft is ready for my reviewâ€ to â€œfinal page delivered and project complete,â€ including client preview, revisions, final payment, and hosting/hand-off.
+
+Define the exact steps from "draft is ready for my review" to "final page delivered and project complete," including client preview, revisions, final payment, and hosting/hand-off.
 
 This SOP is internal only. Clients never see this file.
 
@@ -36,7 +37,7 @@ Steps:
    - Example: http://localhost:3000/clients/<client_id>
 2. Use docs/qa_checklist.md as a guide and spot-check:
    - The hero clearly states:
-     - Who itâ€™s for
+     - Who it"™s for
      - What problem it solves
      - What the main offer is
      - What action to take
@@ -50,7 +51,7 @@ Steps:
    - Tone:
      - Roughly matches the intake (professional vs friendly vs premium)
    - Risk:
-     - No wild claims you didnâ€™t get from the intake
+     - No wild claims you didn"™t get from the intake
      - Must-avoid phrases from the intake are not present
 
 If the draft is clearly broken (layout or copy), fix or regenerate before proceeding. The client should never see an obviously bad version.
@@ -70,7 +71,7 @@ Goal: Give the client a private preview **without** giving them deployable asset
    - The preview URL loads correctly.
    - CTAs behave as expected (even if they point to test or placeholder URLs).
 3. (Optional but recommended) Add a small non-intrusive note on the page:
-   - E.g., â€œDraft preview for review only â€“ not final.â€
+   - E.g., "Draft preview for review only "“ not final."
 
 You are still in DRAFT_REVIEW status at this step.
 
@@ -88,7 +89,7 @@ Goal: Move from internal draft to client review.
 
 2. After sending the preview link:
    - In docs/project_tracker.md:
-     - Set sent_to_client_date to todayâ€™s date.
+     - Set sent_to_client_date to today"™s date.
      - Set status = SENT_TO_CLIENT.
 
 From now until feedback arrives, you do not change the tracker status.
@@ -116,15 +117,15 @@ You do not change files during this period unless the client sends feedback.
 
 When feedback arrives, you need to decide:
 
-- Which requests are â€œincluded revisionâ€
-- Which requests are â€œnew scopeâ€
+- Which requests are "included revision"
+- Which requests are "new scope"
 
 ### 6.1. Consolidate Feedback
 
 1. Read all feedback once without reacting.
 2. Summarize for yourself:
    - What they like
-   - What they donâ€™t like
+   - What they don"™t like
    - Specific requested changes
 
 If they send feedback in many small messages, try to consolidate into a single list for your own use.
@@ -133,19 +134,19 @@ If they send feedback in many small messages, try to consolidate into a single l
 
 Use docs/revisions_and_refunds.md as the rulebook.
 
-â€œIn scopeâ€ examples (revision):
+"In scope" examples (revision):
 
 - Change headlines/subheadlines and body copy
 - Swap testimonials or add one where implied by the intake
 - Tweaks to colors and small visual accents
 - Reordering or lightly adjusting existing sections
 
-â€œOut of scopeâ€ examples (new scope):
+"Out of scope" examples (new scope):
 
 - Entirely new sections not implied by the original intake
 - Changing the main offer, pricing model, or audience
 - Rebuilding layout in a completely new style
-- Adding complex integrations or forms that werenâ€™t in the brief
+- Adding complex integrations or forms that weren"™t in the brief
 
 If feedback is mostly in scope:
 
@@ -158,7 +159,7 @@ If feedback is significantly out of scope:
   - Which parts require a new quote or mini-project
 - Decide whether to:
   - Handle out-of-scope items as a follow-up project, or
-  - Decline them if they donâ€™t fit your service model.
+  - Decline them if they don"™t fit your service model.
 
 ---
 
@@ -167,26 +168,27 @@ If feedback is significantly out of scope:
 When you decide to proceed with the included revision:
 
 1. In docs/project_tracker.md:
-   - Set revision_request_date to todayâ€™s date.
+   - Set revision_request_date to today"™s date.
    - Set status = REVISION_IN_PROGRESS.
 
 2. Implement changes:
    - Update the relevant source files (e.g., content.md, page.tsx).
-   - Optionally re-run parts of the pipeline (e.g., copy or layout tweaks) if youâ€™ve built support for that.
+   - Optionally re-run parts of the pipeline (e.g., copy or layout tweaks) if you"™ve built support for that.
    - Keep revisions focused; avoid turning this into a brand-new build.
 
 3. Run through a light QA again:
    - Make sure requested changes are actually reflected.
-   - Check that you didnâ€™t break headings, CTAs, or layout.
+   - Check that you didn"™t break headings, CTAs, or layout.
 
 4. Deploy updated draft to the same preview/staging environment.
    - Confirm preview URL still works.
 
 5. In docs/project_tracker.md:
-   - Set revision_complete_date to todayâ€™s date.
+   - Set revision_complete_date to today"™s date.
    - Set status = AWAITING_FINAL_PAYMENT.
 
 At this point, the client has seen:
+
 - Initial draft
 - Updated draft after one included revision
 
@@ -194,10 +196,10 @@ At this point, the client has seen:
 
 ## 8. Request Final Payment
 
-Goal: Clearly signal that youâ€™ve done the agreed work and itâ€™s time for the final 50%.
+Goal: Clearly signal that you"™ve done the agreed work and it"™s time for the final 50%.
 
-1. Send a â€œReady for final paymentâ€ email/message:
-   - Recap whatâ€™s included:
+1. Send a "Ready for final payment" email/message:
+   - Recap what"™s included:
      - 1-page landing built
      - Revisions applied as requested (within scope)
    - Confirm:
@@ -214,18 +216,18 @@ Goal: Clearly signal that youâ€™ve done the agreed work and itâ€™s tim
    - Send source code
    - Send asset packs or deployment instructions
 
-â€¦until the final payment is confirmed.
+"¦until the final payment is confirmed.
 
 The tracker remains at AWAITING_FINAL_PAYMENT until the second payment is actually received.
 
 ---
 
-## 9. After Final Payment â€“ Delivery & Hosting
+## 9. After Final Payment "“ Delivery & Hosting
 
 When final payment arrives:
 
 1. In docs/project_tracker.md:
-   - Set final_payment_date to todayâ€™s date.
+   - Set final_payment_date to today"™s date.
 
 2. Depending on hosting type:
 
@@ -233,7 +235,7 @@ When final payment arrives:
 
 1. Set up or confirm production deployment on your hosting platform.
 2. Provide DNS instructions to the client, for example:
-   - â€œPoint landing.yourdomain.com to this CNAME/target.â€
+   - "Point landing.yourdomain.com to this CNAME/target."
 3. Once DNS is set and propagated:
    - Verify:
      - Page loads at the agreed domain.
@@ -273,15 +275,15 @@ When final payment arrives:
 Use ON_HOLD when:
 
 - The client disappears for an extended period.
-- Youâ€™re blocked on required information.
+- You"™re blocked on required information.
 - There is a long delay between draft and feedback or between revision and payment.
 
 Actions:
 
 - Update status = ON_HOLD.
 - Add a note in the tracker explaining why:
-  - â€œNo feedback after draft + reminderâ€
-  - â€œClient requested pause until Q2â€
+  - "No feedback after draft + reminder"
+  - "Client requested pause until Q2"
 
 ### 10.2. CANCELLED
 
@@ -294,8 +296,8 @@ Actions:
 
 - Set status = CANCELLED.
 - Add a note explaining:
-  - â€œClient cancelled before form â€“ deposit refundedâ€
-  - â€œClient cancelled after draft â€“ deposit kept, no further workâ€
+  - "Client cancelled before form "“ deposit refunded"
+  - "Client cancelled after draft "“ deposit kept, no further work"
 
 Follow docs/revisions_and_refunds.md for how to handle money in each scenario.
 
@@ -323,7 +325,7 @@ Operational rules:
 
 ## 12. Summary Checklist
 
-From â€œdraft ready for my reviewâ€ to â€œproject completeâ€:
+From "draft ready for my review" to "project complete":
 
 - [ ] Load the draft page locally; run internal QA.
 - [ ] Deploy draft to a preview/staging environment you control.
@@ -336,7 +338,7 @@ From â€œdraft ready for my reviewâ€ to â€œproject completeâ€:
   - [ ] Implement changes; re-run light QA.
   - [ ] Redeploy preview with updated draft.
   - [ ] Update tracker: revision_complete_date, status = AWAITING_FINAL_PAYMENT.
-- [ ] Request final 50% payment with a clear summary of whatâ€™s done and what happens after payment.
+- [ ] Request final 50% payment with a clear summary of what"™s done and what happens after payment.
 - [ ] When final payment arrives:
   - [ ] Update tracker: final_payment_date.
   - [ ] For Managed Hosting:
@@ -348,4 +350,4 @@ From â€œdraft ready for my reviewâ€ to â€œproject completeâ€:
 - [ ] If delays or cancellation:
   - [ ] Use ON_HOLD or CANCELLED status in tracker with a clear note.
 
-This closes the loop from DRAFT_REVIEW â†’ SENT_TO_CLIENT â†’ REVISION_IN_PROGRESS â†’ AWAITING_FINAL_PAYMENT â†’ COMPLETE for each project.
+This closes the loop from DRAFT_REVIEW → SENT_TO_CLIENT → REVISION_IN_PROGRESS → AWAITING_FINAL_PAYMENT → COMPLETE for each project.

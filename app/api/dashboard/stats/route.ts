@@ -75,17 +75,6 @@ async function loadConfig() {
 }
 
 /**
- * Ensure a value is returned as an array, producing an empty array when the input is not an array.
- *
- * @param data - The value that may be an array
- * @returns The input cast to an array if it was an array, otherwise an empty array
- */
-function normalizeToArray<T>(data: unknown): T[] {
-  if (Array.isArray(data)) return data as T[];
-  return [];
-}
-
-/**
  * Aggregate all time log entries from the specified month's directory.
  *
  * Reads every `.json` file in the data/time_logs/{month} directory, validates each file's contents

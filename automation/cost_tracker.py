@@ -77,6 +77,29 @@ def _format_token_count(tokens: int) -> str:
     return str(tokens)
 
 
+def _simplify_model_name(model: str) -> str:
+    """Simplify model names for cleaner logging."""
+    # Handle Claude models: claude-sonnet-4-5-20250929 -> Sonnet
+    if model.startswith("claude-"):
+        parts = model.split("-")
+        if len(parts) >= 2:
+            model_type = parts[1].capitalize()  # sonnet -> Sonnet, opus -> Opus, haiku -> Haiku
+            return model_type
+    # Handle GPT models: gpt-4 -> GPT-4
+    elif model.startswith("gpt-"):
+        return model.upper()  # gpt-4 -> GPT-4
+    # Return as-is if pattern doesn't match
+    return model
+
+
+def _simplify_activity_name(activity: str) -> str:
+    """Simplify activity names for cleaner logging."""
+    # Remove "pipeline_" prefix if present: pipeline_copywriter -> copywriter
+    if activity.startswith("pipeline_"):
+        return activity.replace("pipeline_", "", 1)
+    return activity
+
+
 def _log_aligned(level: str, emoji: str, label: str, message: str):
     """
     Log a message with aligned header formatting.
@@ -194,11 +217,15 @@ def record_api_cost(
     out_tokens_str = _format_token_count(out_tokens)
     tokens_str = f"{in_tokens_str}+{out_tokens_str}"
     
+    # Simplify model and activity names for cleaner logging
+    simplified_model = _simplify_model_name(model)
+    simplified_activity = _simplify_activity_name(activity)
+    
     _log_aligned(
         "info",
         "💰",
         "API cost",
-        f"${total_cost} | model: {model} | activity: {activity} | tokens: {tokens_str}"
+        f"${total_cost} | model: {simplified_model} | activity: {simplified_activity} | tokens: {tokens_str}"
     )
     return entry
 

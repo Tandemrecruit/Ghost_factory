@@ -1,16 +1,17 @@
-﻿# Sales Page Outline â€“ Done-For-You Landing Page
+﻿# Sales Page Outline "“ Done-For-You Landing Page
 
 This outline is for my public-facing sales / booking page for the landing page offer.
 
 Goal:  
-Make it easy for a busy service business owner to understand what they get, what it costs, how long it takes, and what to do next â€“ without mentioning AI or automation.
+
+Make it easy for a busy service business owner to understand what they get, what it costs, how long it takes, and what to do next "“ without mentioning AI or automation.
 
 Sections:
 
 1. Hero (headline + subhead + primary CTA)
 2. Who this is for
 3. What you get (deliverables)
-4. How it works (simple 3â€“4 step process)
+4. How it works (simple 3"“4 step process)
 5. Timeline
 6. Pricing
 7. FAQ
@@ -21,6 +22,7 @@ Sections:
 ## 1. Hero
 
 Purpose:  
+
 Hook the right people quickly and give them one clear action.
 
 Elements:
@@ -28,11 +30,15 @@ Elements:
 - Headline:
   - Promise a specific outcome:
     - Example idea:  
+
       "Turn browsers into bookings with a focused landing page"
+
 - Subhead:
-  - Clarify who itâ€™s for and whatâ€™s included:
+  - Clarify who it"™s for and what"™s included:
     - Example idea:  
+
       "For small, service-based businesses that need a clear, professional page that actually drives calls, inquiries, or bookings."
+
 - Primary CTA:
   - Button text:
     - Example idea: "Start your project" or "Book your landing page"
@@ -49,19 +55,20 @@ Optional supporting line under the button:
 ## 2. Who This Is For
 
 Purpose:  
+
 Let the right people recognize themselves.
 
 Content ideas:
 
 - Short intro sentence:
-  - "This is for you if you run a small service business and youâ€¦"
-- Bullet list (3â€“5 bullets), for example:
-  - Donâ€™t have a landing page youâ€™re proud to send people to.
-  - Are sending paid or organic traffic to a cluttered home page that doesnâ€™t convert.
+  - "This is for you if you run a small service business and you"¦"
+- Bullet list (3"“5 bullets), for example:
+  - Don"™t have a landing page you"™re proud to send people to.
+  - Are sending paid or organic traffic to a cluttered home page that doesn"™t convert.
   - Feel stuck trying to write your own copy or piece together templates.
   - Want something simple, clear, and focused that makes it easy for visitors to take the next step.
 
-Optional â€œwho this is not forâ€ (1â€“3 bullets):
+Optional "who this is not for" (1"“3 bullets):
 
 - Not ideal if:
   - You need a complex multi-page website with dozens of pages.
@@ -73,12 +80,13 @@ Optional â€œwho this is not forâ€ (1â€“3 bullets):
 ## 3. What You Get (Deliverables)
 
 Purpose:  
-Spell out the concrete outcomes so it doesnâ€™t feel vague.
+
+Spell out the concrete outcomes so it doesn"™t feel vague.
 
 List items (mapped to LP-Standard):
 
 - One conversion-focused landing page
-  - Roughly 5â€“6 sections tailored to your offer and audience.
+  - Roughly 5"“6 sections tailored to your offer and audience.
 - Clear messaging and structure
   - Headline, subheads, body copy, and CTAs written for your business.
 - Page layout and build
@@ -86,57 +94,63 @@ List items (mapped to LP-Standard):
 - One focused revision round
   - You review the draft, send one list of changes, and I refine it.
 - Simple next-step guidance
-  - Iâ€™ll show you how weâ€™ll launch it:
+  - I"™ll show you how we"™ll launch it:
     - Either I host it for you, or
     - I hand everything off to your developer.
 
 Optional small note:
 
-- "This is not a full multi-page website â€“ itâ€™s a focused landing page designed to drive one main action."
+- "This is not a full multi-page website "“ it"™s a focused landing page designed to drive one main action."
 
 ---
 
 ## 4. How It Works (Process)
 
 Purpose:  
+
 Reduce friction by making the steps feel clear and light.
 
 Section title idea:
 
 - "How it works" or "What the process looks like"
 
-Steps (3â€“4):
+Steps (3"“4):
 
 1) Reserve your spot  
+
    - "Secure your project with a 50% deposit so I can hold time for you."
 
 2) Fill out a simple form  
-   - "Youâ€™ll answer a guided questionnaire about your business, your ideal clients, and your offer."
+
+   - "You"™ll answer a guided questionnaire about your business, your ideal clients, and your offer."
 
 3) I turn it into a landing page  
+
    - "I handle the messaging, structure, and build, then send you a draft to review."
 
 4) Review, refine, and launch  
+
    - "You send one list of changes, I refine the page, and we launch or hand it off."
 
-Keep the tone straightforward; avoid jargon like â€œwireframesâ€ unless you really need it.
+Keep the tone straightforward; avoid jargon like "wireframes" unless you really need it.
 
 ---
 
 ## 5. Timeline
 
 Purpose:  
+
 Make the turnaround feel fast but realistic.
 
 Suggested copy:
 
 - "Timeline"
-- "Once you complete the intake form, youâ€™ll receive your first draft within 3â€“5 business days."
-- "After you send your feedback, Iâ€™ll apply your changes and prepare the final version for launch."
+- "Once you complete the intake form, you"™ll receive your first draft within 3"“5 business days."
+- "After you send your feedback, I"™ll apply your changes and prepare the final version for launch."
 
 Optional note:
 
-- "If you have a hard deadline (like a campaign start date), mention it when you book and Iâ€™ll confirm if I can meet it."
+- "If you have a hard deadline (like a campaign start date), mention it when you book and I"™ll confirm if I can meet it."
 
 Later, you can mention rush if you decide to offer it:
 
@@ -147,6 +161,7 @@ Later, you can mention rush if you decide to offer it:
 ## 6. Pricing
 
 Purpose:  
+
 Be clear and simple. One main price.
 
 Structure:
@@ -157,7 +172,7 @@ Structure:
   - "Flat fee for a done-for-you landing page: [YOUR PRICE HERE]"
 
 - Underneath, list what that includes:
-  - One landing page with ~5â€“6 sections.
+  - One landing page with ~5"“6 sections.
   - Strategy, copy, and build.
   - One revision round.
   - Basic launch support or handoff.
@@ -178,11 +193,12 @@ Payment structure (simple version):
 ## 7. FAQ
 
 Purpose:  
+
 Pre-answer the most common hesitations.
 
 Suggested questions (edit wording later):
 
-- "What if I donâ€™t know how to describe what I want?"
+- "What if I don"™t know how to describe what I want?"
   - Answer: The form is written in plain language; you just describe your business and your clients, and I handle the structure and wording.
 
 - "Do I need an existing website?"
@@ -194,7 +210,7 @@ Suggested questions (edit wording later):
 - "Can you connect this to my domain?"
   - Answer: Yes, I can either host it for you and help you point your domain, or prepare everything for your developer to plug into your existing setup.
 
-- "What if Iâ€™m not happy with the draft?"
+- "What if I"™m not happy with the draft?"
   - Answer: I use your form responses as the foundation and we refine through the revision round. The goal is to get you a page you feel confident sharing.
 
 ---
@@ -202,17 +218,18 @@ Suggested questions (edit wording later):
 ## 8. Final Call-To-Action
 
 Purpose:  
+
 End with one clear next step.
 
 Content:
 
 - Short recap sentence:
-  - "If youâ€™re ready to have a landing page youâ€™re not embarrassed to send people to, hereâ€™s the next step."
+  - "If you"™re ready to have a landing page you"™re not embarrassed to send people to, here"™s the next step."
 - Primary CTA button:
   - "Start your project" or "Book your landing page"
 - Under the button:
   - One line explaining what happens:
-    - "Youâ€™ll reserve your spot with a 50% deposit and get a link to the intake form."
+    - "You"™ll reserve your spot with a 50% deposit and get a link to the intake form."
 
 ---
 

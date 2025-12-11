@@ -49,7 +49,6 @@ FAIL: [Brief summary of accessibility issues]
 ## Issues Found:
 1. [Color combination]: Estimated contrast ratio ~[X]:1 (needs >= 4.5:1)
    - Suggested fix: Change [color] from [current] to [suggested hex]
-
 2. [Additional issues...]
 
 ## Recommended Fixes:
@@ -95,7 +94,6 @@ FAIL: Light blue and cream colors have insufficient contrast against white backg
 ## Issues Found:
 1. Primary (#93C5FD) on white: Estimated contrast ratio ~2.5:1 (needs >= 4.5:1)
    - This light blue will be hard to read as text
-
 2. Accent (#FEF3C7) on white: Estimated contrast ratio ~1.3:1 (needs >= 4.5:1)
    - Cream on white is nearly invisible
 

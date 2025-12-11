@@ -1,6 +1,6 @@
 ﻿# docs/hosting_policy.md
 
-# Hosting Policy â€“ Managed vs Self-Hosted Delivery
+# Hosting Policy "“ Managed vs Self-Hosted Delivery
 
 This file defines how hosting and deployment are handled for landing page projects.
 
@@ -10,8 +10,8 @@ This file defines how hosting and deployment are handled for landing page projec
 
 Clients can choose between two hosting options:
 
-1. **Managed Hosting** â€“ you host and manage the live landing page  
-2. **Self-Hosted Handoff** â€“ you provide the code and instructions, and the client (or their developer) hosts it
+1. **Managed Hosting** "“ you host and manage the live landing page  
+2. **Self-Hosted Handoff** "“ you provide the code and instructions, and the client (or their developer) hosts it
 
 Both options use the same underlying page build; only the hosting and responsibilities differ.
 
@@ -19,7 +19,7 @@ Both options use the same underlying page build; only the hosting and responsibi
 
 ## 2. Managed Hosting
 
-### 2.1. Whatâ€™s Included
+### 2.1. What"™s Included
 
 When a client selects Managed Hosting, you:
 
@@ -39,7 +39,7 @@ For a defined grace period after launch (e.g., 14 days), you may include:
 - Swapping a testimonial quote
 - Minor style adjustments that do not require structural rebuilds
 
-Anything beyond this grace window or beyond â€œminorâ€ is treated as:
+Anything beyond this grace window or beyond "minor" is treated as:
 
 - A new mini-project, or
 - Billable maintenance work
@@ -67,7 +67,7 @@ When a client selects Self-Hosted Handoff, you provide:
   - Framework/stack used (e.g., Next.js 15 + React 19)
   - Any required components or dependencies
   - Instructions for integrating the page into an existing app or site
-    - e.g., â€œPlace this file under `app/landing/page.tsx`â€ or similar
+    - e.g., "Place this file under `app/landing/page.tsx`" or similar
   - Basic instructions for environment variables or API keys (if applicable)
 
 ### 3.2. Client Responsibilities
@@ -82,7 +82,7 @@ With Self-Hosted Handoff:
 
 You are not responsible for:
 
-- Their hosting providerâ€™s outages or limitations
+- Their hosting provider"™s outages or limitations
 - Build failures or integration issues in their environment
 - Ongoing maintenance after delivery, unless separately agreed
 

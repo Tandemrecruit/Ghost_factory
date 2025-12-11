@@ -5,9 +5,9 @@ This guide walks you through setting up Discord webhook notifications for the Gh
 ## Overview
 
 The factory sends Discord notifications when:
-- âœ… Build completes successfully (SUCCESS)
-- âš ï¸ QA fails or finds issues (QA_FAILED)
-- âš ï¸ Build completes but QA couldn't run (WARNING)
+- ✅ Build completes successfully (SUCCESS)
+- ⚠️ QA fails or finds issues (QA_FAILED)
+- ⚠️ Build completes but QA couldn't run (WARNING)
 
 ## Step 1: Create a Discord Webhook
 
@@ -26,7 +26,7 @@ The factory sends Discord notifications when:
 3. **Copy Webhook URL**: Click **Copy Webhook URL** - you'll need this in the next step
 4. Click **Save Changes**
 
-> âš ï¸ **Security Note**: Keep your webhook URL secret! Anyone with this URL can send messages to your Discord channel. Never commit it to version control.
+> ⚠️ **Security Note**: Keep your webhook URL secret! Anyone with this URL can send messages to your Discord channel. Never commit it to version control.
 
 ## Step 2: Configure Environment Variable
 
@@ -70,15 +70,15 @@ webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 if webhook_url:
     response = requests.post(webhook_url, json={
         "username": "Factory Manager",
-        "content": "ðŸ§ª Test notification from Ghost Factory"
+        "content": "🧪 Test notification from Ghost Factory"
     })
     print(f"Status: {response.status_code}")
     if response.status_code == 204:
-        print("âœ… Webhook is working!")
+        print("✅ Webhook is working!")
     else:
-        print(f"âŒ Error: {response.text}")
+        print(f"❌ Error: {response.text}")
 else:
-    print("âŒ DISCORD_WEBHOOK_URL not set in .env")
+    print("❌ DISCORD_WEBHOOK_URL not set in .env")
 ```
 
 ### 3.2 Test with Factory Pipeline
@@ -89,12 +89,12 @@ The webhook will automatically be tested when the factory processes a client bui
 
 Notifications appear as rich embeds with:
 
-- **Title**: Status emoji + client name (e.g., "ðŸš€ Build Ready: acme-corp")
+- **Title**: Status emoji + client name (e.g., "🚀 Build Ready: acme-corp")
 - **Description**: Brief status message
 - **Color**: 
-  - ðŸŸ¢ Green (5763719) for SUCCESS
-  - ðŸ”´ Red (15548997) for QA_FAILED
-  - ðŸŸ  Orange (16776960) for WARNING
+  - 🟢 Green (5763719) for SUCCESS
+  - 🔴 Red (15548997) for QA_FAILED
+  - 🟠 Orange (16776960) for WARNING
 - **Fields**:
   - Location: Path to client files
   - Report Details: QA report (if available, truncated to 900 chars)
@@ -131,8 +131,8 @@ If you want notifications in multiple channels, you can:
 
 ## Security Best Practices
 
-- âœ… Never commit `.env` to version control
-- âœ… Regenerate webhook if URL is accidentally exposed
-- âœ… Use separate webhooks for different environments (dev/prod)
-- âœ… Regularly rotate webhook tokens
-- âœ… Monitor webhook usage in Discord server settings
+- ✅ Never commit `.env` to version control
+- ✅ Regenerate webhook if URL is accidentally exposed
+- ✅ Use separate webhooks for different environments (dev/prod)
+- ✅ Regularly rotate webhook tokens
+- ✅ Monitor webhook usage in Discord server settings

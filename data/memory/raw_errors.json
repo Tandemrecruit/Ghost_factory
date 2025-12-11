@@ -1178,5 +1178,45 @@
       "client_id": "demo-hvac",
       "attempt": 2
     }
+  },
+  {
+    "timestamp": "2025-12-11T04:49:04.782389",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(126,191): error TS1005: ',' expected.\npage.tsx(126,194): error TS1005: ',' expected.\npage.tsx(126,203): error TS1005: ',' expected.\npage.tsx(126,208): error TS1005: ',' expected.\npage.tsx(126,215): error TS1005: ',' expected.\npage.tsx(126,216): error TS1003: Identifier expected.\npage.tsx(12",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-saas",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:50:15.887890",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Internal Server Error - The page displays only a generic \"Internal Server Error\" message with no functional content, missing UI elements, images, logos, buttons, or CTAs. The page is not rendering properly and appears to be in a broken/error state rather than displaying the intended mobile in",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-saas",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:51:26.416261",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(146,191): error TS1005: ',' expected.\npage.tsx(146,194): error TS1005: ',' expected.\npage.tsx(146,203): error TS1005: ',' expected.\npage.tsx(146,208): error TS1005: ',' expected.\npage.tsx(146,215): error TS1005: ',' expected.\npage.tsx(146,216): error TS1003: Identifier expected.\npage.tsx(14",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-saas",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:52:30.346752",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [The page displays only \"Internal Server Error\" text on a blank white background. This indicates a critical server-side error rather than a functional mobile UI. The page is missing all content, images, logos, CTAs, buttons, and structural elements. This is not a rendering issue but a complete",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-saas",
+      "attempt": 4
+    }
   }
 ]

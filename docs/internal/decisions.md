@@ -20,9 +20,9 @@ If a decision should still matter a month from now, it belongs here.
   - Change how folders or files are organized
   - Change how tools/agents (CodeRabbit, CI, LLMs) should behave
   - Tighten or relax any guardrail that affects client deliverables
-- Keep entries **short and specific** (aim for 3â€“10 bullets).
+- Keep entries **short and specific** (aim for 3–10 bullets).
 - Never rewrite history; instead, add a new entry and mark the old one as
-  `Deprecated` if itâ€™s no longer valid.
+  `Deprecated` if it's no longer valid.
 
 **For AI agents (all models)**
 
@@ -31,7 +31,7 @@ When proposing or generating changes:
 1. **Read this file first.** Treat these decisions as higher priority than your own defaults.
 2. If your suggestion **would change a decision**, you must:
    - Call out which decision is affected, and
-   - Suggest a new entry (or update) in the â€œProposed decisionsâ€ section.
+   - Suggest a new entry (or update) in the "Proposed decisions" section.
 3. When you implement a change that clearly introduces a new pattern or rule,
    you must:
    - Draft a new decision entry using the template below.
@@ -52,9 +52,9 @@ Example ID: `DEC-2025-12-09-001`
 
 ## Status values
 
-- `Proposed` â€“ idea or pattern under consideration
-- `Active` â€“ current rule of record; should be followed
-- `Deprecated` â€“ kept for history; no longer followed
+- `Proposed` — idea or pattern under consideration
+- `Active` — current rule of record; should be followed
+- `Deprecated` — kept for history; no longer followed
 
 ---
 
@@ -68,7 +68,7 @@ Use this template for each new decision entry:
 - **Date:** YYYY-MM-DD  
 - **Owner:** Ryan (human) | Agent name | Mixed  
 - **Area:** Architecture | Workflow | Code Style | Testing | Tooling | Guardrails | Other  
-- **Applies to:** brief list of folders/files or â€œentire repoâ€
+- **Applies to:** brief list of folders/files or "entire repo"
 
 **Summary**
 
@@ -125,7 +125,7 @@ Use this template for each new decision entry:
 **Rationale**
 
 - Keeps multiple models and tools from drifting in different directions.
-- Makes it easy to audit â€œwhy is it like this?â€ later.
+- Makes it easy to audit "why is it like this?" later.
 
 **Implications for agents**
 
@@ -160,7 +160,7 @@ Use this template for each new decision entry:
 
 **Rationale**
 
-- Youâ€™re building a paid-deliverable system; quality matters.
+- You're building a paid-deliverable system; quality matters.
 - At the same time, hard blocks can slow iteration while patterns are still
   stabilizing.
 
@@ -177,7 +177,7 @@ Use this template for each new decision entry:
 
 ## Proposed decisions
 
-(Add future ideas here with `Status: Proposed` until youâ€™re sure you want them.)
+(Add future ideas here with `Status: Proposed` until you're sure you want them.)
 
 ## Deprecated decisions
 
