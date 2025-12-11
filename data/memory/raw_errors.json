@@ -1248,5 +1248,45 @@
       "client_id": "demo-hvac",
       "attempt": 1
     }
+  },
+  {
+    "timestamp": "2025-12-11T06:03:01.615767",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [list specific visual problems]\n\n**Issues identified:**\n\n1. **Text Truncation**: The file path \"E:\\Desktop\\Projects\\Freelance\\Ghost_factory\\.next\\server\\app\\clients\\demo-hvac\\page.js'\" is truncated and continues on the next line in an awkward way, affecting readability.\n\n2. **Incomplete Path D",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:03:50.953536",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: \n\n1. **Text truncation/overlap issue**: The path text \"E:\\Desktop\\Projects\\Freelance\\Ghost_factory\\\" appears to be cut off and overlaps with the \"Show More\" button, making it difficult to read the complete file path.\n\n2. **Incomplete \"Show More\" section**: There's a partially visible line of t",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:04:34.994826",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Text readability issue - Partially obscured/overlapping text. The error message and require stack section has text that appears to be cut off or overlapped with a \"Show More\" button/link in the middle of the content (visible around \"E:\\Desktop\\Projects\\Freelance\\Ghost_factory\\...\" where \"Show",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:05:15.846124",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Text readability issue - partially obscured text. The \"Show More\" text appears to overlap with or obscure part of the file path text that reads \"E:\\Desktop\\Projects\\...\\Ghost_factory\\...\" making it difficult to read the complete file path. The overlay/truncation of this require stack informat",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
   }
 ]

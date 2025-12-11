@@ -928,12 +928,19 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
     temp_file = None
     temp_path = None
     try:
-        # Create a temporary .tsx file
+        # Create temp file INSIDE the project directory so TypeScript can resolve node_modules
+        # (node module resolution walks up from file location looking for node_modules)
+        repo_root_for_temp = Path(__file__).resolve().parent.parent
+        temp_dir = repo_root_for_temp / ".temp"
+        temp_dir.mkdir(exist_ok=True)
+        
+        # Create a temporary .tsx file in the project's .temp directory
         with tempfile.NamedTemporaryFile(
             mode='w',
             suffix='.tsx',
             delete=False,
-            encoding='utf-8'
+            encoding='utf-8',
+            dir=str(temp_dir)  # Create inside project so node_modules resolves correctly
         ) as temp_file:
             temp_file.write(code_string)
             temp_path = temp_file.name

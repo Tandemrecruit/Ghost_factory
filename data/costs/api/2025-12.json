@@ -3306,5 +3306,93 @@
     "output_tokens": 4000,
     "cost_usd": 0.078,
     "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:02:44.313327",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:03:01.601029",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:03:39.211317",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:03:50.947412",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:04:24.726517",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:04:34.966788",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:05:06.470604",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5-20250929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "input_tokens": 6000,
+    "output_tokens": 4000,
+    "cost_usd": 0.078,
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-12-11T06:05:15.818657",
+    "provider": "anthropic",
+    "model": "claude-haiku-4-5-20251001",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "input_tokens": 2000,
+    "output_tokens": 400,
+    "cost_usd": 0.0,
+    "metadata": {}
   }
 ]
