@@ -395,23 +395,258 @@ def git_pull():
         return False
 
 def git_commit_and_push(client_id):
-    """Commits and pushes generated code to the repository."""
+    """
+    Commits and pushes generated code to a client-specific branch.
+    
+    Creates/checks out a branch named 'client-{client_id}' and pushes changes there,
+    keeping main branch clean and client work segregated.
+    """
     _log_aligned("info", "💾", "Git commit", f"Committing changes for {client_id}...")
+    
+    # Sanitize client_id for branch name (git branch names have restrictions)
+    # Valid characters: alphanumeric, forward slash, hyphen, underscore
+    # Cannot start with . or end with .lock
+    branch_name = f"client-{client_id}"
+    # Replace spaces and underscores with hyphens
+    branch_name = branch_name.replace(" ", "-").replace("_", "-")
+    # Remove any other invalid characters (keep only alphanumeric, hyphens, forward slashes)
+    branch_name = re.sub(r'[^a-zA-Z0-9\-/]', '-', branch_name)
+    # Collapse multiple consecutive dashes
+    branch_name = re.sub(r'-+', '-', branch_name)
+    # Remove leading/trailing dashes and dots
+    branch_name = branch_name.strip('-.')
+    # Ensure it doesn't start with a dot
+    if branch_name.startswith('.'):
+        branch_name = 'client-' + branch_name[1:]
+    # Ensure it doesn't end with .lock
+    if branch_name.endswith('.lock'):
+        branch_name = branch_name[:-5]
+    
+    if not branch_name or len(branch_name) < 2:
+        _log_aligned("error", "❌", "Git branch", f"Invalid branch name generated from client_id: {client_id}")
+        return
+    
+    original_branch = None
+    had_uncommitted_changes = False
+    
     try:
+        # Check if we're in a git repository
+        subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            check=True,
+            capture_output=True
+        )
+    except subprocess.CalledProcessError:
+        _log_aligned("error", "❌", "Git", "Not in a git repository")
+        return
+    except FileNotFoundError:
+        _log_aligned("error", "❌", "Git", "Git not found. Is git installed?")
+        return
+    
+    try:
+        # Get current branch to restore later
+        try:
+            current_branch_result = subprocess.run(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=5
+            )
+            original_branch = current_branch_result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            _log_aligned("warning", "⚠️", "Git", "Timeout checking current branch")
+            original_branch = None
+        except subprocess.CalledProcessError:
+            # Might be in detached HEAD state or new repo
+            original_branch = None
+        
+        # Check for uncommitted changes on current branch
+        status_result = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        if status_result.returncode == 0 and status_result.stdout.strip():
+            had_uncommitted_changes = True
+            _log_aligned("info", "📝", "Git", "Uncommitted changes detected (will be included in client branch)")
+        
+        # Check if client branch exists locally
+        branch_check_result = subprocess.run(
+            ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{branch_name}"],
+            capture_output=True,
+            timeout=5
+        )
+        branch_exists_locally = branch_check_result.returncode == 0
+        
+        if branch_exists_locally:
+            # Checkout existing branch
+            _log_aligned("info", "🌿", "Git branch", f"Switching to existing branch: {branch_name}")
+            checkout_result = subprocess.run(
+                ["git", "checkout", branch_name],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if checkout_result.returncode != 0:
+                error_msg = checkout_result.stderr or checkout_result.stdout or "Unknown error"
+                _log_aligned("error", "❌", "Git checkout", f"Failed to checkout {branch_name}: {error_msg}")
+                return
+        else:
+            # Create new branch from main (or master, or current branch as fallback)
+            base_branch = None
+            
+            # Try main first
+            try:
+                subprocess.run(
+                    ["git", "show-ref", "--verify", "--quiet", "refs/heads/main"],
+                    check=True,
+                    capture_output=True,
+                    timeout=5
+                )
+                base_branch = "main"
+            except subprocess.CalledProcessError:
+                # Try master as fallback
+                try:
+                    subprocess.run(
+                        ["git", "show-ref", "--verify", "--quiet", "refs/heads/master"],
+                        check=True,
+                        capture_output=True,
+                        timeout=5
+                    )
+                    base_branch = "master"
+                except subprocess.CalledProcessError:
+                    # Use current branch or HEAD as last resort
+                    if original_branch:
+                        base_branch = original_branch
+                    else:
+                        base_branch = "HEAD"
+            
+            _log_aligned("info", "🌿", "Git branch", f"Creating new branch {branch_name} from {base_branch}")
+            checkout_result = subprocess.run(
+                ["git", "checkout", "-b", branch_name, base_branch],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if checkout_result.returncode != 0:
+                error_msg = checkout_result.stderr or checkout_result.stdout or "Unknown error"
+                _log_aligned("error", "❌", "Git branch", f"Failed to create branch {branch_name}: {error_msg}")
+                return
+        
         # Stage all changes (new pages, tracking files, processed intakes)
-        subprocess.run(["git", "add", "."], check=True, capture_output=True)
+        add_result = subprocess.run(
+            ["git", "add", "."],
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        if add_result.returncode != 0:
+            error_msg = add_result.stderr or add_result.stdout or "Unknown error"
+            _log_aligned("error", "❌", "Git add", f"Failed to stage changes: {error_msg}")
+            # Try to restore original branch before returning
+            if original_branch and original_branch != branch_name:
+                try:
+                    subprocess.run(["git", "checkout", original_branch], capture_output=True, timeout=10)
+                except:
+                    pass
+            return
         
-        # Commit
-        commit_msg = f"feat: Auto-generated landing page for {client_id}"
-        subprocess.run(["git", "commit", "-m", commit_msg], check=True, capture_output=True)
+        # Check if there are actually changes to commit
+        diff_result = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            capture_output=True
+        )
+        if diff_result.returncode == 0:
+            _log_aligned("info", "ℹ️", "Git commit", "No changes to commit")
+            # Still try to push in case there are commits already
+        else:
+            # Commit
+            commit_msg = f"feat: Auto-generated landing page for {client_id}"
+            commit_result = subprocess.run(
+                ["git", "commit", "-m", commit_msg],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            if commit_result.returncode != 0:
+                error_msg = commit_result.stderr or commit_result.stdout or "Unknown error"
+                # Check if it's just "nothing to commit"
+                if "nothing to commit" in error_msg.lower() or "no changes" in error_msg.lower():
+                    _log_aligned("info", "ℹ️", "Git commit", "No changes to commit (already up to date)")
+                else:
+                    _log_aligned("error", "❌", "Git commit", f"Failed to commit: {error_msg}")
+                    # Try to restore original branch before returning
+                    if original_branch and original_branch != branch_name:
+                        try:
+                            subprocess.run(["git", "checkout", original_branch], capture_output=True, timeout=10)
+                        except:
+                            pass
+                    return
         
-        # Push
-        subprocess.run(["git", "push"], check=True, capture_output=True)
-        _log_aligned("info", "✅", "Git push", "successful.")
-    except subprocess.CalledProcessError as e:
-        # Don't crash the loop if git fails, just log it
-        error_msg = e.stderr.decode() if e.stderr else str(e)
-        _log_aligned("error", "❌", "Git commit/push", f"failed: {error_msg}")
+        # Push to remote (create upstream if needed)
+        _log_aligned("info", "📤", "Git push", f"Pushing to origin/{branch_name}...")
+        
+        # First try with -u flag (sets upstream)
+        push_result = subprocess.run(
+            ["git", "push", "-u", "origin", branch_name],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        if push_result.returncode == 0:
+            _log_aligned("info", "✅", "Git push", f"Successfully pushed to branch {branch_name}")
+        else:
+            # If that fails, try without -u (branch might already exist remotely)
+            error_msg = push_result.stderr or push_result.stdout or "Unknown error"
+            if "no upstream" in error_msg.lower() or "set upstream" in error_msg.lower():
+                # Try without -u
+                push_result2 = subprocess.run(
+                    ["git", "push", "origin", branch_name],
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+                if push_result2.returncode == 0:
+                    _log_aligned("info", "✅", "Git push", f"Successfully pushed to branch {branch_name}")
+                else:
+                    error_msg2 = push_result2.stderr or push_result2.stdout or "Unknown error"
+                    _log_aligned("error", "❌", "Git push", f"Failed to push: {error_msg2}")
+                    # Don't return here - still try to restore branch
+            else:
+                _log_aligned("error", "❌", "Git push", f"Failed to push: {error_msg}")
+        
+        # Optionally switch back to original branch
+        # Uncomment the block below if you want to automatically switch back
+        # if original_branch and original_branch != branch_name:
+        #     try:
+        #         checkout_back_result = subprocess.run(
+        #             ["git", "checkout", original_branch],
+        #             capture_output=True,
+        #             text=True,
+        #             timeout=10
+        #         )
+        #         if checkout_back_result.returncode == 0:
+        #             _log_aligned("info", "🔄", "Git branch", f"Switched back to {original_branch}")
+        #         else:
+        #             _log_aligned("warning", "⚠️", "Git branch", f"Stayed on {branch_name} (could not switch back)")
+        #     except Exception as e:
+        #         _log_aligned("warning", "⚠️", "Git branch", f"Stayed on {branch_name} (error switching back: {e})")
+            
+    except subprocess.TimeoutExpired:
+        _log_aligned("error", "❌", "Git", f"Operation timed out for {client_id}")
+    except FileNotFoundError:
+        _log_aligned("error", "❌", "Git", "Git command not found. Is git installed?")
+    except Exception as e:
+        _log_aligned("error", "❌", "Git commit/push", f"Unexpected error for {client_id}: {e}")
+        # Try to restore original branch on unexpected error
+        if original_branch and original_branch != branch_name:
+            try:
+                subprocess.run(["git", "checkout", original_branch], capture_output=True, timeout=10)
+            except:
+                pass
 
 def run_intake_sanitizer():
     """Converts any raw intakes (intake-raw.md) to structured intakes (intake.md)."""
