@@ -1228,5 +1228,15 @@
       "client_id": "demo-hvac",
       "attempt": 1
     }
+  },
+  {
+    "timestamp": "2025-12-11T05:39:45.828439",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: page.tsx(1,19): error TS2307: Cannot find module 'next/image' or its corresponding type declarations.\npage.tsx(2,18): error TS2307: Cannot find module 'next/link' or its corresponding type declarations.",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
   }
 ]

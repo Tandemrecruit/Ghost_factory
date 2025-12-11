@@ -338,5 +338,15 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-11T05:40:20.770219",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 69.49,
+    "time_saved_seconds": 14330.51,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]
