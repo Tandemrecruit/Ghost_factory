@@ -1006,6 +1006,9 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 }
                 with open(temp_tsconfig_path, "w", encoding="utf-8") as f:
                     json_module.dump(temp_tsconfig_data, f)
+                # #region agent log
+                import json as _dbg_json2; _dbg_log_path2 = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"; open(_dbg_log_path2, "a", encoding="utf-8").write(_dbg_json2.dumps({"hypothesisId": "A,C,D", "location": "factory.py:check_syntax:tsconfig_created", "message": "temp tsconfig data", "data": {"temp_tsconfig_path": temp_tsconfig_path, "temp_tsconfig_data": temp_tsconfig_data, "temp_file_dir": temp_file_dir, "temp_file_name": temp_file_name, "include_path": include_path, "tsconfig_exists": tsconfig_path.exists()}, "timestamp": __import__("time").time(), "sessionId": "debug-session"}) + "\n")
+                # #endregion
                 
                 project_arg = str(temp_tsconfig_path)
             except Exception as e:
@@ -1039,6 +1042,9 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
                 temp_path
             ])
         
+        # #region agent log
+        import json as _dbg_json; _dbg_log_path = r"e:\Desktop\Projects\Freelance\Ghost_factory\.cursor\debug.log"; open(_dbg_log_path, "a", encoding="utf-8").write(_dbg_json.dumps({"hypothesisId": "A,B,E", "location": "factory.py:check_syntax:before_run", "message": "tsc command details", "data": {"cmd": cmd, "cwd": str(repo_root), "temp_path": temp_path, "temp_tsconfig_path": temp_tsconfig_path, "project_arg": project_arg}, "timestamp": __import__("time").time(), "sessionId": "debug-session"}) + "\n")
+        # #endregion
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -1046,6 +1052,9 @@ def check_syntax(code_string: str, client_id: str = "unknown") -> Tuple[bool, st
             timeout=30,
             cwd=str(repo_root)  # Use repo_root instead of os.getcwd()
         )
+        # #region agent log
+        open(_dbg_log_path, "a", encoding="utf-8").write(_dbg_json.dumps({"hypothesisId": "A,B,C,D,E", "location": "factory.py:check_syntax:after_run", "message": "tsc result", "data": {"returncode": result.returncode, "stderr": result.stderr[:1000] if result.stderr else "", "stdout": result.stdout[:1000] if result.stdout else ""}, "timestamp": __import__("time").time(), "sessionId": "debug-session"}) + "\n")
+        # #endregion
         
         # Clean up temp tsconfig if created
         if temp_tsconfig_path and os.path.exists(temp_tsconfig_path):
