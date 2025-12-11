@@ -1098,5 +1098,75 @@
       "client_id": "demo-hvac",
       "attempt": 4
     }
+  },
+  {
+    "timestamp": "2025-12-11T04:06:42.877091",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpv_88fw6o.tsx(16,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:07:32.341350",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp9rvzr6cy.tsx(276,15): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:08:12.315049",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp6rsc7jf5.tsx(15,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:09:01.825986",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmp3zvociqs.tsx(330,60): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 4
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:09:53.315977",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmph2qoz526.tsx(15,8): error TS2307: Cannot find module '@/components' or its corresponding type declarations.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 5
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:10:13.665861",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple visual issues detected]\n\n1. **Missing Images/Logos**: \n   - Several image containers appear empty or show placeholder areas where logos, hero images, and testimonial avatars should be displayed\n   - Company/brand logos are not visible in multiple sections\n   - Testimonial profile ima",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:10:47.787486",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: C:/Users/Ryan/AppData/Local/Temp/tmpu__xi9_p.tsx(330,33): error TS1160: Unterminated template literal.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "ember-roasters",
+      "attempt": 6
+    }
   }
 ]

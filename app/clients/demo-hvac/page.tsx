@@ -1,412 +1,336 @@
 import {
+  NavSimple,
   HeroSimple,
   TrustBadges,
   FeatureGrid,
-  FeatureSteps,
-  TestimonialCards,
-  ContactForm,
-  CtaBanner,
   SectionWrapper,
-  NavSimple,
-  FooterSimple,
-  LogoCloud
+  FeatureSteps,
+  GuaranteeBlock,
+  TestimonialCards,
+  CtaBanner,
+  FooterSimple
 } from '@/components'
 
-export default function Page() {
+export default function ComfortBreezeHeatingAirPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white font-['Inter']">
+      {/* Navigation */}
       <NavSimple
-        logoSrc="/images/logo.png"
+        logoSrc="/images/comfort-breeze-logo.svg"
         logoAlt="Comfort Breeze Heating & Air"
         links={[
-          { label: "Services", href: "#services" },
-          { label: "Why Choose Us", href: "#why-us" },
-          { label: "Service Area", href: "#service-area" },
-          { label: "About", href: "#about" }
+          { label: 'Services', href: '#services' },
+          { label: 'Why Choose Us', href: '#why-choose-us' },
+          { label: 'Service Area', href: '#service-area' },
+          { label: 'About', href: '#about' }
         ]}
-        ctaLabel="Call Now: (586) 555-HVAC"
-        ctaHref="tel:5865554822"
+        ctaLabel="Call (586) XXX-XXXX"
+        ctaHref="tel:586XXXXXXX"
       />
 
-      <HeroSimple
-        heading="Stop Sweating—and Freezing—in Your Own Home"
-        subhead="Sterling Heights families trust Comfort Breeze for honest HVAC service with upfront pricing and no surprises."
-        primaryCtaLabel="Call Now: (586) 555-HVAC"
-        primaryCtaHref="tel:5865554822"
-      />
+      {/* Hero Section */}
+      <SectionWrapper background="white" paddingY="large">
+        <HeroSimple
+          blockId="hero_main"
+          heading="When Your Furnace Quits at Midnight, We Answer"
+          subhead="Family-owned HVAC experts serving Sterling Heights homeowners with honest pricing, reliable repairs, and the same friendly faces every visit. No surprises. No pressure. Just comfort."
+          primaryCtaLabel="Call (586) XXX-XXXX"
+          primaryCtaHref="tel:586XXXXXXX"
+        />
+      </SectionWrapper>
 
+      {/* Trust Bar */}
       <SectionWrapper background="gray" paddingY="small">
         <TrustBadges
           heading=""
           badges={[
-            { icon: "shield", label: "Licensed & Insured" },
-            { icon: "award", label: "Locally Owned & Operated" },
-            { icon: "star", label: "15+ Years Serving Your Neighbors" },
-            { icon: "check-circle", label: "Real Humans Answer the Phone" }
+            { icon: 'shield', label: 'Licensed & Insured' },
+            { icon: 'award', label: 'Family-Owned & Local' },
+            { icon: 'check-circle', label: 'Serving Sterling Heights Since 2010' },
+            { icon: 'lock', label: 'No Hidden Fees, Ever' }
           ]}
         />
       </SectionWrapper>
 
+      {/* Services Overview */}
       <SectionWrapper background="white" paddingY="large">
-        <FeatureGrid
-          eyebrow=""
-          heading="What We Do Best"
-          subhead=""
-          features={[
-            {
-              title: "AC Installation & Replacement",
-              description: "Cool comfort for Michigan summers",
-              icon: "sparkles"
-            },
-            {
-              title: "Furnace Repair & Replacement",
-              description: "Heat you can count on all winter",
-              icon: "zap"
-            },
-            {
-              title: "Spring AC Tune-Ups",
-              description: "Get ahead of the heat wave",
-              icon: "check"
-            },
-            {
-              title: "Fall Furnace Checkups",
-              description: "Safe, efficient heating before the cold hits",
-              icon: "shield"
-            },
-            {
-              title: "Emergency No-Heat Service",
-              description: "Same-day response when you need it most",
-              icon: "clock"
-            },
-            {
-              title: "Indoor Air Quality",
-              description: "Breathe easier at home",
-              icon: "heart"
-            }
-          ]}
-          columns={3}
-        />
-        <div className="text-center mt-8">
-          <p className="text-lg text-gray-700 mb-4">
-            Not sure what you need? Call us — we'll help you figure it out.
-          </p>
-          <a
-            href="tel:5865554822"
-            className="inline-block bg-[#E85D04] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D64E03] transition-colors"
-          >
-            (586) 555-HVAC
-          </a>
+        <div id="services">
+          <FeatureGrid
+            eyebrow="Our Services"
+            heading="HVAC Services You Can Count On"
+            subhead="From seasonal tune-ups to emergency repairs, we handle all your heating and cooling needs with honest, upfront pricing."
+            features={[
+              {
+                title: 'AC Installation & Replacement',
+                description: 'Beat the Michigan heat with efficient AC systems sized right for your home. We help you choose the best fit for your budget.',
+                icon: 'sparkles'
+              },
+              {
+                title: 'Furnace Replacement & Repair',
+                description: "From minor repairs to full replacements, we'll get your furnace running safely and efficiently—without pushing upgrades you don't need.",
+                icon: 'zap'
+              },
+              {
+                title: 'Spring AC Tune-Up',
+                description: "Don't wait for the first 85-degree day. Our seasonal tune-up catches small issues before they become expensive breakdowns.",
+                icon: 'check'
+              },
+              {
+                title: 'Fall Furnace Check',
+                description: 'A pre-season inspection ensures your family stays warm and safe, with carbon monoxide testing included in every visit.',
+                icon: 'shield'
+              },
+              {
+                title: 'Emergency No-Heat Service',
+                description: 'Furnace down in the middle of winter? We understand the urgency. Call us for fast, professional emergency service.',
+                icon: 'clock'
+              },
+              {
+                title: 'Indoor Air Quality',
+                description: 'From air purifiers to humidity control, we help you create healthier indoor air for your family—especially important for allergies.',
+                icon: 'heart'
+              }
+            ]}
+            columns={3}
+          />
         </div>
       </SectionWrapper>
 
+      {/* Why Choose Us */}
       <SectionWrapper background="gray" paddingY="large">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1E5B8C] text-center mb-12">
-            Why Sterling Heights Homeowners Choose Us
-          </h2>
-          <div className="space-y-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-[#E85D04] rounded-lg flex items-center justify-center text-white text-2xl">
-                  💰
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#1E5B8C] mb-2">
-                    Upfront Pricing, No Surprise Fees
-                  </h3>
-                  <p className="text-gray-700">
-                    We'll explain your options—good, better, and best—before any work begins. The price we quote is the price you pay. No hidden charges. No fine print. No "gotcha" moments when we hand you the bill.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-[#E85D04] rounded-lg flex items-center justify-center text-white text-2xl">
-                  👥
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#1E5B8C] mb-2">
-                    Same Faces, Every Visit
-                  </h3>
-                  <p className="text-gray-700">
-                    We're a small local crew, not a rotating cast of strangers. You'll see familiar faces who know your home and your system. Once you're a Comfort Breeze customer, you're part of the family.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-[#E85D04] rounded-lg flex items-center justify-center text-white text-2xl">
-                  ⏰
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#1E5B8C] mb-2">
-                    We Show Up When We Say We Will
-                  </h3>
-                  <p className="text-gray-700">
-                    Your time matters. We call ahead, arrive on schedule, and respect your home like it's our own. Need to leave a key? We treat that trust seriously. Expect courtesy calls, shoe covers, and clean workspaces.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-[#E85D04] rounded-lg flex items-center justify-center text-white text-2xl">
-                  ✅
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#1E5B8C] mb-2">
-                    Honest Recommendations
-                  </h3>
-                  <p className="text-gray-700">
-                    We'll only suggest replacement when repair isn't the smart choice. You get options and straight talk—never a hard sell. If patching your 8-year-old furnace buys you another three winters, we'll tell you. If it's time to replace, we'll explain exactly why.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div id="why-choose-us">
+          <FeatureGrid
+            eyebrow="Why Choose Us"
+            heading="Why Your Sterling Heights Neighbors Keep Calling Us Back"
+            subhead="We're not just another HVAC company. We're your neighbors, and we treat your home like we'd treat our own."
+            features={[
+              {
+                title: 'Honest, Upfront Pricing',
+                description: "We present clear options—good, better, and best—and explain what each one means. No hidden fees. No pressure. When a repair makes sense, we'll repair it. The decision is always yours.",
+                icon: 'target'
+              },
+              {
+                title: 'Real People, Real Answers',
+                description: "Call us and talk to an actual human who knows Sterling Heights. Our technicians aren't rotating strangers; they're your neighbors, and you'll see the same friendly faces on every visit.",
+                icon: 'heart'
+              },
+              {
+                title: 'We Fix First, Replace When It Makes Sense',
+                description: "If your system can be repaired affordably and will give you a few more good years, we'll tell you. We only recommend replacement when it genuinely makes financial sense—or when safety is at risk.",
+                icon: 'award'
+              }
+            ]}
+            columns={3}
+          />
         </div>
       </SectionWrapper>
 
+      {/* How It Works */}
       <SectionWrapper background="white" paddingY="large">
         <FeatureSteps
-          eyebrow=""
-          heading="Three Simple Steps to Home Comfort"
-          subhead=""
+          eyebrow="Our Process"
+          heading="Getting Comfortable Again Is This Easy"
+          subhead="From your first call to a warm, safe home, we make the entire process simple and stress-free."
           steps={[
             {
-              stepNumber: "1",
-              title: "Call or Request Online",
-              description: "Reach a real person during business hours. Tell us what's going on—we'll ask a few quick questions to understand the issue. No phone trees. No 'press 1 for...' Just a conversation with someone who can actually help."
+              stepNumber: '1',
+              title: 'Call or Schedule Online',
+              description: 'Give us a call and talk to someone who cares, or fill out our simple online form to request service at your convenience. Either way, we respond quickly.'
             },
             {
-              stepNumber: "2",
-              title: "We Come to You & Inspect",
-              description: "Our technician arrives on time, takes a thorough look at your system, and explains exactly what's happening in plain English. No jargon. No upselling before we've even diagnosed the problem. Just honest assessment."
+              stepNumber: '2',
+              title: 'We Inspect & Explain Everything',
+              description: "Our technician arrives on time, thoroughly diagnoses your system, and walks you through exactly what we found—in plain English. We'll answer every question you have."
             },
             {
-              stepNumber: "3",
-              title: "You Choose Your Option",
-              description: "We present clear options with upfront pricing. You decide what's right for your home and budget—no pressure, no surprises. Need time to think it over? That's fine. Need it done today? We'll make it happen."
+              stepNumber: '3',
+              title: 'You Choose Your Best Option',
+              description: 'We present your options with transparent, upfront pricing for each one. Then you decide what works for your home, your family, and your budget. No pressure. No rush.'
             }
           ]}
         />
-        <div className="text-center mt-8">
-          <a
-            href="tel:5865554822"
-            className="inline-block bg-[#E85D04] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D64E03] transition-colors"
-          >
-            Ready to get comfortable? Call (586) 555-HVAC
-          </a>
-        </div>
       </SectionWrapper>
 
+      {/* Safety & Peace of Mind */}
       <SectionWrapper background="primary" paddingY="large">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-4xl">
-              🛡️
-            </div>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Your Family's Safety Is Part of Every Visit
-          </h2>
-          <p className="text-lg text-white mb-6">
-            Every furnace inspection includes a carbon monoxide check—because keeping your family safe matters as much as keeping them warm. It's just part of how we do things.
-          </p>
-          <p className="text-white">
-            We take time to explain what we're checking, why it matters, and what you can do between professional visits. You'll never feel like we're creating problems to solve. You'll just have peace of mind that your system is working safely and efficiently.
-          </p>
-        </div>
+        <GuaranteeBlock
+          heading="Your Family's Safety Is Part of Every Job"
+          description="Keeping your home comfortable means keeping it safe. That's why every furnace inspection we perform includes a carbon monoxide test—at no extra charge. It's a simple step that protects what matters most. Carbon monoxide is odorless and invisible, but it's preventable. Our technicians check for leaks, test your system's ventilation, and make sure your furnace is operating safely."
+          badgeText="Safe homes. Warm homes. That's the Comfort Breeze promise."
+          icon="shield"
+        />
       </SectionWrapper>
 
-      <SectionWrapper background="white" paddingY="large">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1E5B8C] text-center mb-6">
-            Proudly Serving Sterling Heights & Surrounding Communities
-          </h2>
-          <p className="text-lg text-gray-700 text-center mb-8">
-            We're based right here in Sterling Heights. When you call Comfort Breeze, you're calling your neighbors.
-          </p>
-          <div className="bg-gray-50 p-8 rounded-lg">
-            <h3 className="text-xl font-bold text-[#1E5B8C] mb-4 text-center">
-              Communities We Serve:
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
-              <div className="text-gray-700">Sterling Heights</div>
-              <div className="text-gray-700">Warren</div>
-              <div className="text-gray-700">Troy</div>
-              <div className="text-gray-700">Shelby Township</div>
-              <div className="text-gray-700">Clinton Township</div>
-              <div className="text-gray-700">Utica</div>
-              <div className="text-gray-700">Rochester Hills</div>
-              <div className="text-gray-700">Fraser</div>
-              <div className="text-gray-700">Roseville</div>
-            </div>
-            <p className="text-center text-gray-600 mt-6">
-              ...and neighbors within 30-40 minutes
-            </p>
-            <p className="text-center text-gray-700 mt-4">
-              Not sure if we serve your area? Give us a call—if we can't help you, we'll point you to someone local who can.
-            </p>
-          </div>
-        </div>
-      </SectionWrapper>
-
-      <SectionWrapper background="gray" paddingY="large">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#1E5B8C] text-center mb-8">
-            Family-Owned, Locally Operated
-          </h2>
-          <div className="bg-white p-8 rounded-lg shadow-sm">
-            <p className="text-lg text-gray-700 mb-4">
-              Comfort Breeze was founded by Mike Johnson right here in Sterling Heights. After 12 years working for the big HVAC companies, Mike saw too many homeowners get burned by surprise bills and technicians who treated them like a number.
-            </p>
-            <p className="text-lg text-gray-700 mb-4">
-              In 2008, he started Comfort Breeze to do things differently—honest work, fair prices, and neighbors helping neighbors stay comfortable year-round.
-            </p>
-            <p className="text-lg text-gray-700">
-              Today, our small crew serves hundreds of families across the Sterling Heights area. We're not trying to be the biggest HVAC company in Michigan. We're just focused on being the most trustworthy one you'll ever call.
-            </p>
-          </div>
-        </div>
-      </SectionWrapper>
-
+      {/* Testimonials */}
       <SectionWrapper background="white" paddingY="large">
         <TestimonialCards
-          eyebrow=""
+          eyebrow="Customer Reviews"
           heading="What Your Neighbors Are Saying"
           testimonials={[
             {
-              quote: "Mike came out the same day our furnace died—and it was 18 degrees outside. He had us up and running in under two hours, explained everything clearly, and didn't try to sell us a new system we didn't need. Can't recommend Comfort Breeze enough.",
-              name: "Jennifer M.",
-              role: "Homeowner",
-              company: "Sterling Heights",
-              avatarSrc: ""
+              quote: "Our furnace went out on a Sunday night, and I was panicking. I called Comfort Breeze first thing Monday morning, and they had someone here by noon. The technician was professional, explained everything, and had us up and running within two hours. No pressure to replace anything—just an honest repair at a fair price.",
+              name: 'Jennifer M.',
+              role: 'Homeowner',
+              company: 'Sterling Heights',
+              avatarSrc: '/images/avatar-female-1.jpg'
             },
             {
-              quote: "We've used Comfort Breeze for three years now. Spring tune-ups, fall checkups, and one emergency AC repair during a heat wave. They're always on time, always honest, and the price is always exactly what they quoted. Finally found an HVAC company we can trust.",
-              name: "Robert & Linda T.",
-              role: "Homeowners",
-              company: "Troy",
-              avatarSrc: ""
+              quote: "We've used other companies before, and they always wanted to replace everything. Comfort Breeze came out for our annual furnace check, found a minor issue, fixed it for under $200, and told us we'd get several more good years out of our system. That kind of honesty is rare.",
+              name: 'Robert T.',
+              role: 'Homeowner',
+              company: 'Warren',
+              avatarSrc: '/images/avatar-male-1.jpg'
             },
             {
-              quote: "What impressed me most was that Mike gave us three options—including one that saved us money in the short term even though it meant less profit for him. That's the kind of honesty you don't find anymore. These guys are the real deal.",
-              name: "David K.",
-              role: "Homeowner",
-              company: "Warren",
-              avatarSrc: ""
+              quote: "What I appreciate most is the consistency. It's the same technician every visit, and he remembers our house and our system. He takes the time to answer my husband's questions and never makes us feel rushed. It's like having a trusted friend who happens to be an HVAC expert.",
+              name: 'Linda K.',
+              role: 'Homeowner',
+              company: 'Troy',
+              avatarSrc: '/images/avatar-female-2.jpg'
+            },
+            {
+              quote: "From the moment they arrived, I knew we'd made the right choice. They wore shoe covers, laid down mats, and cleaned up everything before they left. The technician was respectful, knowledgeable, and didn't talk down to me when I asked basic questions.",
+              name: 'David S.',
+              role: 'Homeowner',
+              company: 'Shelby Township',
+              avatarSrc: '/images/avatar-male-2.jpg'
+            },
+            {
+              quote: "After they replaced our old furnace, the technician walked me through the carbon monoxide test and showed me how to change filters. He even programmed our new thermostat. I feel so much safer knowing our system was installed by people who actually care.",
+              name: 'Maria G.',
+              role: 'Homeowner',
+              company: 'Clinton Township',
+              avatarSrc: '/images/avatar-female-3.jpg'
+            },
+            {
+              quote: "Another company quoted us $8,000 for a full AC replacement. We called Comfort Breeze for a second opinion, and they diagnosed a $400 repair that's been working perfectly for two years now. They could have easily agreed with the first quote, but instead they gave us the truth.",
+              name: 'Michael and Susan P.',
+              role: 'Homeowners',
+              company: 'Macomb',
+              avatarSrc: '/images/avatar-couple-1.jpg'
             }
           ]}
         />
       </SectionWrapper>
 
-      <SectionWrapper background="primary" paddingY="large">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-6">
-            Why Wait Until Your System Breaks?
-          </h2>
-          <p className="text-lg text-white text-center mb-8">
-            Most HVAC emergencies happen at the worst possible time—the coldest night of winter or the hottest day of summer. Regular maintenance catches small issues before they become expensive emergencies.
-          </p>
-          <div className="bg-white/10 backdrop-blur-sm p-8 rounded-lg mb-8">
-            <p className="text-white font-semibold mb-4 text-center">
-              Schedule your seasonal tune-up today and enjoy:
-            </p>
-            <ul className="space-y-3">
-              <li className="flex items-center text-white">
-                <span className="mr-3 flex-shrink-0">✓</span>
-                <span>Lower energy bills from efficient operation</span>
-              </li>
-              <li className="flex items-center text-white">
-                <span className="mr-3 flex-shrink-0">✓</span>
-                <span>Fewer breakdowns and emergency calls</span>
-              </li>
-              <li className="flex items-center text-white">
-                <span className="mr-3 flex-shrink-0">✓</span>
-                <span>Longer system lifespan</span>
-              </li>
-              <li className="flex items-center text-white">
-                <span className="mr-3 flex-shrink-0">✓</span>
-                <span>Priority scheduling for Comfort Breeze maintenance customers</span>
-              </li>
-            </ul>
-          </div>
-          <div className="text-center">
-            <a
-              href="tel:5865554822"
-              className="inline-block bg-[#E85D04] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#D64E03] transition-colors"
-            >
-              Schedule Your Tune-Up: (586) 555-HVAC
-            </a>
-          </div>
-        </div>
-      </SectionWrapper>
-
+      {/* Service Area */}
       <SectionWrapper background="gray" paddingY="large">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <h3 className="text-2xl font-bold text-[#1E5B8C] mb-6">
-                Ready to Get Comfortable?
-              </h3>
-              <a
-                href="tel:5865554822"
-                className="block text-4xl font-bold text-[#1E5B8C] mb-6 hover:text-[#E85D04] transition-colors"
-              >
-                📞 (586) 555-HVAC
-              </a>
-              <div className="space-y-2 text-gray-700 mb-6">
-                <p><strong>Monday-Friday:</strong> 7am-7pm</p>
-                <p><strong>Saturday:</strong> 8am-5pm</p>
-                <p><strong>Sunday:</strong> Emergency Service Available</p>
-              </div>
-              <p className="text-sm text-gray-600 italic">
-                Click to call from your mobile device
-              </p>
+        <div id="service-area" className="max-w-4xl mx-auto text-center">
+          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-3">
+            Local Service
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-['Inter']">
+            Proudly Serving Your Neighborhood
+          </h2>
+          <p className="text-lg text-gray-700 mb-8">
+            We're based in Sterling Heights and serve homeowners throughout the surrounding communities:
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-800 text-base">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Sterling Heights
             </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Warren
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Troy
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Shelby Township
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Clinton Township
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Utica
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Macomb
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Fraser
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-orange-600">✓</span> Roseville
+            </div>
+          </div>
+          <p className="text-gray-600 mt-6 italic">
+            And surrounding areas within 30-40 minutes
+          </p>
+          <p className="text-gray-700 mt-4">
+            If you're not sure whether we serve your area, give us a call—we're happy to help.
+          </p>
+        </div>
+      </SectionWrapper>
 
-            <div>
-              <ContactForm
-                eyebrow=""
-                heading="Request Your Free Quote Online"
-                subhead="Not ready to call? No problem. Fill out this quick form and we'll get back to you within 4 business hours."
-                fields={[
-                  { name: "name", type: "text", placeholder: "Your Name", required: true },
-                  { name: "phone", type: "phone", placeholder: "Phone Number", required: true },
-                  { name: "email", type: "email", placeholder: "Email Address", required: true },
-                  { name: "message", type: "textarea", placeholder: "Tell us what's happening (optional)", required: false }
-                ]}
-                submitLabel="Get Your Free Quote"
-                successMessage="Thanks! We'll get back to you within 4 business hours."
-              />
-              <p className="text-center text-gray-700 mt-4">
-                Or call now if it's urgent: <a href="tel:5865554822" className="text-[#E85D04] font-semibold hover:underline">(586) 555-HVAC</a>
-              </p>
+      {/* About Section */}
+      <SectionWrapper background="white" paddingY="large">
+        <div id="about" className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-3">
+              About Us
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-['Inter']">
+              A Local Team You Can Trust in Your Home
+            </h2>
+          </div>
+          <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
+            <p>
+              Comfort Breeze Heating & Air is a family-owned business built on a simple belief: your home deserves honest service from people who care. For over a decade, we've been serving Sterling Heights and the surrounding communities with reliable HVAC solutions that put homeowners first—not sales quotas.
+            </p>
+            <p>
+              We're not a faceless corporate chain. We're your neighbors. We live here, work here, and raise our families here. When you invite us into your home, we treat it with the same respect we'd want for our own. That means showing up on time, explaining everything clearly, cleaning up after ourselves, and standing behind our work.
+            </p>
+            <p>
+              We got into this business because we genuinely love helping homeowners stay comfortable and safe. Whether it's a quick repair that saves you thousands or an honest conversation about when replacement makes sense, we're here to be the HVAC company you can trust for the long haul.
+            </p>
+          </div>
+          <div className="mt-8 text-center">
+            <div className="inline-block bg-gray-200 rounded-lg px-6 py-4 text-gray-600 italic">
+              [Team photo placeholder - upload your actual team photo here]
             </div>
           </div>
         </div>
       </SectionWrapper>
 
+      {/* Final CTA */}
+      <SectionWrapper background="gradient" paddingY="large">
+        <CtaBanner
+          blockId="cta_final"
+          eyebrow="Ready for Service?"
+          heading="Ready for Reliable Comfort?"
+          subhead="Call now to schedule your seasonal tune-up, get help with an emergency, or just ask a question. We're here to help."
+          primaryCtaLabel="Call (586) XXX-XXXX"
+          primaryCtaHref="tel:586XXXXXXX"
+          secondaryCtaLabel="Or request service online →"
+          secondaryCtaHref="/contact"
+          background="primary"
+        />
+        <div className="text-center mt-6">
+          <p className="text-sm text-white opacity-90 italic">
+            Flexible financing available for qualifying installations and replacements. Ask us for details.
+          </p>
+        </div>
+      </SectionWrapper>
+
+      {/* Footer */}
       <FooterSimple
         companyName="Comfort Breeze Heating & Air"
         links={[
-          { label: "About Us", href: "#about" },
-          { label: "Services", href: "#services" },
-          { label: "Service Area", href: "#service-area" },
-          { label: "Contact", href: "#contact" },
-          { label: "Privacy Policy", href: "/privacy" }
+          { label: 'Services', href: '#services' },
+          { label: 'Service Area', href: '#service-area' },
+          { label: 'About Us', href: '#about' },
+          { label: 'Request Service', href: '/contact' },
+          { label: 'Emergency Service', href: 'tel:586XXXXXXX' },
+          { label: 'Financing Options', href: '/financing' },
+          { label: 'Privacy Policy', href: '/privacy' },
+          { label: 'Terms of Service', href: '/terms' }
         ]}
         socialLinks={[
-          { platform: "facebook", href: "#" },
-          { platform: "twitter", href: "#" }
+          { platform: 'facebook', href: 'https://facebook.com/comfortbreezeheating' },
+          { platform: 'instagram', href: 'https://instagram.com/comfortbreezeheating' }
         ]}
-        copyrightText="© 2024 Comfort Breeze Heating & Air. All rights reserved. Licensed & Insured"
+        copyrightText="© 2024 Comfort Breeze Heating & Air. All rights reserved. Licensed and insured in the State of Michigan."
       />
     </div>
   )

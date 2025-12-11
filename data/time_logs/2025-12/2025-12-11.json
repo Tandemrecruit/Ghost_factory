@@ -108,5 +108,145 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-11T03:59:13.110328",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 73.71,
+    "time_saved_seconds": 10726.29,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T03:59:24.102973",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-saas",
+    "duration_seconds": 23.74,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T03:59:50.173807",
+    "activity": "pipeline_architect",
+    "client_id": "demo-saas",
+    "duration_seconds": 49.82,
+    "time_saved_seconds": 7150.18,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:00:46.750810",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 10.07,
+    "time_saved_seconds": 10789.93,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:00:56.507714",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-saas",
+    "duration_seconds": 66.32,
+    "time_saved_seconds": 10733.68,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:02:00.563359",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 32.7,
+    "time_saved_seconds": 10767.3,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:04:23.868647",
+    "activity": "pipeline_visual_designer",
+    "client_id": "ember-roasters",
+    "duration_seconds": 22.66,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:04:56.516992",
+    "activity": "pipeline_architect",
+    "client_id": "ember-roasters",
+    "duration_seconds": 55.3,
+    "time_saved_seconds": 7144.7,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:05:51.053039",
+    "activity": "pipeline_copywriter",
+    "client_id": "ember-roasters",
+    "duration_seconds": 54.53,
+    "time_saved_seconds": 10745.47,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:07:16.226653",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 21.11,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:07:53.747882",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 58.63,
+    "time_saved_seconds": 7141.37,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:09:08.786411",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 75.03,
+    "time_saved_seconds": 10724.97,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:10:13.646730",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "duration_seconds": 11.95,
+    "time_saved_seconds": 3588.05,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T04:10:47.796827",
+    "activity": "pipeline_builder",
+    "client_id": "ember-roasters",
+    "duration_seconds": 296.74,
+    "time_saved_seconds": 14103.26,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

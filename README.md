@@ -47,23 +47,23 @@ ghost-factory/
 ├── design-system/
 │   └── manifest.md         # Component API reference
 ├── docs/                   # Documentation
-â”‚   â”œâ”€â”€ business/           # Business policies & offers
-â”‚   â”œâ”€â”€ internal/           # Technical guides
-â”‚   â””â”€â”€ operations/         # SOPs & checklists
-â”œâ”€â”€ lib/                    # TypeScript utilities
-â”‚   â”œâ”€â”€ utils.ts            # cn() helper
-â”‚   â”œâ”€â”€ icons.tsx           # Icon mapping
-â”‚   â”œâ”€â”€ metrics.ts          # Analytics tracking
-â”‚   â”œâ”€â”€ schema-validator.ts # Runtime validation
+│   ├── business/           # Business policies & offers
+│   ├── internal/           # Technical guides
+â”‚   â””â”€â”€ │   └── operations/         # SOPs & checklists
+├── lib/                    # TypeScript utilities
+│   ├── utils.ts            # cn() helper
+│   ├── icons.tsx           # Icon mapping
+│   ├── metrics.ts          # Analytics tracking
+│   ├── schema-validator.ts # Runtime validation
 â”‚   â””â”€â”€ ...                 # Additional utilities
-â”œâ”€â”€ prompts/                # AI agent prompts
-â”‚   â”œâ”€â”€ strategy/           # Industry-specific strategies
-â”‚   â”œâ”€â”€ critique/           # Review agent prompts
-â”‚   â””â”€â”€ design/             # Design generation prompts
-â”œâ”€â”€ tests/                  # Test suites
-â”‚   â”œâ”€â”€ *.py                # Python tests (pytest)
-â”‚   â””â”€â”€ ts/                 # TypeScript tests (vitest)
-â””â”€â”€ templates/              # Page templates
+├── prompts/                # AI agent prompts
+│   ├── strategy/           # Industry-specific strategies
+│   ├── critique/           # Review agent prompts
+â”‚   â””â”€â”€ │   └── design/             # Design generation prompts
+├── tests/                  # Test suites
+│   ├── *.py                # Python tests (pytest)
+â”‚   â””â”€â”€ │   └── ts/                 # TypeScript tests (vitest)
+â””└── └── templates/              # Page templates
 ```
 
 ## Getting Started
