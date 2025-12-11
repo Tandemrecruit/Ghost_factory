@@ -408,5 +408,95 @@
     "metadata": {
       "stage": "builder"
     }
+  },
+  {
+    "timestamp": "2025-12-11T06:24:02.925078",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 26.65,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:24:32.891480",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 56.61,
+    "time_saved_seconds": 7143.39,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:27:23.245026",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 170.34,
+    "time_saved_seconds": 10629.66,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:31:49.619055",
+    "activity": "pipeline_visual_designer",
+    "client_id": "demo-hvac",
+    "duration_seconds": 22.18,
+    "time_saved_seconds": 0.0,
+    "metadata": {
+      "stage": "visual_designer"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:33:20.881285",
+    "activity": "pipeline_architect",
+    "client_id": "demo-hvac",
+    "duration_seconds": 113.44,
+    "time_saved_seconds": 7086.56,
+    "metadata": {
+      "stage": "architect"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:35:39.537278",
+    "activity": "pipeline_copywriter",
+    "client_id": "demo-hvac",
+    "duration_seconds": 138.65,
+    "time_saved_seconds": 10661.35,
+    "metadata": {
+      "stage": "copywriter"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:36:45.639536",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "duration_seconds": 10.05,
+    "time_saved_seconds": 3589.95,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:39:48.680657",
+    "activity": "pipeline_qa",
+    "client_id": "demo-hvac",
+    "duration_seconds": 10.58,
+    "time_saved_seconds": 3589.42,
+    "metadata": {
+      "stage": "qa"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:39:48.708929",
+    "activity": "pipeline_builder",
+    "client_id": "demo-hvac",
+    "duration_seconds": 249.17,
+    "time_saved_seconds": 14150.83,
+    "metadata": {
+      "stage": "builder"
+    }
   }
 ]

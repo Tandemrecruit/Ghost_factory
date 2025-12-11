@@ -1288,5 +1288,45 @@
       "client_id": "demo-hvac",
       "attempt": 4
     }
+  },
+  {
+    "timestamp": "2025-12-11T06:36:45.652829",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple critical issues detected]\n\n1. **Missing Images/Logos (CRITICAL)**\n   - GE Appliances logo appears to be missing or not loaded at the top of the page\n   - Multiple section hero images appear as empty containers or placeholder areas throughout the page\n   - Testimonial/avatar images ar",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 1
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:37:52.637101",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: .temp/tmp7o1zg27s.tsx(64,73): error TS1005: ',' expected.\n.temp/tmp7o1zg27s.tsx(64,76): error TS1005: ',' expected.\n.temp/tmp7o1zg27s.tsx(64,81): error TS1005: ',' expected.\n.temp/tmp7o1zg27s.tsx(64,85): error TS1005: ',' expected.\n.temp/tmp7o1zg27s.tsx(64,92): error TS1005: ',' expected.\n.temp/tmp7",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 2
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:38:46.828643",
+    "category": "syntax",
+    "issue": "TypeScript compilation failed: .temp/tmpt8fv59c9.tsx(73,17): error TS2322: Type '\"flame\"' is not assignable to type 'IconName'.\n",
+    "fix": "Will retry with error feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 3
+    }
+  },
+  {
+    "timestamp": "2025-12-11T06:39:48.698634",
+    "category": "visual",
+    "issue": "Visual QA failed: FAIL: [Multiple critical issues detected]\n\n1. **Missing Images/Logos (CRITICAL)**\n   - Several sections appear to have empty image containers or missing visual assets\n   - Logo areas appear blank or not loaded properly\n   - Testimonial/avatar sections show no profile images\n   - Hero images or decor",
+    "fix": "Will retry with visual feedback",
+    "metadata": {
+      "client_id": "demo-hvac",
+      "attempt": 4
+    }
   }
 ]

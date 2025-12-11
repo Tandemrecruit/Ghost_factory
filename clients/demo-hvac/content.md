@@ -1,218 +1,359 @@
 # Comfort Breeze Heating & Air - Website Content
 
-## Hero Section
+## HERO SECTION
 
 ### Headline
-**Stop Sweating and Freezing in Your Own Home**
+**Stop Sweating and Freezing in Your Own House**
 
 ### Subheadline
-Sterling Heights' trusted HVAC team — honest pricing, on-time service, real comfort.
+Your neighbors in Sterling Heights trust Comfort Breeze for honest HVAC service—no surprises, no upsells
 
 ### Primary CTA
-**Call Now to Schedule Service**
+**Call Now: [Client to Provide Phone Number]**
 
 ### Secondary CTA
-**Request a Quote Online**
+[Request Service Online →](#contact-form)
 
-### Supporting Text
-*Phone number displays here - large, clickable format*
-
----
-
-## Trust Bar
-
-Four trust markers displayed horizontally with icons:
-
-- **Family-Owned & Operated**
-- **Licensed & Insured**
-- **Serving Sterling Heights**
-- **Same-Day Emergency Service**
+### Background Note
+*Design team: Use authentic photo of Comfort Breeze technician or local Sterling Heights home. Avoid generic stock imagery.*
 
 ---
 
-## Services Overview
+## TRUST INDICATORS BAR
 
-### Section Headline
-**Heating, Cooling & Air Quality Services for Your Home**
+**Licensed & Insured** | **Family-Owned & Local** | **Upfront Pricing—No Surprise Fees** | **Real Humans Answer the Phone**
+
+---
+
+## SERVICES OVERVIEW
+
+### Headline
+**HVAC Services That Keep Your Home Comfortable Year-Round**
 
 ### Service Cards
 
 #### AC Installation & Changeouts
-Upgrade to efficient cooling that actually keeps up.
+Efficient cooling systems sized right for your home—because one-size-fits-all never works in Michigan summers.
 
 #### Furnace Replacement & Repair
-Stay warm with a system that runs safely and reliably.
+Reliable heat when Michigan winters hit. We'll help you decide if repair or replacement makes more sense for your situation.
 
 #### Spring AC Tune-Ups
-Get ahead of the heat with a quick system check.
+Get ready before the heat waves arrive. A spring check catches small problems before they become expensive emergencies.
 
-#### Fall Furnace Inspections
-Prep your furnace before the first freeze.
+#### Fall Furnace Checks
+Ensure safe, efficient heating all season. Includes carbon monoxide safety inspection with every visit.
 
 #### Emergency No-Heat Service
-Furnace out? We offer same-day response.
+Same-day response when you need it most. We know a broken furnace in January can't wait until next week.
 
 #### Indoor Air Quality Options
-Breathe easier with cleaner air solutions.
+Cleaner air for healthier homes. We'll explain what makes sense for your family without overselling equipment you don't need.
+
+### Section CTA
+**Questions about what you need?** Call us—we'll explain your options clearly.  
+**Phone:** [Client to Provide Phone Number]
 
 ---
 
-## Why Choose Us
-
-### Section Headline
-**Why Homeowners Around Sterling Heights Call Us**
-
-### Honest, Upfront Pricing
-No surprise fees. We explain your options — good, better, and best — so you choose what's right for your budget.
-
-### Same Crew, Every Time
-We're a small local team. You'll see the same familiar faces, not a rotating cast of strangers.
-
-### We Fix, Not Push
-Need a repair? We'll repair it. We only recommend replacement when it truly makes sense — and we'll show you why.
-
----
-
-## How It Works
-
-### Section Headline
-**Getting Comfortable Is Easy**
-
-### Step 1: Call or Request Online
-Reach a real person during business hours. No phone trees, no runaround.
-
-### Step 2: We Inspect & Explain
-Our technician arrives on time, diagnoses the issue, and walks you through what we find.
-
-### Step 3: You Pick Your Option
-Choose the solution that fits your needs and budget. We get to work.
-
----
-
-## Safety Message
+## WHY CHOOSE US
 
 ### Headline
-**Your Family's Safety Matters to Us**
+**Why Sterling Heights Homeowners Choose Comfort Breeze**
 
-### Body Copy
-Every furnace inspection includes a carbon monoxide safety check. It's a quick step that gives you peace of mind — and it's part of every visit, not an upsell.
+### Feature 1: Honest Options, No Pressure
+We give you good, better, and best choices with upfront pricing. We'll tell you if a repair makes more sense than a replacement—because it's your money, not ours.
+
+### Feature 2: Small Crew, Familiar Faces
+You'll see the same local technicians who know your system. We're not a rotating cast of strangers—we're your neighbors.
+
+### Feature 3: We Actually Show Up
+Real humans answer during business hours. We arrive when we say we will. If something changes, we call you first.
 
 ---
 
-## Service Area
+## HOW IT WORKS
 
-### Section Headline
-**Proudly Serving Our Neighbors**
+### Headline
+**Getting Started Is Simple**
 
-### Communities We Serve
+### Step 1: Call or Request Online
+Reach out by phone or fill out our quick online form. We'll find a time that works for your schedule.
+
+### Step 2: We Inspect & Explain
+Our technician arrives on time, diagnoses the issue, and walks you through what we find—no confusing jargon.
+
+### Step 3: You Choose Your Option
+We present clear choices with upfront pricing. You decide what's right for your home and budget.
+
+### Section CTA
+**Ready to get started?**  
+[Call Now: Client to Provide Phone Number] or [Schedule Online →](#contact-form)
+
+---
+
+## SAFETY MESSAGE
+
+### Headline
+**Your Family's Safety Matters**
+
+### Copy
+A fall furnace tune-up isn't just about comfort—it includes a carbon monoxide check to make sure your system is running safely. It's one of those things that's easy to overlook but important to get right. We handle it as part of every inspection.
+
+---
+
+## SERVICE AREA
+
+### Headline
+**Proudly Serving Sterling Heights & Surrounding Communities**
+
+### Copy
+We're based in Sterling Heights and serve homeowners within about 30–40 minutes of our location. Communities we frequently serve include:
+
 - Sterling Heights
 - Warren
 - Troy
 - Shelby Township
 - Clinton Township
-- And surrounding communities within 30–40 minutes
+- Utica
+- Macomb Township
+- Rochester Hills
 
-### Supporting Text
-We're based right here in Sterling Heights — not a call center hours away.
+**Not sure if we cover your area?** Give us a call—we're happy to confirm we can reach you.
 
----
-
-## About Us / Meet the Team
-
-### Section Headline
-**Meet Your Local HVAC Team**
-
-### Body Copy
-Comfort Breeze is family-owned and operated right here in Sterling Heights. We're not a franchise or a big corporate outfit — just a small crew of HVAC pros who take pride in doing honest work for our neighbors.
-
-*Team photo placement: Insert authentic photo of owner and technicians here*
+*Note: Our service area does not include downtown Detroit.*
 
 ---
 
-## Final CTA Section
+## ABOUT / LOCAL STORY
 
 ### Headline
-**Ready to Get Comfortable?**
+**Local, Family-Owned, and Proud of It**
 
-### Subheadline
-Call now for same-day service or schedule your tune-up online.
+### Copy
+Comfort Breeze isn't a franchise or a call center. We're a small HVAC team based right here in Sterling Heights. When you call during business hours, you talk to a real person. When we come to your home, you'll see familiar faces who take pride in doing the job right.
 
-### Primary CTA
-**Call Now to Schedule Service**
+We believe in straightforward service: show up on time, explain your options clearly, and fix the problem without surprise fees. That's it. No gimmicks, no pressure—just honest work for our neighbors.
 
-### Secondary CTA
-**Request a Quote**
-
-### Supporting Text
-*Phone number displays prominently*
-
-Financing available for larger replacements — ask us for details.
+### Photo Note
+*Design team: Use authentic team photo or owner photo provided by client. Avoid stock imagery.*
 
 ---
 
-## Footer
+## TESTIMONIALS SECTION
 
-### Contact Information
-**Comfort Breeze Heating & Air**
+### Headline
+**What Our Neighbors Are Saying**
 
-Phone: *[Insert phone number]*
+### Content Note
+**[CLIENT ACTION REQUIRED]**
 
-Email: *[Insert email address]*
+This section is reserved for verified customer testimonials. Client intake indicates reviews are limited at this time. 
 
-Hours: *[Insert business hours]*
+**Options:**
+1. Client provides 2-3 verified testimonials with customer permission to publish (name, city, and quote)
+2. Link to verified Google Reviews profile if available
+3. Remove section entirely until testimonials are collected
 
-Address: Sterling Heights, MI
-
-### Quick Links
-- AC Services
-- Furnace Services
-- Tune-Ups & Maintenance
-- Emergency Service
-- Service Area
-
-### Service Area Footer
-Serving Sterling Heights, Warren, Troy, Shelby Township, Clinton Township, and surrounding communities.
-
-### Legal
-Licensed & Insured | Michigan License Number on File
-
-© Comfort Breeze Heating & Air. All rights reserved.
+**DO NOT use fabricated testimonials or unverified reviews.**
 
 ---
 
-## Implementation Notes
+## CONTACT & SCHEDULING
 
-### Color Usage Guidelines
-- **Primary Blue (#1E4A7C)**: Main headlines, navigation, footer background
-- **Secondary Blue (#4A90C2)**: Section backgrounds, supporting elements, icons
-- **Accent Orange (#E86F2C)**: Primary CTA buttons, phone number, urgency indicators
-- **Neutral White/Light Gray**: Page background, card backgrounds
-- **Text Dark (#1A1A1A)**: All body copy
+### Headline
+**Let's Fix Your Comfort Problem**
 
-### CTA Button Specifications
-- **Primary buttons**: Orange background, white text, prominent size
-- **Secondary buttons**: White/transparent background, blue border, blue text
-- **Phone number display**: Orange color, large font size, clickable on mobile
+### Contact Information Block
 
-### Image Placeholders
-- Hero: Authentic photo of technician greeting homeowner at door OR comfortable home interior
-- About section: Real team photo (to be provided by client)
-- Service cards: Simple, professional icons (avoid generic stock)
-- Trust bar: Minimal, professional icons for each trust marker
+#### Call Us
+**[Client to Provide Phone Number]**
 
-### Mobile Optimization Notes
-- Phone number sticky at top on mobile scroll
-- CTA buttons full-width on mobile
-- Service cards stack vertically
-- Trust bar elements stack if needed on smallest screens
+Real humans answer during business hours.
 
-### Form Details (for "Request a Quote" CTA)
-When visitor clicks "Request a Quote" button, capture:
-- Name
-- Phone number
+#### Business Hours
+**[Client to Provide Business Hours]**
+
+Monday – Friday: [Hours]  
+Saturday: [Hours]  
+Sunday: [Status]
+
+#### Email
+[Client to Provide Email Address]
+
+We respond within 1 business day.
+
+---
+
+## SERVICE REQUEST FORM
+
+### Form Headline
+**Request Service Online**
+
+### Form Instructions
+Fill out the form below and we'll get back to you within 1 business day to schedule your appointment.
+
+### Form Fields
+
+**Full Name** (required)  
+[Text input field]
+
+**Phone Number** (required)  
+[Phone input field]
+
+**Email Address** (required)  
+[Email input field]
+
+**Street Address** (required)  
+[Text input field]
+
+**City** (required)  
+[Text input field]
+
+**What service do you need?** (required)  
+[Dropdown menu]
+- AC Tune-Up or Repair
+- Furnace Tune-Up or Repair
+- Emergency No-Heat Service
+- AC Installation/Replacement
+- Furnace Installation/Replacement
+- Indoor Air Quality
+- Not Sure—Need Advice
+
+**Tell us more about your situation** (optional)  
+[Text area - 3-4 lines]  
+*Example: "AC not cooling upstairs rooms" or "Furnace making strange noise"*
+
+**Preferred contact method**  
+[Radio buttons]
+- Phone Call
 - Email
-- Service needed (dropdown)
-- Brief description (optional text field)
-- Preferred contact method
+- Either is fine
 
-Keep form short — 5 fields maximum to reduce friction.
+**When is the best time to reach you?**  
+[Checkbox options]
+- Morning (8am-12pm)
+- Afternoon (12pm-5pm)
+- Evening (5pm-7pm)
+
+[Submit Button: "Request Service"]
+
+### Form Confirmation Message
+**Thank you for contacting Comfort Breeze!**
+
+We've received your service request and will get back to you within 1 business day to schedule your appointment. If you need immediate assistance, please call us at [Phone Number].
+
+---
+
+## STICKY MOBILE CTA
+
+### Mobile Navigation Bar (Fixed Position)
+**Call Now: [Client Phone Number]** [Phone icon button]  
+**Request Service** [Form icon button]
+
+*Note to developer: This element should remain visible when user scrolls on mobile devices.*
+
+---
+
+## FOOTER
+
+### Column 1: Company Info
+**Comfort Breeze Heating & Air**  
+Sterling Heights, MI
+
+Licensed & Insured
+
+### Column 2: Quick Links
+- [Services](#services)
+- [Service Area](#service-area)
+- [About Us](#about)
+- [Contact](#contact-form)
+
+### Column 3: Contact
+**Phone:** [Client to Provide Phone Number]  
+**Email:** [Client to Provide Email]
+
+**Hours:**  
+[Client to Provide Business Hours]
+
+### Column 4: Connect
+**[CLIENT ACTION REQUIRED]**
+
+If client has active social media or review profiles to link, provide:
+- Facebook page URL
+- Google Business Profile URL
+- Other verified platforms
+
+If not available, remove this column from footer.
+
+### Footer Bottom Bar
+© [Current Year] Comfort Breeze Heating & Air. All rights reserved.
+
+---
+
+## CONTENT IMPLEMENTATION NOTES FOR CLIENT
+
+### Required Information Before Launch:
+
+1. **Primary Phone Number** (appears 10+ times throughout site)
+2. **Business Email Address** (footer contact)
+3. **Business Hours** (contact section and footer)
+4. **Team/Owner Photo** (About section - authentic photo preferred)
+5. **Technician or Local Home Photo** (Hero section background)
+
+### Optional Elements Requiring Client Decision:
+
+1. **Testimonials Section**
+   - Provide 2-3 verified customer testimonials with permission to publish (name, city, quote)
+   - OR provide link to Google Reviews profile if available
+   - OR remove section until testimonials are collected
+
+2. **Social Media Links** (Footer)
+   - Provide URLs for Facebook, Google Business Profile, or other active platforms
+   - OR remove "Connect" column if not applicable
+
+3. **Service Request Form Destination**
+   - Confirm email address where form submissions should be sent
+   - OR provide integration with scheduling software if applicable
+
+### Content Compliance Verification:
+
+✅ **No fabricated statistics or claims**  
+✅ **No unverified testimonials**  
+✅ **No fake "years in business" claims**  
+✅ **No made-up review ratings**  
+✅ **No placeholder text left in final version**  
+✅ **All promotional offers verified with client**  
+
+---
+
+## DESIGN & BRAND GUIDANCE
+
+### Color Palette (To Be Confirmed with Client)
+- **Primary Blue:** Calming medium blue (suggest: #2B6CB0 range)
+- **Accent Blue:** Darker blue for contrast (suggest: #1E4E7E range)
+- **Heat/Energy Accent:** Orange (suggest: #F56A2C range) - use for CTA buttons
+- **Neutrals:** White/light gray backgrounds, dark gray for body text
+
+### Typography Recommendations
+- **Headlines:** Bold, clean sans-serif (friendly but professional)
+- **Body Copy:** Highly readable sans-serif, adequate line height
+- **Avoid:** Overly technical fonts or script fonts that reduce readability
+
+### Image Requirements
+- **Authentic photos preferred:** Real team members, real local homes
+- **Avoid:** Generic stock photography, models who don't look like actual technicians
+- **Technical shots:** Clear images of HVAC equipment if needed for service cards
+- **All images:** High resolution, optimized for web performance
+
+### Voice & Tone Guidelines
+- **Conversational but competent:** Talk like a trusted neighbor, not a corporate call center
+- **Honest and straightforward:** No hype, no pressure tactics
+- **Educational without condescension:** Explain without jargon
+- **Local pride:** Reference Sterling Heights, Michigan winters, community connection
+
+---
+
+**END OF CONTENT DOCUMENT**
+
+*This content is ready for design and development once client provides required information listed in Implementation Notes section.*
